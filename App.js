@@ -13,6 +13,7 @@ import Create from './screens/Create';
 import Notification from './screens/Notification';
 import Profile from './screens/Profile';
 import Login from './screens/Login';
+import Search from './screens/Search';
 
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { slides } from './utils/onboarding';
@@ -64,7 +65,7 @@ export default function App() {
         <Tab.Screen name='Home' options={{ headerShown: false }} component={Home}/>
         <Tab.Screen name='Notification' options={{ headerShown: false }} component={Notification}/>
         <Tab.Screen name='Create' options={{ headerShown: false }} component={Create}/>
-        <Tab.Screen name='Login' options={{ headerShown: false }} component={Login}/>
+        <Tab.Screen name='Search' options={{ headerShown: false }} component={Search}/>
         <Tab.Screen name='Profile' options={{ headerShown: false }} component={Profile}/>
       </Tab.Navigator>
     </NavigationContainer>
