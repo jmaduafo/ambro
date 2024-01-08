@@ -23,9 +23,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignContent: 'center',
         justifyContent: 'center',
+        paddingBottom: 80,
         backgroundColor: COLORS.backgroundFull,
-        paddingLeft: 30,
-        paddingRight: 30
+        paddingLeft: 40,
+        paddingRight: 40
     },
     text: {
         color: COLORS.textColorFull
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Boska-Medium',
         fontSize: 28,
         color: COLORS.textColorFull,
-        marginTop: 10,
+        marginTop: -10,
         marginBottom: 15,
         textAlign: 'center'
     },
