@@ -10,7 +10,7 @@ import Create from "../screens/Create";
 import Notification from "../screens/Notification";
 import Profile from "../screens/Profile";
 import Search from "../screens/Search";
-import { COLORS } from '../constant/default';
+import { COLORS, SHADOW } from '../constant/default';
 
 const Root = () => {
     const Tab = createBottomTabNavigator();
@@ -67,12 +67,16 @@ const Root = () => {
             tabBarShowLabel: false,
             tabBarStyle: {
               backgroundColor: COLORS.backgroundLight,
-              borderTopColor: COLORS.textColorFull,
-              borderRightColor: COLORS.textColorFull,
-              borderLeftColor: COLORS.textColorFull,
+              borderTopColor: COLORS.backgroundLight,
+              shadowColor: SHADOW.color,
+              shadowOffset: {width: -4, height: 0},
+              shadowOpacity: SHADOW.opacity,
+              shadowRadius: SHADOW.radius,
+              // borderRightColor: COLORS.textColorFull,
+              // borderLeftColor: COLORS.textColorFull,
               borderTopWidth: 1,
-              borderRightWidth: 1,
-              borderLeftWidth: 1,
+              // borderRightWidth: 1,
+              // borderLeftWidth: 1,
             //   borderTopRightRadius: 30,
             //   borderTopLeftRadius: 30,
               height: 90
