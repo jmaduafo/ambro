@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { COLORS } from '../constant/default'
 import generalStyles from '../constant/generalStyles'
+import ProviderButtons from '../components/ProviderButtons'
+import pic from '../assets/adaptive-icon.png'
+import { AntDesign } from '@expo/vector-icons';
 
-const Login = () => {
+const Login = ({navigation}) => {
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
 
@@ -36,6 +39,16 @@ const Login = () => {
               secureTextEntry={true}
             />
           </View>
+        </View>
+        <ProviderButtons text={'Sign In With Google'} image={pic} />
+        <View style={generalStyles.loginSignupBottom}>
+          <Pressable onPress={() => navigation.navigate('SignUp')}>
+            <Text style={generalStyles.loginSignupBottomText}>Register instead</Text>
+          </Pressable>
+          <TouchableOpacity style={generalStyles.loginSignUpButton}>
+            <AntDesign name="arrowright" size={24} color={COLORS.backgroundFull} />
+            <Text style={generalStyles.loginSignUpButtonText}>Log In</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

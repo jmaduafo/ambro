@@ -11,14 +11,14 @@ const generalStyles = StyleSheet.create({
         paddingRight: 30
     },
     loginSignupTitle: {
-        paddingTop: 200,
+        paddingTop: 160,
         marginBottom: 80,
         fontFamily: 'Boska-Medium',
         fontSize: 26,
         color: COLORS.textColorFull
     },
     loginSignupInputSection: {
-        marginBottom: 20
+        marginBottom: 15
     },
     loginSignupLabel: {
         fontFamily: 'Satoshi-Regular',
@@ -42,15 +42,29 @@ const generalStyles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 30,
     },
     loginSignUpButton: {
         backgroundColor: COLORS.textColorFull,
         borderRadius: 40,
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-around'
-
+        justifyContent: 'space-between',
+        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        gap: 40
+    },
+    loginSignupBottomText: {
+        fontFamily: 'Satoshi-Regular',
+        color: COLORS.textColor75,
+        fontSize: 14
+    },
+    loginSignUpButtonText: {
+        fontFamily: 'Satoshi-Regular',
+        fontSize: 16,
+        color: COLORS.backgroundFull
     }
 })
 
