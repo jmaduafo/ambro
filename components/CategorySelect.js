@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
+import pic from '../assets/adaptive-icon.png'
 
 const CategorySelect = ({category}) => {
   return (
     <View style={styles.rounded}>
       <View style={styles.interior}>
         <Image
+        source={pic}
+        style={{ width: '70%', height: '70%', borderRadius: 40}}
             resizeMode='contain'/>
       </View>
       <Text style={styles.text}>{category.length > 15 ? category.substring(0, 15) + '...' : category}</Text>
@@ -20,8 +23,8 @@ const styles = StyleSheet.create({
     rounded: {
         borderRadius: 40,
         backgroundColor: COLORS.backgroundLight,
-        width: 100,
-        height: 160,
+        width: 90,
+        height: 150,
         display: 'flex',
         alignItems: 'center',
         shadowColor: SHADOW.color,
@@ -33,8 +36,11 @@ const styles = StyleSheet.create({
     },
     interior: {
         borderRadius: 40,
-        width: 95,
-        height: 95,
+        width: 85,
+        height: 85,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: COLORS.textColorFull 
     },
     text: {

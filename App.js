@@ -15,6 +15,7 @@ import { slides } from "./utils/onboarding";
 import OnboardingSlide from "./components/OnboardingSlide";
 import OnboardingButton from "./components/OnboardingButton";
 import Root from "./components/Root";
+import Profile from "./screens/Profile";
 
 export default function App({navigation}) {
   const [showHome, setShowHome] = useState(true);
@@ -58,10 +59,11 @@ export default function App({navigation}) {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Root">
+        <Stack.Navigator initialRouteName="Login">
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
             <Stack.Screen name="SignUp" component={SignUp}  options={{ headerShown: false }} />
             <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />
+            <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />  
         </Stack.Navigator>
       </NavigationContainer>
     </>

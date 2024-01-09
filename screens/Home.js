@@ -1,24 +1,31 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import React from 'react'
-import Root from '../components/Root'
 import { COLORS } from '../constant/default'
 import PopularCategories from '../components/Home/PopularCategories'
 import TopDisplay from '../components/Home/TopDisplay'
 import NewRecipes from '../components/Home/NewRecipes'
 
-const Home = () => {
+const Home = ({navigation}) => {
   return (
     <View style={ styles.background }>
-      <SafeAreaView style={{ display: 'flex' }}>
-        <View style={{ paddingLeft: 30, paddingLeft: 30, paddingTop: 50}}>
-          <Text style={[ styles.openingText, { marginBottom: -10 } ]}>Good morning,</Text>
-          <Text style={ styles.openingText }>Kaycee</Text>
+      <SafeAreaView>
+        <View style={styles.intro}>
+          <View>
+            <Text style={[ styles.openingText, { marginTop: 20, marginBottom: -10 } ]}>Good morning,</Text>
+            <Text style={ styles.openingText }>Kaycee</Text>
+          </View>
+          <TouchableOpacity style={styles.profileContainer} onPress={() => navigation.navigate('Profile')}>
+            <View style={styles.profile}>
+            </View>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
       <View style={ styles.mainSection }>
-        <PopularCategories/>
-        <TopDisplay/>
-        <NewRecipes/>
+        <ScrollView>
+          <PopularCategories/>
+          <TopDisplay/>
+          <NewRecipes/>
+        </ScrollView>
       </View>
     </View>
   )
@@ -31,19 +38,34 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.textColorFull,
     flex: 1
   },
+  intro: {
+    display: 'flex',
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingTop: 40,
+    gap: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  profile: {
+    width: 60,
+    height: 60,
+    borderRadius: '50%',
+    backgroundColor: '#fff',
+  },
   openingText: {
     fontFamily: 'Boska-Medium',
     fontSize: 36,
     color: COLORS.backgroundFull
   },
   mainSection: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     backgroundColor: COLORS.backgroundFull,
-    marginTop: 50,
+    marginTop: 40,
     padding: 30,
     paddingRight: 0,
-    paddingTop: 10,
+    paddingTop: 0,
     flex: 1
   }
 })
