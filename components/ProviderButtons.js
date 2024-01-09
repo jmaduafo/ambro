@@ -8,7 +8,7 @@ const ProviderButtons = ({text, image}) => {
         <Image
         source={image}
         resizeMode='contain'
-        style={{ width: 40, height: 40 }}/>
+        style={{ width: 30, height: 30 }}/>
         <Text style={{ fontSize: 14, color: '#404040'}}>{text}</Text>
     </View>
   )

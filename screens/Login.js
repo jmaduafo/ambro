@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { COLORS } from '../constant/default'
 import generalStyles from '../constant/generalStyles'
 import ProviderButtons from '../components/ProviderButtons'
-import pic from '../assets/adaptive-icon.png'
+import pic from '../assets/images/search.png'
 import { AntDesign } from '@expo/vector-icons';
 
 const Login = ({navigation}) => {
