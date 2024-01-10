@@ -8,7 +8,7 @@ const TopDisplay = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [top, setTop] = useState('featured')
+  const [topName, setTopName] = useState('Featured')
 
 //   useEffect(function() {
 //     setLoading(true)
@@ -33,16 +33,24 @@ const TopDisplay = () => {
     
 // }, [])
 
-  function topSelect({text}) {
-    setTop(text)
-    console.log(top)
+const topSelectors = ['Featured', 'Recommended', 'Hot']
+
+  function topSelect(name) {
+    setTopName(name)
   }
   return (
     <View style={styles.section}>
       <View style={styles.slide}>
-        <Text style={styles.slideText} onPress={topSelect}>Featured</Text>
-        <Text style={styles.slideText} onPress={topSelect}>Recommended</Text>
-        <Text style={styles.slideText} onPress={topSelect}>Hot</Text>
+        {topSelectors.map(top => {
+          return (
+            <>
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+              <Text onPress={() => topSelect(top)}  key={top} style={top === topName ? styles.slideTextSelected : styles.slideText}>{top}</Text>
+              <View style={ top === topName ? styles.underline : styles.noUnderline }></View>
+            </View>
+            </>
+          )
+        })}
       </View>
       <View style={styles.colSection}>
         <View style={styles.col1}>
@@ -76,10 +84,27 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10
   },
-  slideText: {
+  slideTextSelected: {
     fontFamily: 'Satoshi-Regular',
     color: COLORS.textColorFull,
-    // backgroundColor: 'black',
+  },
+  slideText: {
+    fontFamily: 'Satoshi-Regular',
+    color: COLORS.textColor50,
+  },
+  underline: {
+    width: '30%',
+    height: 2,
+    borderRadius: 4,
+    backgroundColor: COLORS.textColorFull,
+    marginTop: 3
+  },
+  noUnderline: {
+    width: '0%',
+    height: 2,
+    borderRadius: 4,
+    backgroundColor: COLORS.textColorFull,
+    marginTop: 3
   },
   colSection: {
     flexDirection: 'row',

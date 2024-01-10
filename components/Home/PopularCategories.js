@@ -6,32 +6,6 @@ import axios from 'axios';
 import { categories } from '../../utils/popularCategories';
 
 const PopularCategories = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-//   useEffect(function() {
-//     setLoading(true)
-
-//     async function getData() {
-//       try{
-//         const response = await axios.get('https://www.themealdb.com/api/json/v1/1/categories.php')
-
-//         if (response && response?.data) {
-//           setData(response?.data?.categories)
-//           console.log(data)
-//         }
-//       } catch(err) {
-//         console.log(err.message)
-//       }
-        
-//     }
-
-//     getData()
-
-//     setLoading(false)
-    
-// }, [])
 
   return (
     <View style={{ paddingBottom: 10 }}>
