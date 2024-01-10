@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, TextInput, Pressable } from 'react-native'
 import React from 'react'
 import { COLORS } from '../constant/default'
 import PopularCategories from '../components/Home/PopularCategories'
 import TopDisplay from '../components/Home/TopDisplay'
 import NewRecipes from '../components/Home/NewRecipes'
+import SearchEngine from '../components/SearchEngine'
+
 
 const Home = ({navigation}) => {
   return (
@@ -19,9 +21,11 @@ const Home = ({navigation}) => {
             </View>
           </TouchableOpacity>
         </View>
+        <SearchEngine marginTop={20} />
       </SafeAreaView>
       <View style={ styles.mainSection }>
-        <ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}>
           <PopularCategories/>
           <TopDisplay/>
           <NewRecipes/>
@@ -42,7 +46,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     paddingLeft: 30,
     paddingRight: 30,
-    paddingTop: 40,
+    paddingTop: 20,
     gap: 30,
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     backgroundColor: COLORS.backgroundFull,
-    marginTop: 40,
+    marginTop: 20,
     padding: 30,
     paddingRight: 0,
     paddingTop: 0,

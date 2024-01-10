@@ -1,18 +1,19 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
 import pic from '../assets/adaptive-icon.png'
 
-const CategorySelect = ({category}) => {
+const CategorySelect = ({image, category}) => {
   return (
     <View style={styles.rounded}>
-      <View style={styles.interior}>
+      <TouchableOpacity style={styles.interior}>
         <Image
-        source={pic}
-        style={{ width: '70%', height: '70%', borderRadius: 40}}
-            resizeMode='contain'/>
-      </View>
-      <Text style={styles.text}>{category.length > 15 ? category.substring(0, 15) + '...' : category}</Text>
+        source={image}
+        style={{ width: '50%', height: '50%'}}
+        resizeMode='contain'
+        />
+      </TouchableOpacity>
+      <Text style={styles.text}>{category.length > 8 ? category.substring(0, 8) + '...' : category}</Text>
     </View>
   )
 }
@@ -23,21 +24,22 @@ const styles = StyleSheet.create({
     rounded: {
         borderRadius: 40,
         backgroundColor: COLORS.backgroundLight,
-        width: 90,
-        height: 150,
+        width: 80,
+        height: 130,
         display: 'flex',
         alignItems: 'center',
         shadowColor: SHADOW.color,
         shadowOffset: {width: SHADOW.offsetWidth, height: SHADOW.offsetHeight},
         shadowOpacity: SHADOW.opacity,
         shadowRadius: SHADOW.radius,
-        paddingLeft: 5,
-        paddingRight: 5
+        paddingLeft: 7,
+        paddingRight: 7,
+        marginRight: 20
     },
     interior: {
         borderRadius: 40,
-        width: 85,
-        height: 85,
+        width: 75,
+        height: 75,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -46,7 +48,7 @@ const styles = StyleSheet.create({
     text: {
         fontFamily: 'Satoshi-Regular',
         color: COLORS.textColorFull,
-        marginTop: 20,
+        marginTop: 10,
         textAlign: 'center'
     }
 })

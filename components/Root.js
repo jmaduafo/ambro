@@ -16,7 +16,7 @@ const Root = () => {
     const Tab = createBottomTabNavigator();
 
   return (
-    
+        // BOTTOM TAB NAVIGATION
         <Tab.Navigator initialRouteName='Home'
         screenOptions={({ route }) => ({
             headerShown: false,
@@ -72,13 +72,7 @@ const Root = () => {
               shadowOffset: {width: -4, height: 0},
               shadowOpacity: SHADOW.opacity,
               shadowRadius: SHADOW.radius,
-              // borderRightColor: COLORS.textColorFull,
-              // borderLeftColor: COLORS.textColorFull,
               borderTopWidth: 1,
-              // borderRightWidth: 1,
-              // borderLeftWidth: 1,
-            //   borderTopRightRadius: 30,
-            //   borderTopLeftRadius: 30,
               height: 90
             },
           })}>
