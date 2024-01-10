@@ -1,15 +1,48 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState} from 'react'
 import { COLORS, SHADOW } from '../../constant/default'
 import { AntDesign } from '@expo/vector-icons';
 
 const TopDisplay = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [top, setTop] = useState('featured')
+
+//   useEffect(function() {
+//     setLoading(true)
+
+//     async function getData() {
+//       try{
+//         const response = await axios.get('https://www.themealdb.com/api/json/v1/1/categories.php')
+
+//         if (response && response?.data) {
+//           setData(response?.data?.categories)
+//           console.log(data)
+//         }
+//       } catch(err) {
+//         console.log(err.message)
+//       }
+        
+//     }
+
+//     getData()
+
+//     setLoading(false)
+    
+// }, [])
+
+  function topSelect({text}) {
+    setTop(text)
+    console.log(top)
+  }
   return (
     <View style={styles.section}>
       <View style={styles.slide}>
-        <Text style={styles.slideText}>Featured</Text>
-        <Text style={styles.slideText}>Recommended</Text>
-        <Text style={styles.slideText}>Hot</Text>
+        <Text style={styles.slideText} onPress={topSelect}>Featured</Text>
+        <Text style={styles.slideText} onPress={topSelect}>Recommended</Text>
+        <Text style={styles.slideText} onPress={topSelect}>Hot</Text>
       </View>
       <View style={styles.colSection}>
         <View style={styles.col1}>
