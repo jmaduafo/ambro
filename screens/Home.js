@@ -30,7 +30,7 @@ const Home = ({navigation}) => {
             </View>
           </TouchableOpacity>
         </View>
-        <SearchEngine marginTop={20} />
+        <SearchEngine marginTop={20} placeholderText={'What would you like to cook today?'}/>
       </SafeAreaView>
       <View style={ styles.mainSection }>
         <ScrollView

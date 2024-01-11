@@ -43,12 +43,10 @@ const topSelectors = ['Featured', 'Recommended', 'Hot']
       <View style={styles.slide}>
         {topSelectors.map(top => {
           return (
-            <>
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-              <Text onPress={() => topSelect(top)}  key={top} style={top === topName ? styles.slideTextSelected : styles.slideText}>{top}</Text>
+            <View key={top} style={{ flexDirection: 'column', alignItems: 'center' }}>
+              <Text onPress={() => topSelect(top)} style={top === topName ? styles.slideTextSelected : styles.slideText}>{top}</Text>
               <View style={ top === topName ? styles.underline : styles.noUnderline }></View>
             </View>
-            </>
           )
         })}
       </View>

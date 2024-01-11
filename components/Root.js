@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,6 +14,8 @@ import { COLORS, SHADOW } from '../constant/default';
 
 const Root = () => {
     const Tab = createBottomTabNavigator();
+
+    const [ selectedCat, setSelectedCat ] = useState(null)
 
   return (
         // BOTTOM TAB NAVIGATION
@@ -82,6 +84,7 @@ const Root = () => {
               title: "Feed",
             }}
             component={Home}
+            initialParams={''}
           />
           <Tab.Screen
             name="Notification"
@@ -89,6 +92,7 @@ const Root = () => {
               title: "Notification",
             }}
             component={Notification}
+            initialParams={''}
           />
           <Tab.Screen
             name="Create"
@@ -96,6 +100,7 @@ const Root = () => {
               title: ""
             }}
             component={Create}
+            initialParams={''}
             
           />
           <Tab.Screen
@@ -104,6 +109,7 @@ const Root = () => {
               title: "Search"
             }}
             component={Search}
+            initialParams={''}
           />
           <Tab.Screen
             name="Profile"
@@ -111,6 +117,7 @@ const Root = () => {
               title: "Profile",
             }}
             component={Profile}
+            initialParams={''}
           />
         </Tab.Navigator>
   )

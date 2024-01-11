@@ -3,11 +3,11 @@ import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
 import { Ionicons } from '@expo/vector-icons';
 
-const SearchEngine = ({ marginTop }) => {
+const SearchEngine = ({ marginTop, placeholderText }) => {
   return (
     <View style={[ styles.searchSection, { marginTop: marginTop } ]}>
         <TextInput
-            placeholder='What would you like to cook today?'
+            placeholder={placeholderText}
             placeholderTextColor={COLORS.textColor50}
             style={styles.searchInput}/>
         <Pressable style={styles.searchButton}>
