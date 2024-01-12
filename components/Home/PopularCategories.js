@@ -1,10 +1,11 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, ActivityIndicator, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import HeaderTitle from "../HeaderTitle";
 import CategorySelect from "../CategorySelect";
 import { categories } from "../../utils/popularCategories";
 import axios from "axios";
 import CategoryDisplay from "../CategoryDisplay";
+import { COLORS } from "../../constant/default";
 
 const PopularCategories = () => {
   const [ selectedCategory, setSelectedCategory ] = useState('Beef')
@@ -40,7 +41,7 @@ const PopularCategories = () => {
       {/* <HeaderTitle title={"popular categories"} /> */}
       
       <View>
-        {categories?.length ? (
+        {categories?.length && !loading ? (
           <FlatList
             data={categories}
             renderItem={({ item, index }) => (
@@ -65,7 +66,10 @@ const PopularCategories = () => {
             ItemSeparatorComponent={() => <View style={{ height: 140 }}></View>}
           />
         ) :
-        <View style={{ backgroundColor: 'black'}}></View>}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size='small' color={COLORS.textColor75}/>
+        </View>
+        }
       </View>
       <View style={styles.display}>
         {categoryDisplay?.length ? (
@@ -91,7 +95,10 @@ const PopularCategories = () => {
             // ItemSeparatorComponent={() => <View style={{ height: 140 }}></View>}
           />
         ) :
-        <View style={{ backgroundColor: 'black'}}></View>}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size='small' color={COLORS.textColor75}/>
+        </View>
+        }
       </View>
     </View>
   );
