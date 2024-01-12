@@ -15,7 +15,8 @@ export default HeaderTitle
 const styles = StyleSheet.create({
     position: {
         marginBottom: 20,
-        marginTop: 40
+        marginTop: 40,
+        paddingLeft: 30
     },
     text: {
         fontFamily: 'Satoshi-Medium',

@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 40,
     backgroundColor: COLORS.backgroundFull,
     marginTop: 20,
-    paddingLeft: 30,
+    // paddingLeft: 30,
     paddingRight: 0,
     paddingTop: 0,
     flex: 1

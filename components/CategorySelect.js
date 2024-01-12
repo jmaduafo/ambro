@@ -33,8 +33,7 @@ const styles = StyleSheet.create({
         shadowOpacity: SHADOW.opacity,
         shadowRadius: SHADOW.radius,
         paddingLeft: 7,
-        paddingRight: 7,
-        marginRight: 20
+        paddingRight: 7,        
     },
     interior: {
         borderRadius: 40,

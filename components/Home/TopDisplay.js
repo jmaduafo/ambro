@@ -51,7 +51,8 @@ export default TopDisplay
 const styles = StyleSheet.create({
   section: {
     marginTop: 40,
-    paddingRight: 30
+    paddingRight: 30,
+    paddingLeft: 30
   },
   slide: {
     justifyContent: 'space-between',
