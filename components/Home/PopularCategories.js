@@ -70,12 +70,12 @@ const PopularCategories = () => {
       <View style={styles.display}>
         {categoryDisplay?.length ? (
           <FlatList
-            data={categoryDisplay?.slice(0, 12)}
+            data={categoryDisplay}
             renderItem={({ item, index }) => (
               <View
               style={{
                 marginLeft: index === 0 ? 30 : 7,
-                marginRight: index + 1 === 12 ? 30 : 7,
+                marginRight: index + 1 === categoryDisplay?.length ? 30 : 7,
               }}
               >
                 <CategoryDisplay
@@ -84,7 +84,7 @@ const PopularCategories = () => {
                 />
               </View>
         )}
-            keyExtractor={(item) => item.idCategory}
+            keyExtractor={(item) => item.idMeal}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             horizontal

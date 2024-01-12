@@ -7,39 +7,42 @@ import { HeartIcon, ClockIcon } from 'react-native-heroicons/outline'
 const CategoryDisplay = ({ title, duration, backgroundImage, profileImage, username}) => {
   return (
     <View style={[styles.background]}>
+        {/* BACKGROUND IMAGE */}
         <View style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, objectFit: 'cover', zIndex: -1}}>
             <Image 
             source={{ uri: backgroundImage }}
             resizeMode='cover'
             style={{ width: '100%', height: '100%', borderRadius: 30 }}/>
         </View>
-      <Cover radius={30}/>
-      <View style={styles.label}>
-        <View style={{ flex: 4 }}>
-            {username && username.length && 
-            <View style={styles.user}>
-                <View style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover'}}>
-                <Image 
-                    source={{ uri: profileImage }}
-                    resizeMode='contain'
-                    style={{ width: '100%', height: '100%'}}/>
+        <Cover radius={30}/>
+        {/* USER CREDENTIALS WITH USERNAME AND PROFILE PIC */}
+        <View style={styles.label}>
+            <View style={{ flex: 4 }}>
+                {username && username.length && 
+                <View style={styles.user}>
+                    <View style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover'}}>
+                    <Image 
+                        source={{ uri: profileImage }}
+                        resizeMode='contain'
+                        style={{ width: '100%', height: '100%', borderRadius: '50%'}}/>
+                    </View>
+                    <Text style={styles.userText}>{username}</Text>
                 </View>
-                <Text style={styles.userText}>{username}</Text>
+                }
+                <Text style={styles.title}>{title && title.length > 23 ? title.substring(0, 23) + '...' : title}</Text>
+                {duration &&
+                <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
+                    <ClockIcon color={COLORS.backgroundFull} size={14}/>
+                    <Text style={styles.duration}>{duration}</Text>
+                </View>
+                }
             </View>
-            }
-            <Text style={styles.title}>{title && title.length > 23 ? title.substring(0, 23) + '...' : title}</Text>
-            {duration &&
-            <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-                <ClockIcon color={COLORS.backgroundFull} size={14}/>
-                <Text style={styles.duration}>{duration}</Text>
+            {/* HEART ICON */}
+            <View style={{ flex: 1 }}>
+                <HeartIcon color={COLORS.backgroundFull} size={24}/>
             </View>
-            }
+            
         </View>
-        <View style={{ flex: 1 }}>
-            <HeartIcon color={COLORS.backgroundFull} size={24}/>
-        </View>
-        
-      </View>
     </View>
   )
 }

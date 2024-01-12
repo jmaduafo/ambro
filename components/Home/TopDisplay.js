@@ -2,6 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import React, { useEffect, useState} from 'react'
 import { COLORS, SHADOW } from '../../constant/default'
 import { AntDesign } from '@expo/vector-icons';
+import HeaderTitle from '../HeaderTitle';
+import { HeartIcon } from 'react-native-heroicons/outline';
 
 const TopDisplay = () => {
   const [data, setData] = useState(null);
@@ -27,13 +29,14 @@ const TopDisplay = () => {
           )
         })}
       </View>
+      {/* <HeaderTitle title={'featured'} featured={'yes'}/> */}
       <View style={styles.colSection}>
         <View style={styles.col1}>
           <TouchableOpacity style={styles.col1Profile} >
             <Image/>
           </TouchableOpacity>
           <View style={styles.col1Heart}>
-            <AntDesign name="hearto" size={35} color={COLORS.textColorFull} />
+            <HeartIcon size={35} color={COLORS.textColorFull} />
           </View>
 
         </View>
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 240,
     gap: 10,
-    marginTop: 20
+    marginTop: 20,
   },
   col1: {
     flex: 1,

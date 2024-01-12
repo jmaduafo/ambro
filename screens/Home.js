@@ -5,6 +5,7 @@ import PopularCategories from '../components/Home/PopularCategories'
 import TopDisplay from '../components/Home/TopDisplay'
 import NewRecipes from '../components/Home/NewRecipes'
 import SearchEngine from '../components/SearchEngine'
+import ForYou from '../components/Home/ForYou'
 import { greeting } from '../utils/greeting'
 
 
@@ -34,9 +35,11 @@ const Home = ({navigation}) => {
       </SafeAreaView>
       <View style={ styles.mainSection }>
         <ScrollView
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40}}>
           <PopularCategories/>
           <TopDisplay/>
+          <ForYou/>
           <NewRecipes/>
         </ScrollView>
       </View>
@@ -78,7 +81,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     // paddingLeft: 30,
     paddingRight: 0,
-    paddingTop: 0,
     flex: 1
   }
 })
