@@ -30,7 +30,7 @@ const Home = ({navigation}) => {
             </View>
           </TouchableOpacity>
         </View>
-        <SearchEngine marginTop={20} placeholderText={'What would you like to cook today?'}/>
+        <SearchEngine marginTop={20} marginBottom={0} placeholderText={'What would you like to cook today?'}/>
       </SafeAreaView>
       <View style={ styles.mainSection }>
         <ScrollView
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 40,
     backgroundColor: COLORS.backgroundFull,
     marginTop: 20,
-    padding: 30,
+    paddingLeft: 30,
     paddingRight: 0,
     paddingTop: 0,
     flex: 1

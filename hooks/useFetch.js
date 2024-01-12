@@ -15,8 +15,8 @@ function useFetch(url) {
       try{
         const response = await axios.get(url)
 
-        if (response && response.data) {
-          setData(response.data)
+        if (response && response?.data) {
+          setData(response?.data)
         }
         setLoading(false)
       } catch(err) {

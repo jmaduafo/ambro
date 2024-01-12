@@ -3,9 +3,9 @@ import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
 import { Ionicons } from '@expo/vector-icons';
 
-const SearchEngine = ({ marginTop, placeholderText }) => {
+const SearchEngine = ({ marginTop, marginBottom, placeholderText }) => {
   return (
-    <View style={[ styles.searchSection, { marginTop: marginTop } ]}>
+    <View style={[ styles.searchSection, { marginTop: marginTop, marginBottom: marginBottom } ]}>
         <TextInput
             placeholder={placeholderText}
             placeholderTextColor={COLORS.textColor50}

@@ -4,7 +4,7 @@ import { COLORS } from "./default"
 const generalStyles = StyleSheet.create({
     default: {
         flex: 1,
-        backgroundColor: '#FFEED9'
+        backgroundColor: COLORS.backgroundFull
     },
     loginSignupSection: {
         paddingLeft: 30,

@@ -16,6 +16,10 @@ import OnboardingSlide from "./components/OnboardingSlide";
 import OnboardingButton from "./components/OnboardingButton";
 import Root from "./components/Root";
 import Profile from "./screens/Profile";
+import SearchListings from "./components/Search/SearchListings";
+import SearchRecipesDisplay from "./components/Search/SearchRecipesDisplay";
+import SearchUserPage from "./components/Search/SearchUserPage";
+import Listing from "./components/Listing";
 
 export default function App({navigation}) {
   const [showHome, setShowHome] = useState(true);
@@ -61,9 +65,12 @@ export default function App({navigation}) {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Root">
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
-            <Stack.Screen name="SignUp" component={SignUp}  options={{ headerShown: false }} />
+            <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
             <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />  
+            <Stack.Screen name="SearchList" component={SearchListings} options={{ headerShown: false }} />
+            <Stack.Screen name="SearchRecipe" component={SearchRecipesDisplay} options={{ headerShown: false }} />
+            <Stack.Screen name="SearchUser" component={SearchUserPage} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
