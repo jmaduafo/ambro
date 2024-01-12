@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
-import pic from '../assets/adaptive-icon.png'
 
-const CategorySelect = ({image, category}) => {
+const CategorySelect = ({image, category, setSelectedCategory}) => {
   return (
     <View style={styles.rounded}>
-      <TouchableOpacity style={styles.interior}>
+      <TouchableOpacity onPress={() => {setSelectedCategory(category)}} style={styles.interior}>
         <Image
         source={image}
         style={{ width: '50%', height: '50%'}}
