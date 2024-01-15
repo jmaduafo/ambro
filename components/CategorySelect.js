@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
 
-const CategorySelect = ({image, category, setSelectedCategory}) => {
+const CategorySelect = ({image, category, setSelectedCategory, selectedCategory}) => {
   return (
-    <View style={styles.rounded}>
-      <TouchableOpacity onPress={() => {setSelectedCategory(category)}} style={styles.interior}>
+    <View style={[styles.rounded, selectedCategory === category && styles.shadow]}>
+      <TouchableOpacity onPress={() => {setSelectedCategory(category)}} style={[styles.interior]}>
         <Image
         source={image}
         style={{ width: '50%', height: '50%'}}
@@ -27,12 +27,15 @@ const styles = StyleSheet.create({
         height: 130,
         display: 'flex',
         alignItems: 'center',
+        paddingLeft: 7,
+        paddingRight: 7,  
         shadowColor: SHADOW.color,
         shadowOffset: {width: SHADOW.offsetWidth, height: SHADOW.offsetHeight},
-        shadowOpacity: SHADOW.opacity,
-        shadowRadius: SHADOW.radius,
-        paddingLeft: 7,
-        paddingRight: 7,        
+        shadowOpacity: 0.05,
+        shadowRadius: SHADOW.radius,      
+    },
+    shadow: {
+      shadowOpacity: 0.15
     },
     interior: {
         borderRadius: 40,

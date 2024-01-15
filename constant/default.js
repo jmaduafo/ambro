@@ -6,7 +6,7 @@ export const COLORS = {
     textColor50: 'rgba(0, 0, 0, .5)',
     textColor40: 'rgba(0, 0, 0, .4)',
     textColor20: 'rgba(0, 0, 0, .2)',
-    accent: '#D66D40'
+    accent: '#D8620C'
     // BLUE
     // textColorFull: '#527688',
     // textColor75: 'rgba(82, 118, 136, .75)',

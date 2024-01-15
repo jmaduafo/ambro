@@ -56,6 +56,7 @@ const PopularCategories = () => {
                   image={item.strCategoryThumb}
                   category={item.strCategory}
                   setSelectedCategory={setSelectedCategory}
+                  selectedCategory={selectedCategory}
                 />
               </View>
         )}
