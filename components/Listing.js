@@ -43,7 +43,7 @@ export default Listing
 
 const styles = StyleSheet.create({
     background: {
-        backgroundColor: COLORS.backgroundLight,
+        // backgroundColor: COLORS.backgroundLight,
         borderRadius: 15,
         marginTop: 5,
         marginBottom: 5,
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 20,
         padding: 5,
-        borderColor: COLORS.textColor40,
-        borderWidth: 1
+        // borderColor: COLORS.textColor40,
+        // borderWidth: 1
     },
     searchImage: {
         width: 40,

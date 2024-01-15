@@ -15,6 +15,7 @@
     "axios": "^1.6.5",
     "expo": "~49.0.15",
     "expo-font": "~11.4.0",
+    "expo-linear-gradient": "~12.3.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.7.1",
@@ -22,10 +23,10 @@
     "react-native": "0.72.6",
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-heroicons": "^4.0.0",
+    "react-native-masonry-list": "^2.16.1",
     "react-native-reanimated": "^3.3.0",
     "react-native-responsive-screen": "^1.4.2",
-    "react-native-svg": "^14.1.0",
-    "expo-linear-gradient": "~12.3.0"
+    "react-native-svg": "^14.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

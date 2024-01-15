@@ -6,6 +6,10 @@ const generalStyles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.backgroundFull
     },
+    defaultParagraph: {
+        color: COLORS.textColorFull,
+        fontFamily: 'Satoshi-Regular'
+    },
     loginSignupSection: {
         paddingLeft: 30,
         paddingRight: 30
