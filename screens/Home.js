@@ -7,6 +7,7 @@ import NewRecipes from '../components/Home/NewRecipes'
 import SearchEngine from '../components/SearchEngine'
 import ForYou from '../components/Home/ForYou'
 import { greeting } from '../utils/greeting'
+import { StatusBar } from 'expo-status-bar';
 
 
 const Home = ({navigation}) => {
@@ -21,6 +22,7 @@ const Home = ({navigation}) => {
   return (
     <View style={ styles.background }>
       <SafeAreaView>
+        <StatusBar style='auto'/>
         <View style={styles.intro}>
           <View>
             <Text style={[ styles.openingText, { marginTop: 20, marginBottom: -10 } ]}>Good { date },</Text>

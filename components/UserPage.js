@@ -75,12 +75,12 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
             <Text style={styles.followStatsText}><Text style={styles.stat}>2.1K</Text> followers</Text>
             <Text style={styles.followStatsText}><Text style={styles.stat}>12</Text> following</Text>
           </View>
-          <View style={{ marginTop: 10, paddingLeft: 20, paddingRight: 20}}>
+          <View style={{ marginTop: 10, paddingLeft: 30, paddingRight: 30}}>
             <Text style={generalStyles.defaultParagraph}>
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis.</Text>
           </View>
           {/* LINE BREAK */}
-          <View style={styles.lineBreak}></View>
+          <View style={[generalStyles.lineBreak, { marginTop: 20}]}></View>
           {/* SELECT USER POSTS OR SAVED POSTS */}
           <View style={styles.selectContainer}>
             <Pressable style={styles.press} onPress={() => setSelect('Recipe')}>
@@ -100,7 +100,7 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
           </View>
           {/* DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ marginTop: 10}}>
-            <MasonryList images={categoryArray} rerender={true} columns={3}/>
+            <MasonryList images={categoryArray} rerender={true} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
           </View>
         </ScrollView>
       </View>
@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
   },
   userIntro: {
     // width: '100%',
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
     marginTop: 20,
     // position: 'absolute',
     // top: -30,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    gap: 40
+    gap: 30
   },
   buttons: {
     padding: 7,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Satoshi-Regular',
     color: COLORS.textColorFull,
     letterSpacing: -.5,
-    fontSize: 16,
+    fontSize: 15,
     marginBottom: 3
   },
   noSelectText: {
@@ -200,19 +200,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  lineBreak: {
-    width: '100%',
-    height: 1,
-    backgroundColor: COLORS.textColor20,
-    marginTop: 20
-  },
   followStats: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 40,
     marginTop: 20,
-    paddingLeft: 20,
-    paddingRight: 20
+    paddingLeft: 30,
+    paddingRight: 30
   },
   followStatsText: {
     fontFamily: 'Satoshi-Regular',

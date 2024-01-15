@@ -10,6 +10,11 @@ const generalStyles = StyleSheet.create({
         color: COLORS.textColorFull,
         fontFamily: 'Satoshi-Regular'
     },
+    lineBreak: {
+        width: '100%',
+        height: 1,
+        backgroundColor: COLORS.textColor20,
+    },
     loginSignupSection: {
         paddingLeft: 30,
         paddingRight: 30

@@ -5,7 +5,7 @@ import UserPage from '../UserPage'
 const UserProfile = () => {
   return (
     <>
-      <UserPage/>
+      <UserPage type={'user'}/>
     </>
   )
 }
