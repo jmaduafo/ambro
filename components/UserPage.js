@@ -75,7 +75,7 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
             <Text style={styles.followStatsText}><Text style={styles.stat}>2.1K</Text> followers</Text>
             <Text style={styles.followStatsText}><Text style={styles.stat}>12</Text> following</Text>
           </View>
-          <View style={{ marginTop: 10, paddingLeft: 30, paddingRight: 30}}>
+          <View style={{ marginTop: 10, paddingLeft: 20, paddingRight: 20}}>
             <Text style={generalStyles.defaultParagraph}>
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis.</Text>
           </View>
@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
   },
   userIntro: {
     // width: '100%',
-    paddingLeft: 30,
-    paddingRight: 30,
+    paddingLeft: 20,
+    paddingRight: 20,
     marginTop: 20,
     // position: 'absolute',
     // top: -30,
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 40,
     marginTop: 20,
-    paddingLeft: 30,
-    paddingRight: 30
+    paddingLeft: 20,
+    paddingRight: 20
   },
   followStatsText: {
     fontFamily: 'Satoshi-Regular',

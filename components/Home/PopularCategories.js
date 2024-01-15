@@ -41,7 +41,7 @@ const PopularCategories = () => {
       {/* <HeaderTitle title={"popular categories"} /> */}
       
       <View>
-        {categories?.length && !loading ? (
+        {categories?.length ? (
           <FlatList
             data={categories}
             renderItem={({ item, index }) => (
@@ -72,7 +72,7 @@ const PopularCategories = () => {
         }
       </View>
       <View style={styles.display}>
-        {categoryDisplay?.length ? (
+        {categoryDisplay?.length && !loading ? (
           <FlatList
             data={categoryDisplay}
             renderItem={({ item, index }) => (
