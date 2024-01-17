@@ -15,6 +15,18 @@ const generalStyles = StyleSheet.create({
         height: 1,
         backgroundColor: COLORS.textColor20,
     },
+    error: {
+        padding: 10,
+        backgroundColor: 'rgba(255, 0, 0, .5)',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ff0000',
+        marginBottom: 20
+    },
+    errorText: {
+        color: COLORS.backgroundLight,
+        fontFamily: 'Satoshi-Regular',
+    },
     loginSignupSection: {
         paddingLeft: 30,
         paddingRight: 30

@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable } from 'react-native'
 import React from 'react'
 import { SHADOW } from '../constant/default'
 
-const ProviderButtons = ({text, image}) => {
+const ProviderButtons = ({text, image, onPress}) => {
   return (
-    <View style={styles.button}>
+    <Pressable style={styles.button} onPress={onPress}>
         <Image
         source={image}
         resizeMode='contain'
         style={{ width: 30, height: 30 }}/>
         <Text style={{ fontSize: 14, color: '#404040'}}>{text}</Text>
-    </View>
+    </Pressable>
   )
 }
 

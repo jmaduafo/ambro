@@ -25,4 +25,4 @@ export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 export const db = getFirestore(app)
-export const provider = new GoogleAuthProvider()
+export const provider = new GoogleAuthProvider(app)
