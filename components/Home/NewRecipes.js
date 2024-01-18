@@ -36,7 +36,7 @@ const NewRecipes = () => {
 
   return (
     <View>
-      <HeaderTitle title={'new'} featured={'no'}/>
+      <HeaderTitle title={'latest recipes'} featured={'no'}/>
     </View>
   )
 }

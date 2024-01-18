@@ -7,11 +7,12 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
+const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
 
+  // MASONRY LIST DATA ARRAY
   function categoriesArray() {
     const array = []
     categories?.forEach(cat => {
@@ -103,7 +104,7 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
               {select !== 'Recipe' && <View style={styles.selectLine}></View>}
             </Pressable>
           </View>
-          {/* DISPLAY USER POSTS OR SAVED POSTS */}
+          {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ flex: 1, marginTop: 10}}>
             <MasonryList images={categoryArray} rerender={true} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
           </View>
