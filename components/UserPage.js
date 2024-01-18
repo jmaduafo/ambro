@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
+const UserPage = ({ username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -26,7 +26,7 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
   }, [])
   return (
     <>
-      <View style={styles.top}>
+      <View key={key} style={styles.top}>
         {/* <Pressable style={{ paddingLeft: 20, paddingRight: 20, marginTop: 40, zIndex: 20, width: '100%', position: 'absolute', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
           <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
         </Pressable> */}
@@ -48,17 +48,20 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
               </View>
             </View>
             <View style={{ flexBasis: '70%'}}>
+            {username ? 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View>
-                  <Text style={styles.nameTitle}>kaycee</Text>
-                  <Text style={styles.pronouns}>she/her/hers</Text>
+                  <Text style={styles.nameTitle}>{username}</Text>
+                  {pronouns && <Text style={styles.pronouns}>{pronouns}</Text>}
                 </View>
                 <View>
                   <Pressable onPress={() => {}}>
                     <EllipsisVerticalIcon color={COLORS.textColorFull} strokeWidth={1.5}/>
                   </Pressable>
                 </View>
-              </View>
+              </View> :
+              <ActivityIndicator color={COLORS.textColorFull}/>
+              }
               <View style={styles.buttonsContainer}>
                 {/* if 'type' equals 'user', don't show follow button; if null, show follow button */}
                 {type && type === 'user' && <TouchableOpacity style={styles.buttons}>
@@ -70,14 +73,16 @@ const UserPage = ({ username, pronouns, bio, type, numberOfRecipes, numberOfFoll
               </View>
             </View>
           </View>
+          {/* FOLLOW AND RECIPES STATS */}
           <View style={styles.followStats}>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>93</Text> recipes</Text>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>2.1K</Text> followers</Text>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>12</Text> following</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfRecipes ? numberOfRecipes : '0'}</Text> recipes</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfFollowers ? numberOfFollowers : '0'}</Text> followers</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfFollowing ? numberOfFollowing : '0'}</Text> following</Text>
           </View>
+          {/* USER BIO */}
           <View style={{ marginTop: 10, paddingLeft: 20, paddingRight: 20}}>
             <Text style={generalStyles.defaultParagraph}>
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis.</Text>
+              {bio ? bio : 'No bio yet'}</Text>
           </View>
           {/* LINE BREAK */}
           <View style={[generalStyles.lineBreak, { marginTop: 20}]}></View>
@@ -144,11 +149,11 @@ const styles = StyleSheet.create({
   pronouns: {
     fontFamily: 'Satoshi-Regular',
     color: COLORS.textColor75,
-    marginBottom: 10
   },
   buttonsContainer: {
     flexDirection: 'row',
-    gap: 30
+    gap: 30,
+    marginTop: 10
   },
   buttons: {
     padding: 7,

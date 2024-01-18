@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Pressable } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { COLORS } from '../constant/default'
 import generalStyles from '../constant/generalStyles'
@@ -111,10 +111,21 @@ const Login = ({navigation}) => {
           <Pressable onPress={() => navigation.navigate('SignUp')}>
             <Text style={generalStyles.loginSignupBottomText}>Register instead</Text>
           </Pressable>
-          <TouchableOpacity style={generalStyles.loginSignUpButton} onPress={handleSubmit}>
-            <AntDesign name="arrowright" size={24} color={COLORS.backgroundFull} />
-            <Text style={generalStyles.loginSignUpButtonText}>Log In</Text>
-          </TouchableOpacity>
+          {loading ? (
+            <ActivityIndicator color={COLORS.textColorFull} />
+          ) : (
+            <TouchableOpacity
+              style={generalStyles.loginSignUpButton}
+              onPress={handleSubmit}
+            >
+              <AntDesign
+                name="arrowright"
+                size={24}
+                color={COLORS.backgroundFull}
+              />
+              <Text style={generalStyles.loginSignUpButtonText}>Log In</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </SafeAreaView>
