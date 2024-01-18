@@ -16,7 +16,7 @@ import pic from "../assets/images/search.png";
 import { AntDesign } from "@expo/vector-icons";
 import { auth, db } from "../firebase/config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 
 const SignUp = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -37,7 +37,6 @@ const SignUp = ({ navigation }) => {
     } else if (password.length < 6) {
       setError("Password has to have 6 characters or more");
     } else {
-      try {
         setLoading(true);
         createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
@@ -48,17 +47,22 @@ const SignUp = ({ navigation }) => {
                 await setDoc(doc(db, 'users', user.uid), {
                   id: user.uid,
                   username: username,
-                  email: email,                   
+                  email: email,
+                  bio: null,
+                  profilePicture: null,
+                  profileBackgroundImage: null,
                   createdAt: serverTimestamp()
                 })
-                
+
                 setPassword("");
                 setUsername("");
                 setEmail("");
+                setError("")
                 setLoading(false);
                 navigation.navigate("Root");
 
               } catch (err) {
+                setError(err.message)
                 setLoading(false)
               }
                 
@@ -67,13 +71,9 @@ const SignUp = ({ navigation }) => {
             verify() 
           })
           .catch((err) => {
-            setError("Something went wrong. Please try again.");
+            setError(err.message);
             setLoading(false);
           });
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
     }
   }
 

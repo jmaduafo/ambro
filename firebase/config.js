@@ -9,20 +9,29 @@ import { API_KEY, AUTH_DOMAIN, PROJECT_ID,
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: API_KEY,
+//   authDomain: AUTH_DOMAIN,
+//   projectId: PROJECT_ID,
+//   storageBucket: STORAGE_BUCKET,
+//   messagingSenderId: MESSAGING_SENDER_ID,
+//   appId: APP_ID
+// };
 const firebaseConfig = {
-  apiKey: API_KEY,
-  authDomain: AUTH_DOMAIN,
-  projectId: PROJECT_ID,
-  storageBucket: STORAGE_BUCKET,
-  messagingSenderId: MESSAGING_SENDER_ID,
-  appId: APP_ID
+  apiKey: "AIzaSyCw5vSTYDJ0dX5NyQ8itGSKCuGm_HLdtSE",
+  authDomain: "ambre-50f69.firebaseapp.com",
+  projectId: "ambre-50f69",
+  storageBucket: "ambre-50f69.appspot.com",
+  messagingSenderId: "539938737850",
+  appId: "1:539938737850:web:cf925e43a64741e477fc83"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 // export const auth = getAuth(app)
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+// export const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+// });
+export const auth = getAuth(app);
 export const db = getFirestore(app)
 export const provider = new GoogleAuthProvider(app)
