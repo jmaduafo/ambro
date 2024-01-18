@@ -32,7 +32,7 @@ const generalStyles = StyleSheet.create({
         paddingRight: 30
     },
     loginSignupTitle: {
-        paddingTop: 160,
+        paddingTop: 110,
         marginBottom: 80,
         fontFamily: 'Boska-Medium',
         fontSize: 26,

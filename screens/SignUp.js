@@ -19,6 +19,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 
 const SignUp = ({ navigation }) => {
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,9 +29,9 @@ const SignUp = ({ navigation }) => {
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
   function handleSubmit() {
-    if (!password.length || !username.length || !email.length) {
+    if (!password.length || !username.length || !email.length || !name.length) {
       setError(
-        "Entries must not be empty. Please enter a username, email, and password."
+        "No entries should be left empty"
       );
     } else if (!email.match(emailRegex)) {
       setError("Email is not in the right format");
@@ -48,6 +49,7 @@ const SignUp = ({ navigation }) => {
                   id: user.uid,
                   username: username,
                   email: email,
+                  name: name,
                   bio: null,
                   pronouns: null,
                   profileImage: null,
@@ -57,6 +59,7 @@ const SignUp = ({ navigation }) => {
 
                 setPassword("");
                 setUsername("");
+                setName("");
                 setEmail("");
                 setError("")
                 setLoading(false);
@@ -89,6 +92,16 @@ const SignUp = ({ navigation }) => {
               <Text style={generalStyles.errorText}>{error}</Text>
             </View>
           )}
+          {/* NAME LOGIN INPUT */}
+          <View style={generalStyles.loginSignupInputSection}>
+            <Text style={generalStyles.loginSignupLabel}>Name</Text>
+            <TextInput
+              onChangeText={(text) => setName(text)}
+              value={name}
+              style={generalStyles.loginSignupInput}
+              placeholderTextColor={COLORS.textColor50}
+            />
+          </View>
           {/* USERNAME LOGIN INPUT */}
           <View style={generalStyles.loginSignupInputSection}>
             <Text style={generalStyles.loginSignupLabel}>Username</Text>

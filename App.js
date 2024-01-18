@@ -20,9 +20,12 @@ import SearchListings from "./components/Search/SearchListings";
 import SearchRecipesDisplay from "./components/Search/SearchRecipesDisplay";
 import SearchUserPage from "./components/Search/SearchUserPage";
 import Listing from "./components/Listing";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase/config";
 
 export default function App({navigation}) {
   const [showHome, setShowHome] = useState(true);
+  const [ checkLog, setCheckLog ] = useState('Login')
 
   const Stack = createStackNavigator();
 
@@ -41,12 +44,26 @@ export default function App({navigation}) {
     "Boska-Black": require("./assets/fonts/Boska-Black.otf"),
   });
 
+  // Decides if user should be directed to homepage if logged in or
+  // directed to login screen if logged out
+  function checkLoggedIn() {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCheckLog('Root')
+      } else {
+        setCheckLog('Login')
+      }
+    })
+  }
+
   // Show Splash Screen while fonts load
   useEffect(function () {
     async function prepare() {
       await SplashScreen.preventAutoHideAsync();
     }
     prepare();
+
+    checkLoggedIn()
   }, []);
 
   // Hide Splash Screen when fonts have finished loading
@@ -63,7 +80,7 @@ export default function App({navigation}) {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName={checkLog}>
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
             <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
             <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />

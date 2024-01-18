@@ -39,6 +39,7 @@ const UserProfile = () => {
       {userInfo?.map((profile) => {
         return (
           <UserPage
+            name={profile.name}
             username={profile.username}
             key={profile.id}
             pronouns={profile.pronouns}

@@ -76,7 +76,7 @@ const Home = ({ navigation }) => {
                 >
                   Good {date},
                 </Text>
-                <Text style={styles.openingText}>{user.username}</Text>
+                <Text style={styles.openingText}>{user.name}</Text>
               </View>
               )
             })

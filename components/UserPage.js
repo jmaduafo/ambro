@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ profileImage, bgImage, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
+const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -36,7 +36,6 @@ const UserPage = ({ profileImage, bgImage, username, key, pronouns, bio, type, n
         style={{ width: '100%', height: '100%'}}/>
       </View>
       <View style={styles.bottom}>
-        <ScrollView>
           {/* USER INFO WITH USERNAME, PRONOUNS, AND BUTTONS */}
           <View style={styles.userIntro}>
             <View style={{ flexBasis: '30%' }}>
@@ -51,7 +50,8 @@ const UserPage = ({ profileImage, bgImage, username, key, pronouns, bio, type, n
             {username ? 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View>
-                  <Text style={styles.nameTitle}>{username}</Text>
+                  <Text style={styles.nameTitle}>{name}</Text>
+                  <Text style={styles.username}>@{username}</Text>
                   {pronouns && <Text style={styles.pronouns}>{pronouns}</Text>}
                 </View>
                 <View>
@@ -104,10 +104,9 @@ const UserPage = ({ profileImage, bgImage, username, key, pronouns, bio, type, n
             </Pressable>
           </View>
           {/* DISPLAY USER POSTS OR SAVED POSTS */}
-          <View style={{ marginTop: 10}}>
+          <View style={{ flex: 1, marginTop: 10}}>
             <MasonryList images={categoryArray} rerender={true} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
           </View>
-        </ScrollView>
       </View>
     </>
   )
@@ -132,12 +131,6 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     marginTop: 20,
-    // position: 'absolute',
-    // top: -30,
-    // flexDirection: 'row',
-    // display: 'flex',
-    // justifyContent: 'space-between',
-    // alignItems: 'flex-end',
     flexDirection: 'row',
     alignItems: 'flex-start'
   },
@@ -146,9 +139,16 @@ const styles = StyleSheet.create({
     color: COLORS.textColorFull,
     marginBottom: 0
   },
+  username: {
+    fontFamily: 'Satoshi-Medium',
+    color: COLORS.textColor75,
+    fontSize: 12
+  },
   pronouns: {
     fontFamily: 'Satoshi-Regular',
     color: COLORS.textColor75,
+    fontSize: 12
+
   },
   buttonsContainer: {
     flexDirection: 'row',
