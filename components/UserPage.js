@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
+const UserPage = ({ profileImage, bgImage, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -31,7 +31,7 @@ const UserPage = ({ username, key, pronouns, bio, type, numberOfRecipes, numberO
           <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
         </Pressable> */}
         <ImageBackground
-        source={pic}
+        source={{ uri: bgImage ? bgImage : pic}}
         resizeMode='cover'
         style={{ width: '100%', height: '100%'}}/>
       </View>
@@ -42,7 +42,7 @@ const UserPage = ({ username, key, pronouns, bio, type, numberOfRecipes, numberO
             <View style={{ flexBasis: '30%' }}>
               <View style={{ width: 80, height: 80, borderRadius: '50%'}}>
                 <Image
-                  source={pic}
+                  source={{ uri: profileImage ? profileImage : pic}}
                   resizeMode='cover'
                   style={{ width: '100%', height: '100%', borderRadius: '50%'}}/>
               </View>

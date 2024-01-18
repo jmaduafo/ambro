@@ -49,7 +49,8 @@ const SignUp = ({ navigation }) => {
                   username: username,
                   email: email,
                   bio: null,
-                  profilePicture: null,
+                  pronouns: null,
+                  profileImage: null,
                   profileBackgroundImage: null,
                   createdAt: serverTimestamp()
                 })
