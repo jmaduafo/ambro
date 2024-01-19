@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
+const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -27,7 +27,8 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
   }, [])
   return (
     <>
-      <View key={key} style={styles.top}>
+      {/* BACKGROUND IMAGE */}
+      <View style={styles.top}>
         {/* <Pressable style={{ paddingLeft: 20, paddingRight: 20, marginTop: 40, zIndex: 20, width: '100%', position: 'absolute', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
           <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
         </Pressable> */}
@@ -36,8 +37,9 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
         resizeMode='cover'
         style={{ width: '100%', height: '100%'}}/>
       </View>
+      {/* USER INFO WITH USERNAME, PRONOUNS, AND BUTTONS */}
       <View style={styles.bottom}>
-          {/* USER INFO WITH USERNAME, PRONOUNS, AND BUTTONS */}
+          {/* PROFILE IMAGE */}
           <View style={styles.userIntro}>
             <View style={{ flexBasis: '30%' }}>
               <View style={{ width: 80, height: 80, borderRadius: '50%'}}>
@@ -47,6 +49,7 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
                   style={{ width: '100%', height: '100%', borderRadius: '50%'}}/>
               </View>
             </View>
+            {/* USERNAME, PRONOUNS, BUTTONS */}
             <View style={{ flexBasis: '70%'}}>
             {username ? 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -91,14 +94,12 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
           <View style={styles.selectContainer}>
             <Pressable style={styles.press} onPress={() => setSelect('Recipe')}>
               <View style={styles.selectClick} >
-                {/* <ListBulletIcon color={COLORS.textColorFull} size={16} strokeWidth={1}/> */}
                 <Text style={select === 'Recipe' ? styles.selectText : styles.noSelectText}>Recipes</Text>
               </View>
                 {select === 'Recipe' && <View style={styles.selectLine}></View>}
             </Pressable>
             <Pressable style={styles.press} onPress={() => setSelect('Saves')}>
               <View style={styles.selectClick} >
-                {/* <HeartIcon fill={COLORS.textColorFull} size={18} color={COLORS.textColorFull} strokeWidth={1}/> */}
                 <Text style={select !== 'Recipe' ? styles.selectText : styles.noSelectText}>Saves</Text>
               </View>
               {select !== 'Recipe' && <View style={styles.selectLine}></View>}
@@ -106,7 +107,7 @@ const UserPage = ({ profileImage, bgImage, name, username, key, pronouns, bio, t
           </View>
           {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ flex: 1, marginTop: 10}}>
-            <MasonryList images={categoryArray} rerender={true} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
+            <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
           </View>
       </View>
     </>

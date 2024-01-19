@@ -18,6 +18,7 @@ const SearchListings = () => {
                 <Pressable onPress={() => navigate('SearchRecipesDisplay')}>
                     <Listing name='Beef' image={pic} />
                 </Pressable>
+                
                 <Listing name='Soup'/>
                 <Listing name='Corn'/>
             </View>

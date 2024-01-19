@@ -4,7 +4,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
 import { NavigationContainer } from "@react-navigation/native";
-import {createStackNavigator} from '@react-navigation/stack'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
 
 import Login from "./screens/Login";
 import SignUp from "./screens/SignUp";
@@ -14,7 +14,7 @@ import AppIntroSlider from "react-native-app-intro-slider";
 import { slides } from "./utils/onboarding";
 import OnboardingSlide from "./components/OnboardingSlide";
 import OnboardingButton from "./components/OnboardingButton";
-import Root from "./components/Root";
+import Root from "./components/Navigations/Root";
 import Profile from "./screens/Profile";
 import SearchListings from "./components/Search/SearchListings";
 import SearchRecipesDisplay from "./components/Search/SearchRecipesDisplay";
@@ -23,11 +23,11 @@ import Listing from "./components/Listing";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 
-export default function App({navigation}) {
-  const [showHome, setShowHome] = useState(true);
-  const [ checkLog, setCheckLog ] = useState('Login')
+const Stack = createNativeStackNavigator();
 
-  const Stack = createStackNavigator();
+export default function App({navigation}) {
+  const [showHome, setShowHome] = useState(false);
+  const [ checkLog, setCheckLog ] = useState('Login')
 
   const [fontsLoaded] = useFonts({
     "Satoshi-Light": require("./assets/fonts/Satoshi-Light.otf"),
@@ -73,7 +73,8 @@ export default function App({navigation}) {
     SplashScreen.hideAsync();
   }
 
-  if (showHome) {
+
+  if (!showHome) {
     return Onboarding();
   }
 
@@ -83,13 +84,13 @@ export default function App({navigation}) {
         <Stack.Navigator initialRouteName={checkLog}>
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
             <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
-            <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />
-            <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />  
+            <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} /> 
         </Stack.Navigator>
       </NavigationContainer>
     </>
   );
 
+  // ONBOARDING SLIDES COMPONENT
   function Onboarding() {
     return (
       <>
@@ -111,10 +112,10 @@ export default function App({navigation}) {
           renderNextButton={() => <OnboardingButton text="Next" />}
           renderDoneButton={() => <OnboardingButton text="Done" />}
           onSkip={() => {
-            setShowHome(false)
+            setShowHome(true)
           }}
           onDone={() => {
-            setShowHome(false)
+            setShowHome(true)
           }}
         />
       </>

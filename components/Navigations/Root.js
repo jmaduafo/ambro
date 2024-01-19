@@ -2,37 +2,25 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {createStackNavigator} from '@react-navigation/stack'
 import { Ionicons, FontAwesome } from "react-native-vector-icons";
 
-import Home from "../screens/Home";
-import Create from "../screens/Create";
-import Notification from "../screens/Notification";
-import Profile from "../screens/Profile";
-import Search from "../screens/Search";
-import SearchRecipesDisplay from './Search/SearchRecipesDisplay';
-import SearchListings from './Search/SearchListings';
-import SearchUserPage from './Search/SearchUserPage';
+import Home from "../../screens/Home";
+import Create from "../../screens/Create";
+import Notification from "../../screens/Notification";
+import Profile from "../../screens/Profile";
+import Search from "../../screens/Search";
 
-import { COLORS, SHADOW } from '../constant/default';
+// Import Search components as a stack navigation to nest within tab navigator
+import SearchGroup from './SearchGroup';
+
+import { COLORS, SHADOW } from '../../constant/default';
+
+const Tab = createBottomTabNavigator();
 
 const Root = () => {
-    const Tab = createBottomTabNavigator();
-
     const [ selectedCat, setSelectedCat ] = useState(null)
 
-    const SearchStack = createStackNavigator()
-
-    function SearchGroup() {
-      return (
-      <SearchStack.Navigator>
-        <SearchStack.Screen name='SearchListings' component={SearchListings}/>
-        <SearchStack.Screen name='SearchRecipesDisplay' component={SearchRecipesDisplay}/>
-        <SearchStack.Screen name='SearchUserPage' component={SearchUserPage}/>
-      </SearchStack.Navigator>
-      )
-    }
-
+    
   return (
         // BOTTOM TAB NAVIGATION
         <Tab.Navigator initialRouteName='Home'
