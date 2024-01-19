@@ -6,11 +6,11 @@ import SearchUserPage from '../components/Search/SearchUserPage'
 import { COLORS } from '../constant/default'
 import { StatusBar } from 'expo-status-bar';
 
-const Search = ({ navigation }) => {
+const Search = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundLight}}>
       {/* Pass navigation to components to access navigation properties */}
-      <SearchListings navigation={navigation}/>
+      <SearchListings />
       {/* <SearchUserPage navigation={navigation}/> */}
     </SafeAreaView  >
   )

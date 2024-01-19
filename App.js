@@ -85,9 +85,6 @@ export default function App({navigation}) {
             <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
             <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />  
-            <Stack.Screen name="SearchList" component={SearchListings} options={{ headerShown: false }} />
-            <Stack.Screen name="SearchRecipe" component={SearchRecipesDisplay} options={{ headerShown: false }} />
-            <Stack.Screen name="SearchUser" component={SearchUserPage} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

@@ -4,39 +4,43 @@ import SearchEngine from '../SearchEngine'
 import { COLORS } from '../../constant/default'
 import Listing from '../Listing'
 import pic from '../../assets/icon.png'
+import { useNavigation } from '@react-navigation/native';
 
-const SearchListings = ({ navigation }) => {
+const SearchListings = () => {
+    const { navigate } = useNavigation()
   return (
-    <>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundLight}}>
       <SearchEngine marginTop={20} marginBottom={10} placeholderText={'Search'}/>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Categories</Text>
             <View>
-                <Listing name='Beef' image={pic} navigation={navigation} destination='Profile'/>
-                <Listing name='Soup' navigation={navigation} destination='Profile'/>
-                <Listing name='Corn' navigation={navigation} destination='Profile'/>
+                <Pressable onPress={() => navigate('SearchRecipesDisplay')}>
+                    <Listing name='Beef' image={pic} />
+                </Pressable>
+                <Listing name='Soup'/>
+                <Listing name='Corn'/>
             </View>
         </View>
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Recipes</Text>
             <View>
-                <Listing name='Tres Leches' image={pic} navigation={navigation} destination='SearchRecipe'/>
-                <Listing name='Snickerdoodles' navigation={navigation} destination='SearchRecipe'/>
-                <Listing name='Alfredo Pasta' navigation={navigation} destination='SearchRecipe'/>
-                <Listing name='Chili Sauce' navigation={navigation} destination='SearchRecipe'/>
+                <Listing name='Tres Leches' image={pic} />
+                <Listing name='Snickerdoodles'/>
+                <Listing name='Alfredo Pasta'/>
+                <Listing name='Chili Sauce'/>
             </View>
         </View>
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Users</Text>
             <View>
-                <Listing name='jelly45' image={pic} searchType='user' navigation={navigation} destination='SearchUser'/>
-                <Listing name='tacotuesday' searchType='user' navigation={navigation} destination='SearchUser'/>
-                <Listing name='hallypie' searchType='user' navigation={navigation} destination='SearchUser'/>
+                <Listing name='jelly45' image={pic} searchType='user'/>
+                <Listing name='tacotuesday' searchType='user'/>
+                <Listing name='hallypie' searchType='user'/>
             </View>
         </View>      
       </ScrollView>
-    </>
+    </SafeAreaView>
     
   )
 }

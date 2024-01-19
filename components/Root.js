@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 
-import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {createStackNavigator} from '@react-navigation/stack'
 import { Ionicons, FontAwesome } from "react-native-vector-icons";
 
 import Home from "../screens/Home";
@@ -10,12 +10,28 @@ import Create from "../screens/Create";
 import Notification from "../screens/Notification";
 import Profile from "../screens/Profile";
 import Search from "../screens/Search";
+import SearchRecipesDisplay from './Search/SearchRecipesDisplay';
+import SearchListings from './Search/SearchListings';
+import SearchUserPage from './Search/SearchUserPage';
+
 import { COLORS, SHADOW } from '../constant/default';
 
 const Root = () => {
     const Tab = createBottomTabNavigator();
 
     const [ selectedCat, setSelectedCat ] = useState(null)
+
+    const SearchStack = createStackNavigator()
+
+    function SearchGroup() {
+      return (
+      <SearchStack.Navigator>
+        <SearchStack.Screen name='SearchListings' component={SearchListings}/>
+        <SearchStack.Screen name='SearchRecipesDisplay' component={SearchRecipesDisplay}/>
+        <SearchStack.Screen name='SearchUserPage' component={SearchUserPage}/>
+      </SearchStack.Navigator>
+      )
+    }
 
   return (
         // BOTTOM TAB NAVIGATION
@@ -45,7 +61,7 @@ const Root = () => {
               } else if (route.name === "Create") {
                 return <Ionicons name="add-circle" size={50} color={color} />;
                 // SEARCH SCREEN
-              } else if (route.name === "Search") {
+              } else if (route.name === "SearchGroup") {
                 return (
                   <Ionicons
                     name={focused ? "md-search" : "search-outline"}
@@ -104,11 +120,11 @@ const Root = () => {
             
           />
           <Tab.Screen
-            name="Search"
+            name="SearchGroup"
             options={{
               title: "Search"
             }}
-            component={Search}
+            component={SearchGroup}
             initialParams={''}
           />
           <Tab.Screen

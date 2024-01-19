@@ -3,14 +3,13 @@ import React from 'react'
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../constant/default';
 
-const Listing = ({navigation, ...props}) => {
-  
+const Listing = (props) => {
   return (
-    <Pressable style={styles.background} onPress={() => navigation.navigate(props.destination)}>
+    <View style={styles.background}>
         {props.image ? 
         <View style={styles.searchImage}>
             <Image
-                source={props.image}
+                source={{uri: props.image}}
                 resizeMode='contain'
                 style={{width: '100%', height: '100%', borderRadius: 10}}
             />
@@ -35,7 +34,7 @@ const Listing = ({navigation, ...props}) => {
             </View>}
         </View>
       
-    </Pressable>
+    </View>
   )
 }
 
