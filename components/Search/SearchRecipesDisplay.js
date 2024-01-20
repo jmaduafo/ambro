@@ -6,25 +6,36 @@ import { COLORS, SHADOW } from '../../constant/default'
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { FireIcon as FireOutline } from 'react-native-heroicons/outline'
 import { FireIcon as FireSolid } from 'react-native-heroicons/solid'
+import HeaderTitle from '../HeaderTitle'
 
 const SearchRecipesDisplay = () => {
   return (
     <View style={generalStyles.default}>
       <ScrollView>
         {/* IMAGE CAROUSEL OR SINGULAR IMAGE SECTION */}
-        <View>
+        <View style={{ backgroundColor: 'gray', width: '100%', height: 300}}>
 
         </View>
         <View style={styles.bottom}>
-          {/* RECIPE INFORMATION OR RECIPE ABOUT SECTION */}
+          {/* IF FIREBASE, RECIPE INFORMATION, OR IF API, RECIPE ABOUT SECTION */}
           <View style={styles.recipeCard}>
             <UserRecipe/>
           </View>
           {/* RECIPE TAGS */}
+          <View>
+            <Text style={{ backgroundColor: COLORS.textColorFull, color: COLORS.backgroundFull}}>Text</Text>
+            <Text>Text</Text>
+          </View>
           {/* INGREDIENTS SECTION */}
+          <View>
+            <HeaderTitle title={'Ingredients'} paddingLeft={0} paddingRight={0}/>
+          </View>
           {/* LINE BREAK */}
           <View style={[generalStyles.lineBreak, { marginTop: 30, marginBottom: 30}]}></View>
           {/* INSTRUCTIONS SECTION */}
+          <View>
+            <HeaderTitle title={'Instructions'} paddingLeft={0} paddingRight={0}/>
+          </View>
 
           {/* IF API, THEN DISPLAY YOUTUBE VIDEO */}
           <View></View>
@@ -36,7 +47,7 @@ const SearchRecipesDisplay = () => {
 
 export default SearchRecipesDisplay
 
-// The recipes displayed from the firebase backend
+// The recipe displayed from the firebase backend
 function UserRecipe() {
   const info = [
     {
@@ -153,7 +164,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: SHADOW.offsetWidth, height: SHADOW.offsetHeight},
     shadowRadius: SHADOW.radius,
     shadowOpacity: SHADOW.opacity,
-    padding: 15,
+    padding: 20,
     borderRadius: 30
   },
   rowCenter: {

@@ -5,7 +5,7 @@ import HeaderTitle from '../HeaderTitle'
 const ForYou = () => {
   return (
     <View>
-        <HeaderTitle title={'for you'} featured={'no'}/>
+        <HeaderTitle title={'for you'} featured={'no'} paddingLeft={30} paddingRight={30}/>
     </View>
   )
 }

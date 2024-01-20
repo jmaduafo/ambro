@@ -2,9 +2,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { COLORS } from '../constant/default'
 
-const HeaderTitle = ({title, featured}) => {
+const HeaderTitle = ({title, featured, paddingLeft, paddingRight}) => {
   return (
-    <View style={styles.position}>
+    <View style={[styles.position, { paddingLeft: paddingLeft, paddingRight: paddingRight}]}>
       <Text style={styles.text}>{title}</Text>
       {featured === 'no' &&
       <Pressable onPress={() => {}}>
@@ -21,8 +21,6 @@ const styles = StyleSheet.create({
     position: {
         marginBottom: 20,
         marginTop: 40,
-        paddingLeft: 30,
-        paddingRight: 30,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
