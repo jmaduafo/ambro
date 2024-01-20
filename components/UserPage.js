@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
+const UserPage = ({ navigate, profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -59,7 +59,7 @@ const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, 
                   {pronouns && <Text style={styles.pronouns}>{pronouns}</Text>}
                 </View>
                 <View>
-                  <Pressable onPress={() => {}}>
+                  <Pressable onPress={() => {navigate('Settings')}}>
                     <EllipsisVerticalIcon color={COLORS.textColorFull} strokeWidth={1.5}/>
                   </Pressable>
                 </View>
@@ -71,7 +71,7 @@ const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, 
                 {type && type === 'user' && <TouchableOpacity style={styles.buttons}>
                   <Text style={styles.buttonsText}>Follow</Text>
                 </TouchableOpacity>}
-                <TouchableOpacity style={styles.buttons}>
+                <TouchableOpacity style={styles.buttons} onPress={() => navigate('EditProfile')}>
                   <Text style={styles.buttonsText}>Edit Profile</Text>
                 </TouchableOpacity>
               </View>

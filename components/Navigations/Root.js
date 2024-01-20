@@ -13,6 +13,7 @@ import Search from "../../screens/Search";
 // Import Search components as a stack navigation to nest within tab navigator
 import SearchGroup from './SearchGroup';
 import HomeGroup from './HomeGroup';
+import ProfileGroup from './ProfileGroup';
 
 import { COLORS, SHADOW } from '../../constant/default';
 
@@ -59,7 +60,7 @@ const Root = () => {
                   />
                 );
                 // PROFILE SCREEN
-              } else if (route.name === "Profile") {
+              } else if (route.name === "ProfileGroup") {
                 return (
                   <FontAwesome
                     name={focused ? "user" : "user-o"}
@@ -117,11 +118,11 @@ const Root = () => {
             initialParams={''}
           />
           <Tab.Screen
-            name="Profile"
+            name="ProfileGroup"
             options={{
               title: "Profile",
             }}
-            component={Profile}
+            component={ProfileGroup}
             initialParams={''}
           />
         </Tab.Navigator>

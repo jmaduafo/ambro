@@ -4,8 +4,11 @@ import UserPage from "../UserPage";
 import { auth, db } from "../../firebase/config";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { COLORS } from "../../constant/default";
+import { useNavigation } from "@react-navigation/native";
 
 const UserProfile = () => {
+  const { navigate } = useNavigation()
+
   const [userInfo, setUserInfo] = useState();
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +49,7 @@ const UserProfile = () => {
               bio={profile.bio}
               profileImage={profile.profileImage}
               bgImage={profile.profileBackgroundImage}
+              navigate={navigate}
             />
         </View>
         );

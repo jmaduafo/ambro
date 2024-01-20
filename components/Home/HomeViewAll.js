@@ -3,11 +3,14 @@ import React from 'react'
 import ViewAll from '../ViewAll'
 import { COLORS } from '../../constant/default'
 import generalStyles from '../../constant/generalStyles'
-
+import { useRoute } from '@react-navigation/native'
 const HomeViewAll = () => {
+    const route = useRoute()
+    const { params } = route
+
   return (
     <SafeAreaView style={[generalStyles.default, { backgroundColor: COLORS.backgroundLight}]}>
-      <ViewAll type='home'/>
+      <ViewAll type='home' />
     </SafeAreaView>
   )
 }

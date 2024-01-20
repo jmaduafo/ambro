@@ -34,7 +34,7 @@ const RecipeDisplay = () => {
             <UserRecipe/>
           </View>
           {/* RECIPE TAGS */}
-          <View style={[styles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
+          <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
             {/* CUISINE */}
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Mexican</Text>
@@ -147,7 +147,7 @@ function UserRecipe() {
     function fireCount(quantity) {
       if (quantity === 1) {
         return (
-          <View style={styles.rowCenter}>
+          <View style={generalStyles.rowCenter}>
             <FireSolid size={17} color={COLORS.textColorFull} />
             <FireOutline size={17} color={COLORS.textColorFull} />
             <FireOutline size={17} color={COLORS.textColorFull} />
@@ -155,7 +155,7 @@ function UserRecipe() {
         )
       } else if (quantity === 2) {
         return (
-          <View style={styles.rowCenter}>
+          <View style={generalStyles.rowCenter}>
             <FireSolid size={17} color={COLORS.textColorFull} />
             <FireSolid size={17} color={COLORS.textColorFull} />
             <FireOutline size={17} color={COLORS.textColorFull} />
@@ -163,7 +163,7 @@ function UserRecipe() {
         )
       } else if (quantity === 3) {
         return (
-          <View style={styles.rowCenter}>
+          <View style={generalStyles.rowCenter}>
             <FireSolid size={17} color={COLORS.textColorFull} />
             <FireSolid size={17} color={COLORS.textColorFull} />
             <FireSolid size={17} color={COLORS.textColorFull} />
@@ -176,7 +176,7 @@ function UserRecipe() {
   
     return (
       <>
-        <View style={[styles.rowCenter, { gap: 10}]}>
+        <View style={[generalStyles.rowCenter, { gap: 10}]}>
           <View style={styles.userImage}>
 
           </View>
@@ -188,7 +188,7 @@ function UserRecipe() {
         <View style={{ marginTop: 10}}>
           <Text style={styles.recipeTitle}>Cranberry Sangria <Text style={styles.servings}>| 3 servings</Text></Text>
         </View>
-        <View style={[styles.rowCenter, { gap: 10, marginTop: 5}]}>
+        <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}>
           <StarRatingDisplay
             rating={4.6}
             color={COLORS.textColorFull}
@@ -232,7 +232,7 @@ function UserRecipe() {
     const [isSelected, setSelection] = useState(false);
 
     return (
-        <View style={[styles.rowCenter, { gap: 10, marginBottom: 5}]}>
+        <View style={[generalStyles.rowCenter, { gap: 10, marginBottom: 5}]}>
             <Checkbox
               style={{ borderRadius: 5}}
               value={isSelected}
@@ -272,10 +272,6 @@ const styles = StyleSheet.create({
         shadowOpacity: SHADOW.opacity,
         padding: 20,
         borderRadius: 30
-      },
-      rowCenter: {
-        flexDirection: 'row',
-        alignItems: 'center'
       },
     //   USER RECIPE COMPONENT STYLING
       userImage: {

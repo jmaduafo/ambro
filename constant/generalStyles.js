@@ -10,6 +10,10 @@ const generalStyles = StyleSheet.create({
         color: COLORS.textColorFull,
         fontFamily: 'Satoshi-Regular'
     },
+    rowCenter: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
     lineBreak: {
         width: '100%',
         height: 1,

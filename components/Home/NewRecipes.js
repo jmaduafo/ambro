@@ -13,7 +13,7 @@ const NewRecipes = ({ navigate }) => {
 
   return (
     <View>
-      <HeaderTitle title={'latest recipes'} featured={'no'} navigate={navigate} paddingLeft={30} paddingRight={30}/>
+      <HeaderTitle title={'latest recipes'} select='Latest' featured={'no'} navigate={navigate} paddingLeft={30} paddingRight={30}/>
     </View>
   )
 }
