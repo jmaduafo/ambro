@@ -15,7 +15,7 @@ const SearchListings = () => {
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Categories</Text>
             <View>
-                <Pressable onPress={() => navigate('SearchRecipesDisplay')}>
+                <Pressable onPress={() => navigate('SearchViewAll')}>
                     <Listing name='Beef' image={pic} />
                 </Pressable>
                 
@@ -26,7 +26,9 @@ const SearchListings = () => {
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Recipes</Text>
             <View>
-                <Listing name='Tres Leches' image={pic} />
+            <Pressable onPress={() => navigate('SearchRecipeDisplay')}>
+                    <Listing name='Tres Leche' image={pic} />
+                </Pressable>
                 <Listing name='Snickerdoodles'/>
                 <Listing name='Alfredo Pasta'/>
                 <Listing name='Chili Sauce'/>
@@ -35,7 +37,9 @@ const SearchListings = () => {
         <View style={styles.searchSection}>
             <Text style={styles.searchTitle}>Users</Text>
             <View>
-                <Listing name='jelly45' image={pic} searchType='user'/>
+                <Pressable onPress={() => navigate('SearchUserPage')}>
+                    <Listing name='jelly45' image={pic} searchType='user'/>
+                </Pressable>
                 <Listing name='tacotuesday' searchType='user'/>
                 <Listing name='hallypie' searchType='user'/>
             </View>

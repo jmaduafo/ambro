@@ -19,7 +19,7 @@ const TopDisplay = () => {
   }
   return (
     <View style={styles.section}>
-      <View style={styles.slide}>
+      {/* <View style={styles.slide}>
         {topSelectors.map(top => {
           return (
             <View key={top} style={{ flexDirection: 'column', alignItems: 'center' }}>
@@ -28,8 +28,8 @@ const TopDisplay = () => {
             </View>
           )
         })}
-      </View>
-      {/* <HeaderTitle title={'featured'} featured={'yes'}/> */}
+      </View> */}
+      <HeaderTitle title={'featured recipes'} featured={'yes'} />
       <View style={styles.colSection}>
         <View style={styles.col1}>
           <TouchableOpacity style={styles.col1Profile} >
@@ -53,7 +53,6 @@ export default TopDisplay
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 40,
     paddingRight: 30,
     paddingLeft: 30
   },

@@ -12,6 +12,7 @@ import Search from "../../screens/Search";
 
 // Import Search components as a stack navigation to nest within tab navigator
 import SearchGroup from './SearchGroup';
+import HomeGroup from './HomeGroup';
 
 import { COLORS, SHADOW } from '../../constant/default';
 
@@ -28,7 +29,7 @@ const Root = () => {
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => {
                 // HOME SCREEN
-              if (route.name === "Home") {
+              if (route.name === "HomeGroup") {
                 return (
                   <Ionicons
                     name={focused ? "home" : "home-outline"}
@@ -83,11 +84,11 @@ const Root = () => {
             },
           })}>
           <Tab.Screen
-            name="Home"
+            name="HomeGroup"
             options={{
               title: "Feed",
             }}
-            component={Home}
+            component={HomeGroup}
             initialParams={''}
           />
           <Tab.Screen

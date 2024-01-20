@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Button, StyleSheet, Text, View } from 'react-native'
 import React, { Fragment, useState } from 'react'
 import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
@@ -7,9 +7,11 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { FireIcon as FireOutline } from 'react-native-heroicons/outline'
 import { FireIcon as FireSolid } from 'react-native-heroicons/solid'
 import HeaderTitle from './HeaderTitle'
-import CheckBox from 'react-native-check-box'
+import Checkbox from 'expo-checkbox';
+import WebView from 'react-native-webview'
 
 const RecipeDisplay = () => {
+    const iframeString = 'https://youtu.be/QpfAyQgphgw?si=L5QIYZCqV1ZHIWvG'
     const tags = {
         vegetarian: true,
         lowCarb: true,
@@ -34,37 +36,37 @@ const RecipeDisplay = () => {
           {/* RECIPE TAGS */}
           <View style={[styles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
             {/* CUISINE */}
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Mexican</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Mexican</Text>
             </View>
             {/* VEGETARIAN */}
             {tags.vegetarian && 
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Vegetarian</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Vegetarian</Text>
             </View>
             }
             {/* LOW CARB */}
             {tags.lowCarb && 
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Low Carb</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Low Carb</Text>
             </View>
             }
             {/* LOW SODIUM */}
             {tags.lowSodium && 
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Low Sodium</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Low Sodium</Text>
             </View>
             }
             {/* VEGAN */}
             {tags.vegan && 
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Vegan</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Vegan</Text>
             </View>
             }
             {/* DAIRY FREE */}
             {tags.dairyFree && 
-            <View style={styles.tagSection}>      
-                <Text style={styles.tag}>Dairy Free</Text>
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>Dairy Free</Text>
             </View>
             }
           </View>
@@ -98,7 +100,20 @@ const RecipeDisplay = () => {
           </View>
 
           {/* IF API, THEN DISPLAY YOUTUBE VIDEO */}
-          <View></View>
+          <View>
+            
+        <WebView
+          scalesPageToFit={true}
+          bounces={false}
+          javaScriptEnabled
+          style={{ height: 300, width: '100%', borderRadius: 20, marginTop: 10, marginBottom: 20 }}
+          source={{
+            uri: iframeString,
+          }}
+          automaticallyAdjustContentInsets={false}
+        />
+          
+          </View>
         </View>
       </ScrollView>
     </>
@@ -212,25 +227,24 @@ function UserRecipe() {
     )
   }
 
+  // Ingredients checklist
   function IngredientList({measurement, ingredient}) {
     const [isSelected, setSelection] = useState(false);
 
     return (
-        <View style={[styles.rowCenter, { gap: 10}]}>
-            <CheckBox
-              onClick={()=>{
-                setSelection(prev => !prev)
-              }}
-              isChecked={isSelected}
-              checkBoxColor={COLORS.textColorFull}
-              checkedCheckBoxColor={COLORS.textColorFull}
-              uncheckedCheckBoxColor={COLORS.textColorFull}
+        <View style={[styles.rowCenter, { gap: 10, marginBottom: 5}]}>
+            <Checkbox
+              style={{ borderRadius: 5}}
+              value={isSelected}
+              onValueChange={setSelection}
+              color={COLORS.textColorFull}
             />
             <Text style={styles.measurement}>{measurement} <Text style={styles.ingredient}>{ingredient}</Text></Text>
         </View>
     )
   }
 
+  // Instructions display with number and text
   function InstructionList({index, instruction}) {
     const [isSelected, setSelection] = useState(false);
 
@@ -319,18 +333,13 @@ const styles = StyleSheet.create({
         height: 30,
         backgroundColor: COLORS.textColor10
       },
-    //   TAG STYLING
-      tagSection: {
-        padding: 5,
-        paddingLeft: 15,
-        paddingRight: 15,
-        borderRadius: 20,
-        backgroundColor: COLORS.textColorFull,
+    //   INGREDIENTS STYLING
+      measurement: {
+        fontFamily: 'Satoshi-Medium',
+        color: COLORS.textColor50,
       },
-      tag: {
-        fontFamily: 'Satoshi-Regular',
-        color: COLORS.backgroundFull,
-        textAlign: 'center',
-        fontSize: 12
-      }
+      ingredient: {
+        fontFamily: 'Satoshi-Medium',
+        color: COLORS.textColorFull,
+      },
 })

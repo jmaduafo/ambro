@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import UserPage from '../UserPage'
+import generalStyles from '../../constant/generalStyles'
 
-const SearchUserPage = ({ navigation }) => {
+const SearchUserPage = () => {
   return (
-    <View>
-      <Text>SearchUserPage</Text>
+    <View style={generalStyles.default}>
+      <UserPage/>
     </View>
   )
 }

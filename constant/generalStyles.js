@@ -86,7 +86,21 @@ const generalStyles = StyleSheet.create({
         fontFamily: 'Satoshi-Regular',
         fontSize: 16,
         color: COLORS.backgroundFull
-    }
+    },
+    //   TAG STYLING
+    tagSection: {
+        padding: 5,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderRadius: 20,
+        backgroundColor: COLORS.textColorFull,
+      },
+      tag: {
+        fontFamily: 'Satoshi-Regular',
+        color: COLORS.backgroundFull,
+        textAlign: 'center',
+        fontSize: 12
+      },
 })
 
 export default generalStyles

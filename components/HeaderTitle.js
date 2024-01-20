@@ -1,13 +1,15 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { COLORS } from '../constant/default'
+import { useNavigation } from '@react-navigation/native'
 
-const HeaderTitle = ({title, featured, paddingLeft, paddingRight}) => {
+const HeaderTitle = ({title, featured, paddingLeft, paddingRight, navigate }) => {
+  
   return (
     <View style={[styles.position, { paddingLeft: paddingLeft, paddingRight: paddingRight}]}>
       <Text style={styles.text}>{title}</Text>
       {featured === 'no' &&
-      <Pressable onPress={() => {}}>
+      <Pressable onPress={() => {navigate('HomeViewAll')}}>
         <Text style={styles.viewAll}>View All</Text>
       </Pressable>
       }

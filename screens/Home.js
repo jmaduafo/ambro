@@ -20,12 +20,14 @@ import { greeting } from "../utils/greeting";
 import { StatusBar } from "expo-status-bar";
 import { auth, db } from "../firebase/config";
 import { query, collection, getDocs, where } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
 
 const Home = ({ navigation }) => {
   const [date, setDate] = useState("");
   const [userInfo, setUserInfo] = useState();
   const [loading, setLoading] = useState(false);
 
+  const { navigate } = useNavigation()
   const time = new Date();
 
   function getUser() {
@@ -101,8 +103,8 @@ const Home = ({ navigation }) => {
         >
           <PopularCategories />
           <TopDisplay />
-          <ForYou />
-          <NewRecipes />
+          <ForYou navigate={navigate}/>
+          <NewRecipes navigate={navigate}/>
         </ScrollView>
       </View>
     </View>

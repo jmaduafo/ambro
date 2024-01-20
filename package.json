@@ -17,6 +17,7 @@
     "@react-navigation/stack": "^6.3.20",
     "axios": "^1.6.5",
     "expo": "~49.0.15",
+    "expo-checkbox": "~2.4.0",
     "expo-font": "~11.4.0",
     "expo-image-picker": "~14.3.2",
     "expo-image-picker-multiple": "^1.4.1",
@@ -34,6 +35,7 @@
     "react-native-responsive-screen": "^1.4.2",
     "react-native-star-rating-widget": "^1.7.3",
     "react-native-svg": "^14.1.0",
+    "react-native-webview": "^13.6.4",
     "react-timeago": "^7.2.0"
   },
   "devDependencies": {
