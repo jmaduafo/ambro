@@ -30,6 +30,7 @@
     "react-native-masonry-list": "^2.16.1",
     "react-native-reanimated": "^3.3.0",
     "react-native-responsive-screen": "^1.4.2",
+    "react-native-star-rating-widget": "^1.7.3",
     "react-native-svg": "^14.1.0"
   },
   "devDependencies": {

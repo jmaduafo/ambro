@@ -13,7 +13,7 @@ const generalStyles = StyleSheet.create({
     lineBreak: {
         width: '100%',
         height: 1,
-        backgroundColor: COLORS.textColor20,
+        backgroundColor: COLORS.textColor10,
     },
     error: {
         padding: 10,

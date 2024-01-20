@@ -15,11 +15,7 @@ import { slides } from "./utils/onboarding";
 import OnboardingSlide from "./components/OnboardingSlide";
 import OnboardingButton from "./components/OnboardingButton";
 import Root from "./components/Navigations/Root";
-import Profile from "./screens/Profile";
-import SearchListings from "./components/Search/SearchListings";
-import SearchRecipesDisplay from "./components/Search/SearchRecipesDisplay";
-import SearchUserPage from "./components/Search/SearchUserPage";
-import Listing from "./components/Listing";
+
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 
