@@ -9,7 +9,7 @@ const Listing = (props) => {
         {props.image ? 
         <View style={styles.searchImage}>
             <Image
-                source={{uri: props.image}}
+                source={props.image}
                 resizeMode='contain'
                 style={{width: '100%', height: '100%', borderRadius: 10}}
             />

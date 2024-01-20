@@ -33,7 +33,7 @@ const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, 
           <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
         </Pressable> */}
         <ImageBackground
-        source={{ uri: bgImage ? bgImage : pic}}
+        source={ bgImage ? bgImage : pic }
         resizeMode='cover'
         style={{ width: '100%', height: '100%'}}/>
       </View>
@@ -42,11 +42,11 @@ const UserPage = ({ profileImage, bgImage, name, username, pronouns, bio, type, 
           {/* PROFILE IMAGE */}
           <View style={styles.userIntro}>
             <View style={{ flexBasis: '30%' }}>
-              <View style={{ width: 80, height: 80, borderRadius: '50%'}}>
+              <View style={{ width: 80, height: 80, borderRadius: 80/2 }}>
                 <Image
-                  source={{ uri: profileImage ? profileImage : pic}}
+                  source={ profileImage ? profileImage : pic }
                   resizeMode='cover'
-                  style={{ width: '100%', height: '100%', borderRadius: '50%'}}/>
+                  style={{ width: '100%', height: '100%', borderRadius: 100000}}/>
               </View>
             </View>
             {/* USERNAME, PRONOUNS, BUTTONS */}
