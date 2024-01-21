@@ -54,6 +54,7 @@ const SignUp = ({ navigation }) => {
                   pronouns: null,
                   profileImage: null,
                   profileBackgroundImage: null,
+                  private: false,
                   createdAt: serverTimestamp()
                 })
 

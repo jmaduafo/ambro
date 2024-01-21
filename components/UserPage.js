@@ -71,7 +71,7 @@ const UserPage = ({ navigate, profileImage, bgImage, name, username, pronouns, b
                 {type && type === 'user' && <TouchableOpacity style={styles.buttons}>
                   <Text style={styles.buttonsText}>Follow</Text>
                 </TouchableOpacity>}
-                <TouchableOpacity style={styles.buttons} onPress={() => navigate('EditProfile')}>
+                <TouchableOpacity style={styles.buttons} onPress={() => navigate('Edit Profile')}>
                   <Text style={styles.buttonsText}>Edit Profile</Text>
                 </TouchableOpacity>
               </View>
