@@ -85,7 +85,9 @@ const Home = ({ navigation }) => {
           )}
           <TouchableOpacity
             style={styles.profileContainer}
-            onPress={() => navigation.navigate("Profile")}
+            // Navigates to the stack navigation containing the profile page within the
+            // nested navigation and specify the name of the screen to navigate to
+            onPress={() => navigation.navigate('ProfileGroup', { screen: 'Profile' })}
           >
             <View style={styles.profile}></View>
           </TouchableOpacity>

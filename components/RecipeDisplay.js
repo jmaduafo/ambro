@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View } from 'react-native'
+import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React, { Fragment, useState } from 'react'
 import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
@@ -10,7 +10,7 @@ import HeaderTitle from './HeaderTitle'
 import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
 
-const RecipeDisplay = () => {
+const RecipeDisplay = ({ navigate }) => {
     const iframeString = 'https://youtu.be/QpfAyQgphgw?si=L5QIYZCqV1ZHIWvG'
     const tags = {
         vegetarian: true,
@@ -29,9 +29,9 @@ const RecipeDisplay = () => {
 
         </View>
         <View style={styles.bottom}>
-          {/* IF FIREBASE, RECIPE INFORMATION, OR IF API, RECIPE ABOUT SECTION */}
+          {/* IF FIREBASE, RECIPE INFORMATION, AND IF API, RECIPE ABOUT SECTION */}
           <View style={styles.recipeCard}>
-            <UserRecipe/>
+            <UserRecipe navigate={navigate}/>
           </View>
           {/* RECIPE TAGS */}
           <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
@@ -123,7 +123,7 @@ const RecipeDisplay = () => {
 export default RecipeDisplay
 
 // The recipe displayed from the firebase backend
-function UserRecipe() {
+function UserRecipe({navigate}) {
     const info = [
       {
         title: 'duration',
@@ -177,9 +177,9 @@ function UserRecipe() {
     return (
       <>
         <View style={[generalStyles.rowCenter, { gap: 10}]}>
-          <View style={styles.userImage}>
+          <Pressable style={styles.userImage} onPress={() => navigate('SearchUserPage')}>
 
-          </View>
+          </Pressable>
           <View>
             <Text style={styles.userName}>@jmaduafo</Text>
             <Text style={styles.userRecipeCount}>34 recipes</Text>

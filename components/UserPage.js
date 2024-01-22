@@ -107,7 +107,7 @@ const UserPage = ({ navigate, profileImage, bgImage, name, username, pronouns, b
           </View>
           {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ flex: 1, marginTop: 10}}>
-            <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundLight} imageContainerStyle={{ borderRadius: 5}}/>
+            <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
           </View>
       </View>
     </>
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.textColorFull,
   },
   bottom: {
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: COLORS.backgroundFull,
     // borderTopRightRadius: 40,
     // borderTopLeftRadius: 40,
     flex: 3,

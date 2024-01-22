@@ -6,7 +6,7 @@ import { COLORS } from '../../constant/default'
 
 const SearchViewAll = () => {
   return (
-    <SafeAreaView style={[generalStyles.default, { backgroundColor: COLORS.backgroundLight}]}>
+    <SafeAreaView style={[generalStyles.default]}>
       <ViewAll/>
     </SafeAreaView>
   )

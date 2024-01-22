@@ -100,7 +100,7 @@ const ViewAll = ({ type }) => {
         <MasonryList
           images={categoryArray}
           columns={3}
-          backgroundColor={COLORS.backgroundLight}
+          backgroundColor={COLORS.backgroundFull}
           imageContainerStyle={{ borderRadius: 5 }}
         />
       </View>

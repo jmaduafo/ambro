@@ -4,34 +4,67 @@ import generalStyles from '../../constant/generalStyles'
 import { COLORS } from '../../constant/default'
 import { SelectList } from 'react-native-dropdown-select-list'
 import { editPronouns } from '../../utils/userEdit';
+import { ChevronRightIcon } from 'react-native-heroicons/outline'
+import Modal from '../Modal'
+import ReAuthenticate from '../ReAuthenticate'
 
 const EditProfile = () => {
   const [ newBio, setNewBio ] = useState('')
-  const [ newUsername, setNewUsername ] = useState('')
-  const [ newName, setNewName ] = useState('')
+  const [ newUsername, setNewUsername ] = useState('ginalovely')
+  const [ newName, setNewName ] = useState('Gina')
   const [ newPronouns, setNewPronouns ] = useState(null)
+  const [ nameEdit, setNameEdit ] = useState(false)
+  const [ usernameEdit, setUsernameEdit ] = useState(false)
+
   return (
-    <SafeAreaView>
-      <ScrollView style={{ paddingLeft: 20, paddingRight: 20}}>
+    <View style={[ generalStyles.default, { position: 'relative'}]}>
+      <ReAuthenticate/>
+      <ScrollView style={{ marginTop: 40, paddingLeft: 20, paddingRight: 20}}>
         {/* USER USERNAME */}
         <View style={generalStyles.loginSignupInputSection}>
             <Text style={generalStyles.loginSignupLabel}>Name</Text>
+          {/* EDIT NAME  */}
           <View style={[generalStyles.rowCenter, {justifyContent: 'space-between'}]}>
-            <Text>Gina</Text>
-            <TouchableOpacity style={generalStyles.tagSection}>
+            <TextInput
+            value={newName}
+            onChangeText={text => setNewName(text)}
+            // DISABLE USER'S ABILITY TO INPUT TEXT WHEN NOT IN EDIT MODE
+            readOnly={nameEdit ? false : true}
+            style={[generalStyles.loginSignupInput, { color: nameEdit ? COLORS.textColor75 : COLORS.textColor40, borderColor: nameEdit ? COLORS.textColorFull : COLORS.textColor50}]}
+            />
+            {/* IF EDIT BUTTON IS CLICKED, HIDE EDIT BUTTON AND SHOW SAVE BUTTON;
+            IF SAVE BUTTON IS CLICKED, SHOW EDIT BUTTON */}
+            <TouchableOpacity style={[generalStyles.tagSection, { display: nameEdit ? 'none' : 'block'} ]} onPress={() => setNameEdit(true)}>
               <Text style={generalStyles.tag}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[generalStyles.tagSection, { display: nameEdit ? 'block' : 'none'} ]} onPress={() => setNameEdit(false)}>
+              <Text style={generalStyles.tag}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
+        {/* EDIT USERNAME */}
         <View style={generalStyles.loginSignupInputSection}>
           <Text style={generalStyles.loginSignupLabel}>Username</Text>
           <View style={[generalStyles.rowCenter, {justifyContent: 'space-between'}]}>
-            <Text>@ginawonder</Text>
-            <TouchableOpacity style={generalStyles.tagSection}>
+            <TextInput
+              value={newUsername}
+              onChangeText={text => setNewUsername(text)}
+              readOnly={usernameEdit ? false : true}
+              style={[generalStyles.loginSignupInput, { color: usernameEdit ? COLORS.textColor75 : COLORS.textColor40, borderColor: usernameEdit ? COLORS.textColorFull : COLORS.textColor50}]}
+            />
+            <TouchableOpacity style={[generalStyles.tagSection, { display: usernameEdit ? 'none' : 'block'} ]} onPress={() => setUsernameEdit(true)}>
               <Text style={generalStyles.tag}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[generalStyles.tagSection, { display: usernameEdit ? 'block' : 'none'} ]} onPress={() => setUsernameEdit(false)}>
+              <Text style={generalStyles.tag}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
+        <TouchableOpacity style={[generalStyles.rowCenter, styles.password ]}>
+          <Text style={{ fontFamily: 'Satoshi-Regular'}}>Change Password</Text>
+          <ChevronRightIcon color={COLORS.textColor20} />
+        </TouchableOpacity>
+        <View style={[generalStyles.lineBreak, {marginTop: 15, marginBottom: 15}]}></View>
         {/* USER BIO INPUT */}
         <View style={generalStyles.loginSignupInputSection}>
           <Text style={generalStyles.loginSignupLabel}>Bio</Text>
@@ -66,10 +99,20 @@ const EditProfile = () => {
         </View>
       
       </ScrollView>
-    </SafeAreaView>
+    </View>
   )
 }
 
 export default EditProfile
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  password: {
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.backgroundLight,
+    opacity: .6,
+    padding: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 10
+  }
+})

@@ -5,11 +5,12 @@ import { COLORS } from '../../constant/default'
 import Listing from '../Listing'
 import pic from '../../assets/icon.png'
 import { useNavigation } from '@react-navigation/native';
+import generalStyles from '../../constant/generalStyles'
 
 const SearchListings = () => {
     const { navigate } = useNavigation()
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundLight}}>
+    <SafeAreaView style={generalStyles.default}>
       <SearchEngine marginTop={20} marginBottom={10} placeholderText={'Search'}/>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.searchSection}>

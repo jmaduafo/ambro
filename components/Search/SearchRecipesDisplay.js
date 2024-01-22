@@ -4,11 +4,13 @@ import { ScrollView } from 'react-native'
 import generalStyles from '../../constant/generalStyles'
 import { COLORS, SHADOW } from '../../constant/default'
 import RecipeDisplay from '../RecipeDisplay'
+import { useNavigation } from '@react-navigation/native'
 
 const SearchRecipesDisplay = () => {
+  const {navigate} = useNavigation()
   return (
     <View style={generalStyles.default}>
-      <RecipeDisplay/>
+      <RecipeDisplay navigate={navigate}/>
     </View>
   )
 }

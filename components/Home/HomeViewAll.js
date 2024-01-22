@@ -9,7 +9,7 @@ const HomeViewAll = () => {
     const { params } = route
 
   return (
-    <SafeAreaView style={[generalStyles.default, { backgroundColor: COLORS.backgroundLight}]}>
+    <SafeAreaView style={[generalStyles.default]}>
       <ViewAll type='home' />
     </SafeAreaView>
   )

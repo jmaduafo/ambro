@@ -1,6 +1,7 @@
 export const COLORS = {
-    backgroundFull: '#FFF5E9',
-    backgroundLight: '#FFF9F2',
+    backgroundFull: '#FFF9F2',
+    // backgroundFull: '#FFF5E9',
+    backgroundLight: '#FFFFFF',
     textColorFull: '#000',
     textColor75: 'rgba(0, 0, 0, .75)',
     textColor50: 'rgba(0, 0, 0, .5)',

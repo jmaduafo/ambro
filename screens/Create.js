@@ -5,18 +5,24 @@ import CreateRecipeForm from '../components/Create/CreateRecipeForm'
 import { COLORS } from '../constant/default'
 import CameraRoll from '../components/Create/CameraRoll'
 import generalStyles from '../constant/generalStyles'
+import Modal from '../components/Modal'
 
 const Create = () => {
   
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.view}>
-        <AccessCamera/>
-        <CameraRoll/>
-        <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
-        <CreateRecipeForm />
-      </ScrollView>
-    </SafeAreaView>
+    <View style={[generalStyles.default, { position: 'relative'}]}>
+      {/* <Modal>
+        <Text>Hi</Text>
+      </Modal> */}
+      <SafeAreaView>
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.view}>
+          <AccessCamera/>
+          <CameraRoll/>
+          <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
+          <CreateRecipeForm />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   )
 }
 
