@@ -5,16 +5,17 @@ import generalStyles from '../constant/generalStyles'
 import { XMarkIcon } from 'react-native-heroicons/outline'
 import { COLORS } from '../constant/default'
 
-const ReAuthenticate = () => {
+const ReAuthenticate = ({ setOpen }) => {
     const [ oldPassword, setOldPassword] = useState('')
     const [ newPassword, setNewPassword] = useState('')
+    
   return (
     <>
       <Modal>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10}}>
-            <Pressable onPress={() => {}}>
+            <TouchableOpacity onPress={() => {setOpen(false)}}>
                 <XMarkIcon color={COLORS.textColorFull}/>
-            </Pressable>
+            </TouchableOpacity>
         </View>
         {/* <OldPassword oldPassword={oldPassword} setOldPassword={setOldPassword}/> */}
         <NewPassword newPassword={newPassword} setNewPassword={setNewPassword}/>
@@ -68,8 +69,8 @@ function NewPassword({ newPassword, setNewPassword }) {
                 onChangeText={text => setNewPassword(text)}
                 secureTextEntry={true}
                 />
-            <TouchableOpacity onPress={handleSubmit} style={[generalStyles.loginSignUpButton, { justifyContent: 'center', gap: 0, marginTop: 10} ]}>
-                    <Text style={[generalStyles.loginSignUpButtonText]}>Submit</Text>
+            <TouchableOpacity onPress={handleSubmit} style={[generalStyles.button, { marginTop: 10} ]}>
+                    <Text style={[generalStyles.buttonText]}>Submit</Text>
             </TouchableOpacity>
         </>
     )

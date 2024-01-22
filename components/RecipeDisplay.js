@@ -239,7 +239,7 @@ function UserRecipe({navigate}) {
               onValueChange={setSelection}
               color={COLORS.textColorFull}
             />
-            <Text style={styles.measurement}>{measurement} <Text style={styles.ingredient}>{ingredient}</Text></Text>
+            <Text style={[styles.measurement, { textDecorationLine: isSelected ? 'line-through' : 'none', textDecorationColor: COLORS.textColorFull}]}>{measurement} <Text style={[styles.ingredient]}>{ingredient}</Text></Text>
         </View>
     )
   }

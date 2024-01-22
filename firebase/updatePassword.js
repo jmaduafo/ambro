@@ -1,4 +1,4 @@
-import { reauthenticateWithCredential, updatePassword } from "firebase/auth";
+import { reauthenticateWithCredential, updatePassword, EmailAuthProvider } from "firebase/auth";
 import { auth } from "./config";
 
 export function updatePassword(oldPassword, newPassword) {
@@ -16,7 +16,7 @@ export function updatePassword(oldPassword, newPassword) {
         async function authenticate() {
             if (oldPassword.length && newPassword.length) {
                 await reauthenticateWithCredential(
-                    auth?.currentUser, 
+                    user, 
                     credential
                 ).then(result => {
                     user.updatePassword(newPassword)
@@ -27,9 +27,11 @@ export function updatePassword(oldPassword, newPassword) {
                     }).catch((error) => {
                         // An error occurred
                         // ...
+                        success = '';
                         errorMessage = error.message
                     });
                 }).catch(err => {
+                    success = '';
                     errorMessage = err.message
                 })
             }
@@ -37,6 +39,8 @@ export function updatePassword(oldPassword, newPassword) {
 
     authenticate()
     
+    } else {
+        error = "Password must be entered in to update password"
     }
 
     

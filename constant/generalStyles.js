@@ -91,6 +91,19 @@ const generalStyles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.backgroundFull
     },
+    button: {
+        backgroundColor: COLORS.textColorFull,
+        borderRadius: 40,
+        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+    },
+    buttonText: {
+        fontFamily: 'Satoshi-Regular',
+        fontSize: 16,
+        color: COLORS.backgroundFull,
+        textAlign: 'center'
+    },
     //   TAG STYLING
     tagSection: {
         padding: 5,
