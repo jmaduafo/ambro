@@ -11,6 +11,7 @@
     "bundle-android": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --sourcemap-output android/app/src/main/assets/index.android.map --assets-dest android/app/src/main/res/"
   },
   "dependencies": {
+    "@expo/webpack-config": "^19.0.0",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-picker/picker": "^2.4.10",
@@ -29,23 +30,24 @@
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.7.1",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-native": "0.72.6",
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-check-box": "^2.1.7",
     "react-native-dropdown-select-list": "^2.0.5",
     "react-native-heroicons": "^4.0.0",
     "react-native-masonry-list": "^2.16.1",
+    "react-native-paper": "^5.12.2",
     "react-native-picker-select": "^9.0.0",
+    "react-native-radio-buttons-group": "^3.0.6",
     "react-native-reanimated": "^3.3.0",
     "react-native-responsive-screen": "^1.4.2",
     "react-native-select-dropdown": "^3.4.0",
     "react-native-star-rating-widget": "^1.7.3",
     "react-native-svg": "^14.1.0",
-    "react-native-webview": "^13.6.4",
-    "react-timeago": "^7.2.0",
     "react-native-web": "~0.19.6",
-    "react-dom": "18.2.0",
-    "@expo/webpack-config": "^19.0.0"
+    "react-native-webview": "^13.6.4",
+    "react-timeago": "^7.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

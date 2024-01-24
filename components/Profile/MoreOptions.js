@@ -8,6 +8,7 @@ import { signOut } from 'firebase/auth';
 import HeaderTitle from '../HeaderTitle';
 import Modal from '../Modal';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../../firebase/config';
 
 
 const MoreOptions = () => {

@@ -49,6 +49,7 @@ const generalStyles = StyleSheet.create({
         fontFamily: 'Satoshi-Regular',
         color: COLORS.textColorFull,
         fontSize: 14,
+        paddingLeft: 10,
         marginBottom: 10
     },
     loginSignupInput: {
@@ -89,7 +90,7 @@ const generalStyles = StyleSheet.create({
     loginSignUpButtonText: {
         fontFamily: 'Satoshi-Regular',
         fontSize: 16,
-        color: COLORS.backgroundFull
+        color: COLORS.backgroundFull,
     },
     button: {
         backgroundColor: COLORS.textColorFull,

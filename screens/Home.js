@@ -9,7 +9,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { COLORS } from "../constant/default";
 import PopularCategories from "../components/Home/PopularCategories";
 import TopDisplay from "../components/Home/TopDisplay";
@@ -21,6 +21,8 @@ import { StatusBar } from "expo-status-bar";
 import { auth, db } from "../firebase/config";
 import { query, collection, getDocs, where } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
+import { Image } from "react-native";
+import { UserIcon } from "react-native-heroicons/solid";
 
 const Home = ({ navigation }) => {
   const [date, setDate] = useState("");
@@ -69,28 +71,39 @@ const Home = ({ navigation }) => {
           ) : (
             userInfo?.map(user => {
               return (
-              <View key={user.id}>
-                <Text
-                  style={[
-                    styles.openingText,
-                    { marginTop: 20, marginBottom: -10 },
-                  ]}
-                >
-                  Good {date},
-                </Text>
-                <Text style={styles.openingText}>{user.name}</Text>
-              </View>
+                <Fragment key={user.id}>
+                  <View>
+                    <Text
+                      style={[
+                        styles.openingText,
+                        { marginTop: 20, marginBottom: -10 },
+                      ]}
+                    >
+                      Good {date},
+                    </Text>
+                    <Text style={styles.openingText}>{user.name}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.profile}
+                    // Navigates to the stack navigation containing the profile page within the
+                    // nested navigation and specify the name of the screen to navigate to
+                    onPress={() => navigation.navigate('ProfileGroup', { screen: 'Profile' })}
+                  >
+                    {user.profileImage ?
+                      <Image
+                      source={{ uri: user.profileImage }}
+                      resizeMode='cover'
+                      style={{ width: '100%', height: '100%', borderRadius: 10000}}
+                      /> 
+                      : 
+                      <UserIcon color={COLORS.backgroundLight}/>
+                    }
+                    
+                  </TouchableOpacity>
+                </Fragment>
               )
             })
           )}
-          <TouchableOpacity
-            style={styles.profileContainer}
-            // Navigates to the stack navigation containing the profile page within the
-            // nested navigation and specify the name of the screen to navigate to
-            onPress={() => navigation.navigate('ProfileGroup', { screen: 'Profile' })}
-          >
-            <View style={styles.profile}></View>
-          </TouchableOpacity>
         </View>
         <SearchEngine
           marginTop={20}
@@ -134,6 +147,9 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: "50%",
     backgroundColor: "#fff",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   openingText: {
     fontFamily: "Boska-Medium",

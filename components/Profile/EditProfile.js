@@ -312,7 +312,7 @@ const EditProfile = () => {
             save="value"
             search={false}
             searchicon={() => <View></View>}
-            placeholder="Select your pronouns"
+            placeholder={newPronouns.length ? newPronouns : "Select your pronouns"}
             inputStyles={{
               fontFamily: "Satoshi-Regular",
               color: COLORS.textColorFull,

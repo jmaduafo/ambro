@@ -1,25 +1,26 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, FlatList } from 'react-native'
 import React, { useState } from 'react'
 import AccessCamera from '../components/Create/AccessCamera'
 import CreateRecipeForm from '../components/Create/CreateRecipeForm'
 import { COLORS } from '../constant/default'
 import CameraRoll from '../components/Create/CameraRoll'
 import generalStyles from '../constant/generalStyles'
+import { RadioButton } from 'react-native-paper';
 import Modal from '../components/Modal'
 
 const Create = () => {
-  
   return (
     <View style={[generalStyles.default, { position: 'relative'}]}>
       {/* <Modal>
         <Text>Hi</Text>
       </Modal> */}
-      <SafeAreaView>
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.view}>
+      <SafeAreaView >
+        <ScrollView style={[styles.view, { paddingBottom: 80}]}>
           <AccessCamera/>
           <CameraRoll/>
           <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
           <CreateRecipeForm />
+          <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
         </ScrollView>
       </SafeAreaView>
     </View>
