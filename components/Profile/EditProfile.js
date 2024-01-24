@@ -42,31 +42,59 @@ const EditProfile = () => {
   // Handles background pic image picker
   const backgroundImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 2],
-      quality: 1,
-    });
+    const { status } = await ImagePicker. 
+      requestMediaLibraryPermissionsAsync(); 
 
-    if (!result.canceled) {
-      setBackgroundImagePick(result.assets[0].uri);
-    }
+  if (status !== "granted") { 
+
+      // If permission is denied, show an alert 
+      Alert.alert( 
+          "Permission Denied", 
+          `Sorry, we need camera  
+            roll permission to upload images.` 
+      ); 
+  } else { 
+
+      // Launch the image library and get 
+      // the selected image 
+      const result = 
+          await ImagePicker.launchImageLibraryAsync(); 
+
+      if (!result.canceled) { 
+
+          // Append to images array when image is added
+          setBackgroundImagePick(result.assets[0].uri); 
+          // Clear any previous errors 
+      } 
+  }
   };
 
   // Handles profile pic image picker
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const { status } = await ImagePicker. 
+        requestMediaLibraryPermissionsAsync(); 
 
-    if (!result.canceled) {
-      setImagePick(result.assets[0].uri);
-      console.log(imagePick);
+    if (status !== "granted") { 
+
+        // If permission is denied, show an alert 
+        Alert.alert( 
+            "Permission Denied", 
+            `Sorry, we need camera  
+              roll permission to upload images.` 
+        ); 
+    } else { 
+
+        // Launch the image library and get 
+        // the selected image 
+        const result = 
+            await ImagePicker.launchImageLibraryAsync(); 
+
+        if (!result.canceled) { 
+            // Append to images array when image is added
+            setImagePick(result.assets[0].uri); 
+            // Clear any previous errors 
+        } 
     }
   };
 

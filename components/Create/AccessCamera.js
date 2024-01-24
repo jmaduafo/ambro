@@ -1,20 +1,54 @@
-import { StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { CameraIcon } from 'react-native-heroicons/outline'
 import { COLORS } from '../../constant/default'
 import generalStyles from '../../constant/generalStyles'
 import { Button } from 'react-native'
+import CameraRoll from './CameraRoll'
+import * as ImagePicker from "expo-image-picker";
 
 const AccessCamera = () => {
   const [ modalVisible, setModalVisible ] = useState(false)
+  const [ imagesArray, setImagesArray ] = useState([])
+
+  const pickImage = async () => {
+    if (imagesArray.length < 5) {
+      // No permissions request is necessary for launching the image library
+      const { status } = await ImagePicker. 
+              requestMediaLibraryPermissionsAsync(); 
+    
+          if (status !== "granted") { 
+    
+              // If permission is denied, show an alert 
+              Alert.alert( 
+                  "Permission Denied", 
+                  `Sorry, we need camera  
+                   roll permission to upload images.` 
+              ); 
+          } else { 
+    
+              // Launch the image library and get 
+              // the selected image 
+              const result = 
+                  await ImagePicker.launchImageLibraryAsync(); 
+    
+              if (!result.canceled) { 
+    
+                  // Append to images array when image is added
+                  setImagesArray([...imagesArray, result.assets[0].uri]); 
+                  // Clear any previous errors 
+              } 
+          } 
+    }
+  };
+
   return (
     <>
-    <TouchableOpacity style={styles.cameraButton}>
+    <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
         <CameraIcon color={COLORS.textColorFull} strokeWidth={1}/>
         <Text style={styles.cameraText}>Camera</Text>
     </TouchableOpacity>
-    <Button title='show' onPress={() => setModalVisible(true)}/>
-    <Modal
+    {/* <Modal
         animationType='slide'
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -22,7 +56,9 @@ const AccessCamera = () => {
           <Text>jajadhsjh</Text>
           <Button title='hide' onPress={() => setModalVisible(false)}/>
           </SafeAreaView>
-        </Modal>
+        </Modal> */}
+
+      <CameraRoll setImagesArray={setImagesArray} array={imagesArray}/>
     </>
   )
 }

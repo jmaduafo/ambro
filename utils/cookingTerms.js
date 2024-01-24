@@ -77,15 +77,15 @@ export const courses = [
 export const difficulty = [
     {
         key: '1',
-        value: 'low'
+        value: 'Low'
     },
     {
         key: '2',
-        value: 'medium'
+        value: 'Medium'
     },
     {
         key: '3',
-        value: 'high'
+        value: 'High'
     }
 ]
 

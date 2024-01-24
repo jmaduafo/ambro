@@ -17,10 +17,8 @@ const Create = () => {
       <SafeAreaView >
         <ScrollView style={[styles.view, { paddingBottom: 80}]}>
           <AccessCamera/>
-          <CameraRoll/>
           <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
           <CreateRecipeForm />
-          <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
         </ScrollView>
       </SafeAreaView>
     </View>
