@@ -39,7 +39,7 @@ const UserProfile = () => {
   
   return (
     <>
-      {userInfo?.map((profile) => {
+      {!loading && userInfo ? userInfo?.map((profile) => {
         return (
         <View key={profile.id} style={{ flex: 1 }}>
             <UserPage
@@ -53,7 +53,9 @@ const UserProfile = () => {
             />
         </View>
         );
-      })}
+      })
+      :
+      <ActivityIndicator color={COLORS.textColorFull}/>}
     </>
   );
 };

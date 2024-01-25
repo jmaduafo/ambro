@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Keyboard
 } from "react-native";
 import React, { useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
@@ -21,7 +22,7 @@ import {
   heat,
   tagsOptions,
 } from "../utils/cookingTerms";
-import { PlusCircleIcon, XCircleIcon } from "react-native-heroicons/solid";
+import { PlusCircleIcon, XCircleIcon, PencilIcon } from "react-native-heroicons/solid";
 
 const Create = () => {
   const [loading, setLoading] = useState();
@@ -40,7 +41,7 @@ const Create = () => {
 
   // INGREDIENTS STATE
   const [listedIngredients, setListedIngredients] = useState([]);
-  const [listedMeasurements, setListedMesasurements] = useState([]);
+  const [listedMeasurements, setListedMeasurements] = useState([]);
   const [quantity, setQuantity] = useState("");
   const [measure, setMeasure] = useState("");
   const [itemName, setItemName] = useState("");
@@ -150,7 +151,7 @@ const Create = () => {
             {/* INGREDIENTS INPUT */}
             <IngredientsInput
               setListedIngredients={setListedIngredients}
-              setListedMesasurements={setListedMesasurements}
+              setListedMeasurements={setListedMeasurements}
               setMeasure={setMeasure}
               setQuantity={setQuantity}
               setItemName={setItemName}
@@ -417,7 +418,7 @@ const IngredientsInput = ({
   setListedIngredients,
   listedIngredients,
   listedMeasurements,
-  setListedMesasurements,
+  setListedMeasurements,
   setQuantity,
   quantity,
   setMeasure,
@@ -425,18 +426,35 @@ const IngredientsInput = ({
   setItemName,
   itemName,
 }) => {
+  const [ isEdit, setIsEdit ] = useState(false)
+  const [ editIndex, setEditIndex ] = useState()
+
+
   function handleIngredient() {
-    if (quantity.length && measure.length && itemName.length) {
+    if (quantity.length && measure.length && itemName.length && !isEdit) {
       let ing = "";
 
       ing += quantity + " " + measure;
 
-      setListedMesasurements([...listedMeasurements, ing]);
+      setListedMeasurements([...listedMeasurements, ing]);
       setListedIngredients([...listedIngredients, itemName]);
 
       setQuantity("");
       setMeasure("");
       setItemName("");
+    } else if (quantity.length && measure.length && itemName.length && isEdit) {
+      // In edit mode, once done button is clicked, replace the text of the item name and measurements
+      // with the newly updated text from the input
+      let ing = "";
+
+      ing += quantity + " " + measure;
+
+      listedMeasurements[editIndex] = ing
+      listedIngredients[editIndex] = itemName
+
+      // Exit edit mode and set input to empty string
+      setIsEdit(false)
+      setItemName('')
     }
   }
 
@@ -448,6 +466,15 @@ const IngredientsInput = ({
 
     setListedMesasurements(newMeasure);
     setListedIngredients(newIngredients);
+  }
+
+  function handleEdit(item, index) {
+    // Set to edit mode
+    setIsEdit(true)
+    // Assign the input to the text that we want updated
+    setItemName(listedIngredients[index])
+    // Set a state to get the index in order to use it in another function
+    setEditIndex(index)
   }
 
   return (
@@ -466,6 +493,10 @@ const IngredientsInput = ({
         {listedMeasurements &&
           listedMeasurements.map((item, index) => {
             return (
+              <View>
+              <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end'}} onPress={() => handleEdit(item, index)}>
+                <PencilIcon size={18} color={COLORS.textColorFull}/>
+              </TouchableOpacity>
               <View
                 key={item}
                 style={[generalStyles.rowCenter, { gap: 10, marginBottom: 5 }]}
@@ -480,6 +511,7 @@ const IngredientsInput = ({
                     {listedIngredients[index]}
                   </Text>
                 </View>
+              </View>
               </View>
             );
           })}
@@ -507,8 +539,6 @@ const IngredientsInput = ({
               setSelected={(val) => setMeasure(val)}
               data={measurement}
               save="value"
-              search={false}
-              searchicon={() => <View></View>}
               placeholder="Select a measurement"
               inputStyles={{
                 fontFamily: "Satoshi-Regular",
@@ -549,7 +579,7 @@ const IngredientsInput = ({
             ]}
           >
             <PlusCircleIcon color={COLORS.backgroundFull} />
-            <Text style={generalStyles.tag}>Add Ingredient</Text>
+            <Text style={generalStyles.tag}>{isEdit ? 'Edit' : 'Add'} Ingredient</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -564,10 +594,24 @@ function InstructionsInput({
   setInstructionsArray,
   instructionsArray,
 }) {
+
+  const [ isEdit, setIsEdit ] = useState(false)
+  const [ editIndex, setEditIndex ] = useState()
+
   function handleInstructions() {
-    if (instructionStep.length) {
+    if (instructionStep.length && !isEdit) {
       setInstructionsArray([...instructionsArray, instructionStep]);
       setInstructionStep("");
+      Keyboard.dismiss()
+    } else if (instructionStep.length && isEdit) {
+      // In edit mode, once done button is clicked, replace the text of the instruction step
+      // with the newly updated text from the input
+      instructionsArray[editIndex] = instructionStep
+
+      // Exit edit mode and set input to empty string
+      setIsEdit(false)
+      setInstructionStep('')
+      Keyboard.dismiss()
     }
   }
 
@@ -575,6 +619,15 @@ function InstructionsInput({
     const newInstructions = instructionsArray.filter((obj) => obj !== item);
 
     setInstructionsArray(newInstructions);
+  }
+
+  function handleEdit(item, index) {
+    // Set to edit mode
+    setIsEdit(true)
+    // Assign the input to the text that we want updated
+    setInstructionStep(item)
+    // Set a state to get the index in order to use it in another function
+    setEditIndex(index)
   }
   return (
     <View style={{ marginBottom: 10 }}>
@@ -592,27 +645,38 @@ function InstructionsInput({
         {instructionsArray &&
           instructionsArray.map((item, index) => {
             return (
+              <View 
+              key={item} 
+              style={[{
+                marginBottom: 10
+                }]}>
+
               <View
-                key={item}
                 style={[
                   {
                     flexDirection: "row",
-                    alignItems: "flex-start",
-                    gap: 10,
-                    marginBottom: 12,
+                    alignItems: "center",
+                    justifyContent: 'space-between',
+                    marginBottom: 0,
                   },
                 ]}
               >
-                <XCircleIcon
-                  onPress={() => handleCancel(item)}
-                  color={COLORS.textColorFull}
-                />
-                <View style={{}}>
-                  <Text style={[styles.step, { marginBottom: 5 }]}>
-                    Step {index + 1}
-                  </Text>
-                  <Text style={styles.instructions}>{item}</Text>
+                <View style={[generalStyles.rowCenter, {gap: 10}]}>
+                  <XCircleIcon
+                    onPress={() => handleCancel(item)}
+                    color={COLORS.textColorFull}
+                  />
+                  <View style={{}}>
+                    <Text style={[styles.step, { marginBottom: 5 }]}>
+                      Step {index + 1}
+                    </Text>
+                  </View>
                 </View>
+                <TouchableOpacity onPress={() => handleEdit(item, index)}>
+                  <PencilIcon size={18} color={COLORS.textColorFull}/>
+                </TouchableOpacity>
+                </View>
+                <Text style={[styles.instructions, { paddingLeft: 35 }]}>{item}</Text>
               </View>
             );
           })}
@@ -623,6 +687,9 @@ function InstructionsInput({
           <TextInput
             onChangeText={(text) => setInstructionStep(text)}
             value={instructionStep}
+            numberOfLines={4}
+            editable
+            multiline
             style={generalStyles.loginSignupInput}
             placeholder="Recipe instructions steps"
             placeholderTextColor={COLORS.textColor50}
@@ -643,7 +710,7 @@ function InstructionsInput({
             ]}
           >
             <PlusCircleIcon color={COLORS.backgroundFull} />
-            <Text style={generalStyles.tag}>Add Instruction</Text>
+            <Text style={generalStyles.tag}>{isEdit ? 'Edit' : 'Add'} Instruction</Text>
           </TouchableOpacity>
         </View>
       </View>
