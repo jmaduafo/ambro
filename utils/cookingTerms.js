@@ -1,3 +1,5 @@
+import { categories } from "./popularCategories"
+
 const measure = [
     'pound',
     'pounds',
@@ -146,3 +148,9 @@ export const calorieRanges = [
         value: '1201 - 900'
     },
 ]
+
+export const tagsOptions = []
+
+categories.forEach((categories, index) => {
+    tagsOptions.push({key: index, value: categories.strCategory})
+})

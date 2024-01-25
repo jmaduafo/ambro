@@ -7,9 +7,7 @@ import { Button } from 'react-native'
 import CameraRoll from './CameraRoll'
 import * as ImagePicker from "expo-image-picker";
 
-const AccessCamera = () => {
-  const [ modalVisible, setModalVisible ] = useState(false)
-  const [ imagesArray, setImagesArray ] = useState([])
+const AccessCamera = ({ setImagesArray, imagesArray }) => {
 
   const pickImage = async () => {
     if (imagesArray.length < 5) {
@@ -46,7 +44,7 @@ const AccessCamera = () => {
     <>
     <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
         <CameraIcon color={COLORS.textColorFull} strokeWidth={1}/>
-        <Text style={styles.cameraText}>Camera</Text>
+        <Text style={styles.cameraText}>Add an image</Text>
     </TouchableOpacity>
     {/* <Modal
         animationType='slide'
@@ -58,7 +56,7 @@ const AccessCamera = () => {
           </SafeAreaView>
         </Modal> */}
 
-      <CameraRoll setImagesArray={setImagesArray} array={imagesArray}/>
+      {imagesArray.length ? <CameraRoll setImagesArray={setImagesArray} array={imagesArray}/> : <View style={{ marginTop: 20, marginBottom: 20}}><Text style={[generalStyles.defaultParagraph, { textAlign: 'center'}]}>No images selected yet</Text></View>}
     </>
   )
 }

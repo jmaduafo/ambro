@@ -12,23 +12,23 @@ import React, { useMemo, useState } from "react";
 import { RadioButton } from "react-native-paper";
 import { SelectList } from "react-native-dropdown-select-list";
 import generalStyles from "../../constant/generalStyles";
-
 import { COLORS } from "../../constant/default";
 import {
   measurement,
   courses,
   difficulty,
   heat,
+  tagsOptions
 } from "../../utils/cookingTerms";
-import { XCircleIcon, PlusCircleIcon } from "react-native-heroicons/solid";
+import { PlusCircleIcon, XCircleIcon } from "react-native-heroicons/solid";
 
-const CreateRecipeForm = () => {
-  
+const CreateRecipeForm = ({ setCreateRecipe, handleSubmit }) => {
   return (
     <View>
       <View>
-        <FirstPage
-         
+        <MainPage
+          setCreateRecipe={setCreateRecipe}
+          handleSubmit={handleSubmit}
         />
       </View>
     </View>
@@ -37,78 +37,8 @@ const CreateRecipeForm = () => {
 
 export default CreateRecipeForm;
 
-function SecondPage() {
-  const [selectedVegetarian, setSelectedVegetarian] = useState("true");
-  const [selectedLowCarb, setSelectedLowCarb] = useState("true");
-  const [selectedLowSodium, setSelectedLowSodium] = useState("true");
-  const [selectedGlutenFree, setSelectedGlutenFree] = useState("true");
-  const [selectedDairyFree, setSelectedDairyFree] = useState("true");
-  const [selectedVegan, setSelectedVegan] = useState("true");
-
-  const radioButtons = [
-    {
-      // acts as primary key, should be unique and non-empty string
-      label: "Vegetarian",
-      function: setSelectedVegetarian,
-      value: selectedVegetarian,
-    },
-    {
-      label: "Low Carb",
-      function: setSelectedLowCarb,
-      value: selectedLowCarb,
-    },
-    {
-      label: "Low Sodium",
-      function: setSelectedLowSodium,
-      value: selectedLowSodium,
-    },
-    {
-      label: "Gluten Free",
-      function: setSelectedGlutenFree,
-      value: selectedGlutenFree,
-    },
-    {
-      label: "Dairy Free",
-      function: setSelectedDairyFree,
-      value: selectedDairyFree,
-    },
-    {
-      label: "Vegan",
-      function: setSelectedVegan,
-      value: selectedVegan,
-    },
-  ];
-  return (
-    <View>
-      <Text>Select all that apply</Text>
-      <FlatList
-        data={radioButtons}
-        numColumns={3}
-        renderItem={({ item, index }) => (
-          <View style={{ marginRight: index % 3 === 2 ? 0 : 30 }}>
-            <Text style={generalStyles.loginSignupLabel}>{item.label}?</Text>
-            <RadioButton.Group
-              onValueChange={(value) => item.function(value)}
-              value={item.value}
-            >
-              <View style={generalStyles.rowCenter}>
-                <RadioButton value="true" color={COLORS.textColorFull} />
-                <Text style={generalStyles.defaultParagraph}>Yes</Text>
-              </View>
-              <View style={generalStyles.rowCenter}>
-                <RadioButton value="false" color={COLORS.textColorFull} />
-                <Text style={generalStyles.defaultParagraph}>No</Text>
-              </View>
-            </RadioButton.Group>
-          </View>
-        )}
-        keyExtractor={(item) => item.label}
-      />
-    </View>
-  );
-}
-
-function FirstPage(props) {
+function MainPage({ setCreateRecipe, handleSubmit }) {
+  // INPUT FOR THE REST
   const [selectedName, setSelectedName] = useState("");
   const [selectedDuration, setSelectedDuration] = useState(0);
   const [selectedCourseType, setCourseType] = useState("");
@@ -119,12 +49,34 @@ function FirstPage(props) {
   const [selectedCuisine, setSelectedCuisine] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
+  // INGREDIENTS STATE
+  const [listedIngredients, setListedIngredients] = useState([]);
+  const [listedMeasurements, setListedMesasurements] = useState([]);
+  const [ quantity, setQuantity ] = useState('')
+  const [ measure, setMeasure ] = useState('')
+  const [ itemName, setItemName ] = useState('')
+
+  // INSTRUCTIONS STATE
+  const [ instructionsArray, setInstructionsArray ] = useState([])
+  const [ instructionStep, setInstructionStep ] = useState('')
+
+  // TAGS STATE
+  const [ tagsArray, setTagsArray ] = useState([])
+  const [ tag, setTag ] = useState('')
+
+  // SAY YES TO ALL THAT APPLY SECTION
   const [selectedVegetarian, setSelectedVegetarian] = useState("Yes");
   const [selectedLowCarb, setSelectedLowCarb] = useState("Yes");
   const [selectedLowSodium, setSelectedLowSodium] = useState("Yes");
   const [selectedGlutenFree, setSelectedGlutenFree] = useState("Yes");
   const [selectedDairyFree, setSelectedDairyFree] = useState("Yes");
   const [selectedVegan, setSelectedVegan] = useState("Yes");
+
+  const [message, setMessage] = useState("");
+
+  // BOOLEAN STATE FOR CALORIES BUTTONS
+  const [isRange, setIsRange] = useState(true);
+  
 
   const selection = [
     {
@@ -160,7 +112,6 @@ function FirstPage(props) {
     },
   ];
 
-  const [isRange, setIsRange] = useState(true);
 
   const allApply = [
     {
@@ -190,7 +141,17 @@ function FirstPage(props) {
           style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10 }]}
         ></View>
         {/* INGREDIENTS INPUT */}
-        <IngredientsInput/>
+        <IngredientsInput
+          setListedIngredients={setListedIngredients}
+          setListedMesasurements={setListedMesasurements}
+          setMeasure={setMeasure}
+          setQuantity={setQuantity}
+          setItemName={setItemName}
+          listedIngredients={listedIngredients}
+          listedMeasurements={listedMeasurements}
+          measure={measure}
+          quantity={quantity}
+          itemName={itemName}/>
         {/* LINE BREAK */}
         <View
           style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10 }]}
@@ -360,6 +321,21 @@ function FirstPage(props) {
           />
         </View>
         {/* RELEVANT CATEGORIES AND TAGS (OPTIONAL) */}
+        <View style={generalStyles.loginSignupInputSection}>
+          <Text style={generalStyles.loginSignupLabel}>
+            Relevant categories & tags (optional)
+          </Text>
+          <TextInput
+            onChangeText={(text) => setSelectedTags(text)}
+            value={selectedTags}
+            style={generalStyles.loginSignupInput}
+            placeholderTextColor={COLORS.textColor50}
+          />
+          <TouchableOpacity onPress={() => {}}  style={[generalStyles.button, generalStyles.rowCenter, {justifyContent: 'center', gap: 10, borderRadius: 5, marginTop: 20}]}>
+            <PlusCircleIcon color={COLORS.backgroundFull}/>
+            <Text style={generalStyles.tag}>Add Tag</Text>
+          </TouchableOpacity>
+        </View>
         {/* LINE BREAK */}
         <View style={[generalStyles.lineBreak, { marginTop: 10, marginBottom: 10}]}></View>
         {/* ALL THAT APPLY (YES OR NO) SECTION */}
@@ -391,7 +367,8 @@ function FirstPage(props) {
             })
           }
         </View>
-        <TouchableOpacity style={[generalStyles.button, { marginBottom: 20 }]}>
+        {/* SUBMIT RECIPE FORM */}
+        <TouchableOpacity onPress={handleSubmit} style={[generalStyles.button, { marginBottom: 20 }]}>
           <Text style={generalStyles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>
@@ -399,24 +376,22 @@ function FirstPage(props) {
   );
 }
 
-const IngredientsInput = () => {
-  const [listedIngredients, setListedIngredients] = useState([]);
-  const [listedMeasurements, setListedMesasurements] = useState([]);
-  const [ quantity, setQuantity ] = useState('')
-  const [ measure, setMeasure ] = useState('')
-  const [ itemName, setItemName ] = useState('')
-  
+const IngredientsInput = ({ setListedIngredients, listedIngredients, listedMeasurements, setListedMesasurements, setQuantity, quantity, setMeasure, measure, setItemName, itemName}) => {
   function handleIngredient() {
-    let ing = ''
+    if (quantity.length && measure.length && itemName) {
+      let ing = ''
+  
+      ing += quantity + ' ' + measure
+      
+      setListedMesasurements([...listedMeasurements, ing])
+      setListedIngredients([...listedIngredients, itemName])
+  
+      setQuantity('')
+      setMeasure('')
+      setItemName('')
+    } else {
 
-    ing += quantity + ' ' + measure
-    
-    setListedMesasurements([...listedMeasurements, ing])
-    setListedIngredients([...listedIngredients, itemName])
-
-    setQuantity('')
-    setMeasure('')
-    setItemName('')
+    }
   }
 
   function handleCancel(item, index) {    
@@ -474,7 +449,6 @@ const IngredientsInput = () => {
                 inputStyles={{
                   fontFamily: "Satoshi-Regular",
                   color: COLORS.textColorFull,
-                  
                 }}
                 boxStyles={{
                   borderColor: COLORS.textColorFull,
@@ -506,9 +480,7 @@ const IngredientsInput = () => {
   );
 };
 
-function InstructionsInput() {
-  const [ instructionsArray, setInstructionsArray ] = useState([])
-  const [ instructionStep, setInstructionStep ] = useState('')
+function InstructionsInput({ instructionStep, setInstructionStep, setInstructionsArray, instructionsArray}) {
 
   function handleInstructions() {
     setInstructionsArray([...instructionsArray, instructionStep])
