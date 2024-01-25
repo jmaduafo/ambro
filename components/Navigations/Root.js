@@ -27,7 +27,7 @@ const Root = () => {
         // BOTTOM TAB NAVIGATION
         <Tab.Navigator initialRouteName='Home'
         screenOptions={({ route }) => ({
-            headerShown: false,
+            headerShown: route === 'Create' ? true : false,
             tabBarIcon: ({ focused, color, size }) => {
                 // HOME SCREEN
               if (route.name === "HomeGroup") {
@@ -103,7 +103,8 @@ const Root = () => {
           <Tab.Screen
             name="Create"
             options={{
-              title: ""
+              title: "Create Recipe",
+              headerShown: true
             }}
             component={Create}
             initialParams={''}

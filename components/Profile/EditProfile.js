@@ -9,6 +9,7 @@ import {
   ScrollView,
   Pressable,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import generalStyles from "../../constant/generalStyles";
@@ -37,6 +38,7 @@ const EditProfile = () => {
   const [imagePick, setImagePick] = useState(null);
   const [backgroundImagePick, setBackgroundImagePick] = useState(null);
 
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Handles background pic image picker
@@ -129,6 +131,7 @@ const EditProfile = () => {
     if (!newUsername.length || !newName.length) {
       setError('Name and username must not be empty')
     } else {
+      setLoading(true)
       const userRef = doc(db, 'users', auth?.currentUser?.uid)
 
       async function updateUserInfo() {
@@ -143,11 +146,12 @@ const EditProfile = () => {
           })
           setError('Updated successfully!')
           setMessageOpen(true)
-
+          setLoading(false)
         } catch(err) {
           setError('Something went wrong while')
           setMessageOpen(true)
-        }
+          setLoading(false)
+        }      
   
       }
   
@@ -351,12 +355,14 @@ const EditProfile = () => {
             }}
           />
         </View>
+        {loading ? <ActivityIndicator size={'small'} color={COLORS.textColorFull}/> : 
         <TouchableOpacity
           onPress={handleSubmit}
           style={[generalStyles.button, { marginTop: 20, marginBottom: 280 }]}
         >
           <Text style={generalStyles.buttonText}>Submit</Text>
         </TouchableOpacity>
+        }
       </ScrollView>
     </View>
   );

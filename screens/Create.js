@@ -113,7 +113,7 @@ const Create = () => {
 
   function handleSubmit() {}
   return (
-    <View style={[generalStyles.default, { position: "relative" }]}>
+    <View style={[generalStyles.default, { position: "relative", paddingTop: 20 }]}>
       {/* <Modal>
         <Text>Hi</Text>
       </Modal> */}
