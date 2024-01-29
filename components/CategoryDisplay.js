@@ -33,7 +33,7 @@ const CategoryDisplay = ({ title, duration, backgroundImage, profileImage, usern
                 {duration &&
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
                     <ClockIcon color={COLORS.backgroundFull} size={14}/>
-                    <Text style={styles.duration}>{duration}</Text>
+                    <Text style={styles.duration}>{duration} mins</Text>
                 </View>
                 }
             </View>

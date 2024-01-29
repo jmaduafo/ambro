@@ -7,7 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  Keyboard
+  Keyboard,
+  ActivityIndicator
 } from "react-native";
 import React, { useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
@@ -20,23 +21,25 @@ import {
   courses,
   difficulty,
   heat,
-  tagsOptions,
 } from "../utils/cookingTerms";
 import { PlusCircleIcon, XCircleIcon, PencilIcon } from "react-native-heroicons/solid";
+import Modal from "../components/Modal";
+import { auth, db } from "../firebase/config";
+import { doc, collection, addDoc, serverTimestamp, query, where, updateDoc, getDocs } from "firebase/firestore";
+import { uploadToStorage } from "../firebase/config";
 
 const Create = () => {
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
-  const [modalVisible, setModalVisible] = useState(false);
   const [imagesArray, setImagesArray] = useState([]);
 
   const [selectedName, setSelectedName] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState(0);
+  const [selectedDuration, setSelectedDuration] = useState('');
   const [selectedCourseType, setCourseType] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [selectedCalories, setSelectedCalories] = useState("");
-  const [selectedHeat, setSelectedHeat] = useState(0);
-  const [selectedServings, setSelectedServings] = useState(1);
+  const [selectedHeat, setSelectedHeat] = useState('');
+  const [selectedServings, setSelectedServings] = useState('');
   const [selectedCuisine, setSelectedCuisine] = useState("");
 
   // INGREDIENTS STATE
@@ -62,10 +65,166 @@ const Create = () => {
   const [selectedDairyFree, setSelectedDairyFree] = useState("Yes");
   const [selectedVegan, setSelectedVegan] = useState("Yes");
 
-  const [message, setMessage] = useState("");
+  const [imageMessage, setImageMessage] = useState("");
+  const [nameMessage, setNameMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState("");
+  const [ingredientsMessage, setIngredientsMessage] = useState("");
+  const [instructionsMessage, setInstructionsMessage] = useState("");
+  const [applyMessage, setApplyMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const [ onProgress, setOnProgress] = useState(0)
 
   // BOOLEAN STATE FOR CALORIES BUTTONS
   const [isRange, setIsRange] = useState(true);
+
+  function handleSubmit() {
+    // console.log(
+    //   'selectedDuration', selectedDuration.length,
+    //   'selectedCourseType', selectedCourseType.length,
+    //   'selectedDifficulty', selectedDifficulty.length,
+    //   'selectedCalories', selectedCalories.length,
+    //   'selectedHeat', selectedHeat.length,
+    //   'selectedServings', selectedServings.length
+    // )
+    if (!imagesArray.length) {
+      setImageMessage('* You must select an image')
+      setTimeout(function() {
+        setImageMessage('')
+      }, 15000)
+    }
+    else if (!selectedName.length) {
+      setNameMessage('* You must enter a name')
+      setTimeout(function() {
+        setNameMessage('')
+      }, 15000)
+    } 
+    else if (!listedIngredients.length || !listedMeasurements.length) {
+      setIngredientsMessage('* You must add at least one ingredient')
+      setTimeout(function() {
+        setIngredientsMessage('')
+      }, 15000)
+    } 
+    else if (!instructionsArray.length) {
+      setInstructionsMessage('* You must add at least one instruction')
+      setTimeout(function() {
+        setInstructionsMessage('')
+      }, 15000)
+    } 
+    else if (!selectedDuration.length || !selectedCourseType.length || !selectedDifficulty.length ||
+      !selectedCalories.length || !selectedHeat.length || !selectedServings.length) {
+      setInputMessage('* Entries must not be left empty')
+      setTimeout(function() {
+        setInputMessage('')
+      }, 15000)
+    } 
+    else if (!selectedVegetarian.length || !selectedLowCarb.length || !selectedLowSodium.length ||
+      !selectedGlutenFree.length || !selectedDairyFree.length || !selectedVegan.length) {
+        setApplyMessage('* You must select an option')
+        setTimeout(function() {
+          setApplyMessage('')
+        }, 15000)
+    } 
+    else {
+      console.log('else')
+      setLoading(true)
+
+      const recipeRef = collection(db, 'recipes')
+
+
+      try { 
+        async function createRecipe() {
+          await addDoc(recipeRef, {
+            user_id: auth?.currentUser?.uid,
+            recipeName: selectedName,
+            ingredientsMeasurements: listedMeasurements,
+            ingredientsItems: listedIngredients,
+            instructions: instructionsArray,
+            tags: tagsArray,
+            id: recipeRef.id,
+            courseType: selectedCourseType,
+            cuisine: selectedCuisine,
+            difficulty: selectedDifficulty,
+            duration: selectedDuration,
+            servings: selectedServings,
+            heatLevel: selectedHeat,
+            vegetarian: selectedVegetarian === 'Yes' ? true : false,
+            lowCarb: selectedLowCarb === 'Yes' ? true : false,
+            glutenFree: selectedGlutenFree === 'Yes' ? true : false,
+            dairyFree: selectedDairyFree === 'Yes' ? true : false,
+            lowSodium: selectedLowSodium === 'Yes' ? true : false,
+            vegan: selectedVegan === 'Yes' ? true : false,
+            createdAt: serverTimestamp()
+          })
+
+          imagesArray.forEach(image => {
+            let separate = image.split(' ')
+
+            const fileName = separate[0]
+            const uri = separate[1]
+
+            async () => {
+              const uploadResp = await uploadToStorage(uri, 'recipes', recipeRef.id, fileName)
+
+              console.log(uploadResp)
+            }
+          })
+
+          // Finds the recipe that contains the recipe images since it would be the most unique
+          // value in the document
+          const findRecipeRef = query(collection(db, 'recipes'), where('recipeImages', '==', imagesArray))
+          const findUserRef = query(collection(db, 'users'), where('user_id', '==', auth?.currentUser?.uid))
+
+          async function findRecipe() {
+            const recipeSnap = await getDocs(findRecipeRef)
+            const userSnap = await getDocs(findUserRef)
+
+            let userArray = []
+
+            userSnap.forEach(doc => {
+              userArray.push(doc.data())
+            })
+
+            if (userArray.length) {
+              recipeSnap.forEach(doc => {
+                async function findUserRecipe() {
+                  // Matches the recipe exactly to the correct recipe for extra assurance
+                  if (doc.data().user_id === auth?.currentUser?.uid && doc.data().recipeName === selectedName && doc.data().id === recipeRef.id) {
+                    // Add the recipe id to the existing document
+                    try {
+                      await updateDoc(doc.ref, {
+                        user: userArray
+                      })
+                    } catch(err) {
+                      console.log(err.message)
+                    }
+                  }
+                }
+  
+                findUserRecipe()
+              })
+            }
+          }
+          findRecipe()
+        }
+        createRecipe()
+        setLoading(false)
+        setImageMessage('')
+        setNameMessage('')
+        setIngredientsMessage('')
+        setInstructionsMessage('')
+        setInputMessage('')
+        setApplyMessage('')
+      } catch (err) {
+        setError(err.message)
+        setLoading(false)
+        setTimeout(function() {
+          setError('')
+        }, 4000)
+      }
+
+    }
+  }
 
   const selection = [
     {
@@ -112,17 +271,25 @@ const Create = () => {
     },
   ];
 
-  function handleSubmit() {}
   return (
-    <View style={[generalStyles.default, { position: "relative", paddingTop: 20 }]}>
-      {/* <Modal>
-        <Text>Hi</Text>
-      </Modal> */}
+    <View style={[generalStyles.default, { position: "relative" }]}>
+      <View style={{ height: 2, backgroundColor: COLORS.textColorFull, width: `${onProgress}%`  }}></View>
+      {error && error.length && 
+      <Modal>
+        <Text style={{ fontFamily: 'Satoshi-Medium', color: COLORS.textColorFull, textAlign: 'center'}}>{error}</Text>
+        <TouchableOpacity style={[generalStyles.button, { marginTop: 10 }]}>
+          <Text style={[generalStyles.buttonText]}>Submit</Text>
+        </TouchableOpacity>
+      </Modal>
+      }
       <SafeAreaView>
-        <ScrollView style={[styles.view, { paddingBottom: 80 }]}>
+        <ScrollView style={[styles.view, { paddingBottom: 80, paddingTop: 20 }]}>
           <AccessCamera
             imagesArray={imagesArray}
             setImagesArray={setImagesArray}
+            message={imageMessage}
+            setOnProgress={setOnProgress}
+            onProgress={onProgress}
           />
           <View
             style={[
@@ -131,8 +298,14 @@ const Create = () => {
             ]}
           ></View>
           <View>
-            {/* DRECIPE NAME */}
+            {/* RECIPE NAME */}
             <View style={generalStyles.loginSignupInputSection}>
+              {
+                nameMessage && nameMessage.length &&
+              <View style={{ marginTop: 10, marginBottom: 10}}>
+                <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{nameMessage}</Text>
+              </View>
+              }
               <Text style={generalStyles.loginSignupLabel}>Recipe Name</Text>
               <TextInput
                 onChangeText={(text) => setSelectedName(text)}
@@ -149,6 +322,12 @@ const Create = () => {
               ]}
             ></View>
             {/* INGREDIENTS INPUT */}
+            {
+              ingredientsMessage && ingredientsMessage.length &&
+            <View style={{ marginTop: 10, marginBottom: 10}}>
+              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{ingredientsMessage}</Text>
+            </View>
+            }
             <IngredientsInput
               setListedIngredients={setListedIngredients}
               setListedMeasurements={setListedMeasurements}
@@ -169,6 +348,12 @@ const Create = () => {
               ]}
             ></View>
             {/* INSTRUCTIONS INPUT */}
+            {
+              instructionsMessage && instructionsMessage.length &&
+            <View style={{ marginTop: 10, marginBottom: 10}}>
+              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{instructionsMessage}</Text>
+            </View>
+            }
             <InstructionsInput
               instructionStep={instructionStep}
               instructionsArray={instructionsArray}
@@ -183,6 +368,12 @@ const Create = () => {
               ]}
             ></View>
             {/* DURATION */}
+            {
+              inputMessage && inputMessage.length &&
+            <View style={{ marginTop: 10, marginBottom: 10}}>
+              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{inputMessage}</Text>
+            </View>
+            }
             <View style={generalStyles.loginSignupInputSection}>
               <Text style={generalStyles.loginSignupLabel}>
                 Duration (in minutes)
@@ -190,7 +381,7 @@ const Create = () => {
               {/* Only accepts numbers */}
               <TextInput
                 onChangeText={(text) =>
-                  setSelectedDuration(text.replace(/[^0-9]/g, ""))
+                  setSelectedDuration(text)
                 }
                 value={selectedDuration}
                 keyboardType="numeric"
@@ -268,7 +459,7 @@ const Create = () => {
               </View>
               {isRange ? (
                 <SelectList
-                  setSelected={(val) => setSelectedCalories(val)}
+                  setSelected={(val) => setSelectedCalories(val.toString())}
                   data={heat}
                   save="value"
                   search={false}
@@ -300,7 +491,7 @@ const Create = () => {
               </Text>
               {/* Only accepts numbers */}
               <SelectList
-                setSelected={(val) => setSelectedHeat(val)}
+                setSelected={(val) => setSelectedHeat(val.toString())}
                 data={heat}
                 save="value"
                 search={false}
@@ -324,7 +515,7 @@ const Create = () => {
               {/* Only accepts numbers */}
               <TextInput
                 onChangeText={(text) =>
-                  setSelectedServings(text.replace(/[^0-9]/g, ""))
+                  setSelectedServings(text)
                 }
                 value={selectedServings}
                 keyboardType="numeric"
@@ -359,6 +550,12 @@ const Create = () => {
               ]}
             ></View>
             {/* ALL THAT APPLY (YES OR NO) SECTION */}
+            {
+             applyMessage && applyMessage.length &&
+            <View style={{ marginTop: 10, marginBottom: 10}}>
+              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{applyMessage}</Text>
+            </View>
+            }
             <Text
               style={{
                 fontFamily: "Satoshi-Medium",
@@ -398,12 +595,16 @@ const Create = () => {
               })}
             </View>
             {/* SUBMIT RECIPE FORM */}
+            {loading ? 
+            <ActivityIndicator size='small' color={COLORS.textColorFull}/>
+            :
             <TouchableOpacity
               onPress={handleSubmit}
               style={[generalStyles.button, { marginBottom: 20 }]}
             >
               <Text style={generalStyles.buttonText}>Submit</Text>
             </TouchableOpacity>
+            }
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -464,7 +665,7 @@ const IngredientsInput = ({
       (obj) => obj !== listedIngredients[index]
     );
 
-    setListedMesasurements(newMeasure);
+    setListedMeasurements(newMeasure);
     setListedIngredients(newIngredients);
   }
 
@@ -493,7 +694,7 @@ const IngredientsInput = ({
         {listedMeasurements &&
           listedMeasurements.map((item, index) => {
             return (
-              <View>
+              <View key={item}>
               <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end'}} onPress={() => handleEdit(item, index)}>
                 <PencilIcon size={18} color={COLORS.textColorFull}/>
               </TouchableOpacity>

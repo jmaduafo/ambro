@@ -5,6 +5,7 @@ import { auth, db } from "../../firebase/config";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { COLORS } from "../../constant/default";
 import { useNavigation } from "@react-navigation/native";
+import generalStyles from "../../constant/generalStyles";
 
 const UserProfile = () => {
   const { navigate } = useNavigation()
@@ -55,7 +56,10 @@ const UserProfile = () => {
         );
       })
       :
-      <ActivityIndicator color={COLORS.textColorFull}/>}
+      <View style={generalStyles.default}>
+        <ActivityIndicator color={COLORS.textColorFull}/>
+      </View>
+        }
     </>
   );
 };

@@ -1,10 +1,12 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore'
 import { getAuth, GoogleAuthProvider, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { API_KEY, AUTH_DOMAIN, PROJECT_ID, 
     STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env'
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { Alert } from "react-native";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -19,10 +21,62 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// export const auth = getAuth(app)
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+let app;
+export let auth;
+
+if (!getApps().length) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+    });
+  } catch (error) {
+    console.log("Error initializing app: " + error);
+  }
+} else {
+  app = getApp();
+  auth = getAuth(app);
+}
+
 export const db = getFirestore(app)
 export const provider = new GoogleAuthProvider(app)
+
+const storage = getStorage();
+
+export async function uploadToStorage(uri, base, id, fileName, setOnProgress) {
+  const fetchResponse = await fetch(uri)
+  const blob = await fetchResponse.blob()
+
+  // Base example ('recipe', 'user')
+  const storageRef = ref(storage, `images/${base}/${id}/${fileName}`);
+
+  const uploadTask = uploadBytesResumable(storageRef, blob);
+
+  return new Promise(( resolve, reject) => {
+    uploadTask.on('state_changed', 
+    (snapshot) => {
+      // Observe state change events such as progress, pause, and resume
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      
+      console.log(progress)
+
+      progress && setOnProgress(progress)
+    }, 
+    (error) => {
+      // Handle unsuccessful uploads
+      reject(error)
+    }, 
+    () => {
+      // Handle successful uploads on complete
+      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        resolve({
+          downloadURL,
+          metadata: uploadTask.snapshot.metadata
+        })
+      })
+    }
+  );
+  })
+}
