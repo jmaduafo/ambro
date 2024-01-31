@@ -58,8 +58,6 @@ export async function uploadToStorage(uri, base, id, fileName, setOnProgress) {
       // Observe state change events such as progress, pause, and resume
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      
-      console.log(progress)
 
       progress && setOnProgress(progress)
     }, 
