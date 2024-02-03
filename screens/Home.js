@@ -59,7 +59,7 @@ const Home = ({ navigation }) => {
 
   useEffect(function () {
     getUser();
-  }, []);
+  }, [userInfo]);
 
   return (
     <View style={styles.background}>
@@ -116,7 +116,7 @@ const Home = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40 }}
         >
-          <PopularCategories />
+          <PopularCategories navigate={navigate} />
           <TopDisplay />
           <ForYou navigate={navigate}/>
           <NewRecipes navigate={navigate}/>

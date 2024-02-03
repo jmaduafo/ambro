@@ -35,14 +35,12 @@ const AccessCamera = ({ setImagesArray, imagesArray, message, setOnProgress, onP
               if (!result.canceled) { 
                   let fullUriAndName = ''
 
-                  fullUriAndName += result.assets[0].fileName + ' ' + result.assets[0].uri
+                  const fileName = result.assets[0].uri.split('/').pop()
 
-                  // const { uri, fileName } = result.assets[0]
+                  fullUriAndName += fileName + ' ' + result.assets[0].uri
                   
-                
-                  // const uploadResp = await uploadToStorage(uri, 'recipes', 'testID', fileName)
                   // Append to images array when image is added
-                  setImagesArray([...imagesArray, result.assets[0].uri]); 
+                  setImagesArray([...imagesArray, fullUriAndName]); 
                   // Clear any previous errors 
               } 
           } 
@@ -81,16 +79,7 @@ const AccessCamera = ({ setImagesArray, imagesArray, message, setOnProgress, onP
 
                   const fileName = result.assets[0].uri.split('/').pop()
 
-                  const { uri } = result.assets[0]
-
-                  fullUriAndName += result.assets[0].uri.split('/').pop() + ' ' + result.assets[0].uri
-
-
-                  const uploadResp = await uploadToStorage(uri, 'recipes', 'testID', fileName, setOnProgress)
-
-                  console.log(uploadResp)
-                  
-                  setOnProgress(0)
+                  fullUriAndName += fileName + ' ' + result.assets[0].uri
 
                   
                   // Append to images array when image is added

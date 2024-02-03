@@ -36,7 +36,7 @@ const UserProfile = () => {
 
   useEffect(function () {
     getUser();
-  }, []);
+  }, [auth]);
   
   return (
     <>

@@ -1,5 +1,5 @@
-import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { Fragment, useState } from 'react'
+import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
+import React, { Fragment, useState, useEffect } from 'react'
 import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
 import { COLORS, SHADOW } from '../constant/default'
@@ -9,9 +9,15 @@ import { FireIcon as FireSolid } from 'react-native-heroicons/solid'
 import HeaderTitle from './HeaderTitle'
 import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
+import axios from 'axios'
 
-const RecipeDisplay = ({ navigate }) => {
-    const iframeString = 'https://youtu.be/QpfAyQgphgw?si=L5QIYZCqV1ZHIWvG'
+const RecipeDisplay = ({ navigation, isApi, item }) => {
+    const [ apiData, setApiData] = useState(null)
+    const [ loading, setLoading ] = useState(false)
+    const [ measurementData, setMeasurementData ] = useState([])
+    const [ ingredientsData, setIngredientsData ] = useState([])
+    const [ iFrame, setIFrame] = useState('https://youtu.be/QpfAyQgphgw?si=L5QIYZCqV1ZHIWvG')
+
     const tags = {
         vegetarian: true,
         lowCarb: true,
@@ -20,51 +26,116 @@ const RecipeDisplay = ({ navigate }) => {
         vegan: true,
         dairyFree: false
     }
+  
+    useEffect(function() {
+      setLoading(true)
+      
+      if (isApi) {
+        const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${item.idMeal}`
+
+        async function getData() {
+          try{
+            const response = await axios.get(url)
+    
+            if (response) {
+              setApiData(response?.data?.meals[0])
+
+              console.log(apiData)
+
+              let measureArray = []
+              let ingredientArray = []
+
+              Object.keys(apiData).forEach(obj => {
+                {obj.includes('strMeasure') && measureArray.push(obj)}
+                {obj.includes('strIngredient') && ingredientArray.push(obj)}
+              })
+
+              setIngredientsData(ingredientArray)
+              setMeasurementData(measureArray)
+
+              console.log(measurementData)
+              console.log(ingredientsData)
+              
+            }
+            
+            setLoading(false)
+          } catch(err) {
+            Alert.alert(err.message)
+            setLoading(false)
+          }
+
+        }
+        getData()    
+      }
+
+  
+    }, [item])
 
   return (
     <>
       <ScrollView>
         {/* IMAGE CAROUSEL OR SINGULAR IMAGE SECTION */}
+        {isApi && apiData ?
+        <View style={[ styles.image ]}>
+          <Image
+            source={{ uri: apiData?.strMealThumb }}
+            style={{ width: '100%', height: '100%'}}
+            resizeMode='cover'
+            />
+        </View>
+        :
         <View style={{ backgroundColor: 'gray', width: '100%', height: 300}}>
 
         </View>
+
+        }
         <View style={styles.bottom}>
           {/* IF FIREBASE, RECIPE INFORMATION, AND IF API, RECIPE ABOUT SECTION */}
           <View style={styles.recipeCard}>
-            <UserRecipe navigate={navigate}/>
+            {isApi ? 
+            <APIRecipe name={apiData?.strMeal} description={'hi'}/>
+            :
+            <UserRecipe navigation={navigation}/>
+            } 
           </View>
           {/* RECIPE TAGS */}
           <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
             {/* CUISINE */}
             <View style={generalStyles.tagSection}>      
-                <Text style={generalStyles.tag}>Mexican</Text>
+                {isApi ? <Text style={generalStyles.tag}>{apiData?.strArea}</Text> : <Text style={generalStyles.tag}>Mexican</Text>}
             </View>
+            {/* CATEGORY */}
+            {isApi && apiData && 
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>{apiData?.strCategory}</Text>
+            </View>
+            }
             {/* VEGETARIAN */}
-            {tags.vegetarian && 
+            {!isApi && tags.vegetarian && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Vegetarian</Text>
             </View>
             }
             {/* LOW CARB */}
-            {tags.lowCarb && 
+            {!isApi && tags.lowCarb && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Low Carb</Text>
             </View>
             }
             {/* LOW SODIUM */}
-            {tags.lowSodium && 
+            {!isApi && tags.lowSodium && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Low Sodium</Text>
             </View>
             }
             {/* VEGAN */}
-            {tags.vegan && 
+            {!isApi && tags.vegan && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Vegan</Text>
             </View>
             }
             {/* DAIRY FREE */}
-            {tags.dairyFree && 
+            {!isApi && tags.dairyFree && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Dairy Free</Text>
             </View>
@@ -74,13 +145,25 @@ const RecipeDisplay = ({ navigate }) => {
           <View>
             <HeaderTitle title={'Ingredients'} paddingLeft={0} paddingRight={0}/>
             <View>
-                {[1, 2, 3, 4, 5, 6].map(list => {
+              {isApi && apiData && measurementData?.length ?
+                measurementData?.map((measure, index) => {
+                  if (apiData[measure] !== ' ' || apiData[measure] !== '') {
+                    return (
+                        <View key={`${measure}${index}`}>
+                            <IngredientList measurement={apiData[measure]} ingredient={apiData[`strIngredient${index + 1}`]}/>
+                        </View>
+                    )
+                  }
+                })
+              :
+                [1, 2, 3, 4, 5, 6].map(list => {
                     return (
                         <View key={list}>
                             <IngredientList measurement={'1 cup'} ingredient={'oranges'}/>
                         </View>
                     )
-                })}
+                })
+              }
             </View>
           </View>
           {/* LINE BREAK */}
@@ -90,28 +173,40 @@ const RecipeDisplay = ({ navigate }) => {
             <HeaderTitle title={'Instructions'} paddingLeft={0} paddingRight={0}/>
           </View>
           <View>
-            {[1, 2, 3, 4].map((list, index) => {
+            {isApi && apiData ?
+            // apiData?.strInstructions?.split()?.map((list, index) => {
+            //    return (
+              <View>
+                  <InstructionList isApi={isApi} instruction={apiData?.strInstructions}/>
+              </View>
+            //     )
+            // })
+            :
+            [1, 2, 3, 4].map((list, index) => {
                 return (
                     <View key={list}>
                         <InstructionList index={index}/>
                     </View>
                 )
-            })}
+            })
+            }
           </View>
 
-          {/* IF API, THEN DISPLAY YOUTUBE VIDEO */}
+          {/* IF API AND YOUTUBE SOURCE ISN'T AN EMPTY STRING, THEN DISPLAY YOUTUBE VIDEO */}
           <View>
-            
+        {isApi && apiData && apiData?.strYoutube?.length && 
         <WebView
           scalesPageToFit={true}
           bounces={false}
           javaScriptEnabled
           style={{ height: 300, width: '100%', borderRadius: 20, marginTop: 10, marginBottom: 20 }}
           source={{
-            uri: iframeString,
+            uri: apiData?.strYoutube,
           }}
+          originWhitelist={['*']}
           automaticallyAdjustContentInsets={false}
         />
+        }
           
           </View>
         </View>
@@ -219,9 +314,9 @@ function UserRecipe({navigate}) {
   function APIRecipe({ name, description}) {
     return (
       <View>
-        <Text style={[styles.recipeTitle, { marginBottom: 30}]}>Cranberry Sangria</Text>
+        <Text style={[styles.recipeTitle, { marginBottom: 30}]}>{name}</Text>
         <Text style={generalStyles.defaultParagraph}>
-        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec.
+        {description}
         </Text>
       </View>
     )
@@ -245,16 +340,24 @@ function UserRecipe({navigate}) {
   }
 
   // Instructions display with number and text
-  function InstructionList({index, instruction}) {
+  function InstructionList({index, instruction, isApi}) {
     const [isSelected, setSelection] = useState(false);
 
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, marginBottom: 20}}>
+      <>
+      {isApi && instruction.length ? 
+        <View style={{ marginBottom: 20}}>
+            <Text style={[generalStyles.defaultParagraph, { paddingRight: 30}]}>{instruction}</Text>
+        </View>
+      :
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, marginBottom: 20}}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, borderRadius: 24/2, backgroundColor: COLORS.textColorFull}}>
                 <Text style={[generalStyles.defaultParagraph, { color: COLORS.backgroundFull}]}>{index + 1}</Text>
             </View>
-            <Text style={[generalStyles.defaultParagraph, { paddingRight: 30}]}>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.</Text>
+            <Text style={[generalStyles.defaultParagraph, { paddingRight: 30}]}>{instruction}</Text>
         </View>
+      }
+      </>
     )
   }
 
@@ -272,6 +375,16 @@ const styles = StyleSheet.create({
         shadowOpacity: SHADOW.opacity,
         padding: 20,
         borderRadius: 30
+      },
+      image: {
+        backgroundColor: 'gray',
+        width: '100%',
+        height: 300
+      },
+      apiBgImage: {
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'norepeat',
       },
     //   USER RECIPE COMPONENT STYLING
       userImage: {

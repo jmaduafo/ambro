@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from "react-native";
 import React, { useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
@@ -27,8 +28,10 @@ import Modal from "../components/Modal";
 import { auth, db } from "../firebase/config";
 import { doc, collection, addDoc, serverTimestamp, query, where, updateDoc, getDocs } from "firebase/firestore";
 import { uploadToStorage } from "../firebase/config";
+import { useNavigation } from "@react-navigation/native";
 
 const Create = () => {
+  const { navigate } = useNavigation()
   const [loading, setLoading] = useState(false);
 
   const [imagesArray, setImagesArray] = useState([]);
@@ -79,14 +82,8 @@ const Create = () => {
   const [isRange, setIsRange] = useState(true);
 
   function handleSubmit() {
-    // console.log(
-    //   'selectedDuration', selectedDuration.length,
-    //   'selectedCourseType', selectedCourseType.length,
-    //   'selectedDifficulty', selectedDifficulty.length,
-    //   'selectedCalories', selectedCalories.length,
-    //   'selectedHeat', selectedHeat.length,
-    //   'selectedServings', selectedServings.length
-    // )
+    // Checks the length of each section and sets the states
+    // to empty string after 15 seconds
     if (!imagesArray.length) {
       setImageMessage('* You must select an image')
       setTimeout(function() {
@@ -126,22 +123,22 @@ const Create = () => {
         }, 15000)
     } 
     else {
-      console.log('else')
+      // Start the loading process
       setLoading(true)
 
       const recipeRef = collection(db, 'recipes')
 
-
       try { 
         async function createRecipe() {
-          await addDoc(recipeRef, {
+          // Adds a new document to firestore database under the recipes
+          // collection, adding all the appropriate inputs
+          const recipeAdd = await addDoc(recipeRef, {
             user_id: auth?.currentUser?.uid,
             recipeName: selectedName,
             ingredientsMeasurements: listedMeasurements,
             ingredientsItems: listedIngredients,
             instructions: instructionsArray,
             tags: tagsArray,
-            id: recipeRef.id,
             courseType: selectedCourseType,
             cuisine: selectedCuisine,
             difficulty: selectedDifficulty,
@@ -157,70 +154,108 @@ const Create = () => {
             createdAt: serverTimestamp()
           })
 
+          let fileNameArray = []
+
+          // Section uploads image to firebase storage
           imagesArray.forEach(image => {
+            // Image output is 'fileName uri' so must split them up by ' ' for each
+            // element in the imagesArray
+            
             let separate = image.split(' ')
 
             const fileName = separate[0]
             const uri = separate[1]
 
-            async () => {
-              const uploadResp = await uploadToStorage(uri, 'recipes', recipeRef.id, fileName)
+            uriArray.push(uri)
+            fileNameArray.push(fileName)
 
-              console.log(uploadResp)
+            async function uploadImages() {
+              try {
+                // Call the upload to storage function and assign uri, collection name, 
+                // recipeID, filename, and the state to show progress bar
+                await uploadToStorage(uri, 'recipes', recipeAdd?.id, fileName)
+
+                // Then set progress count back to 0 or 0% so 
+                // that it's not visible
+                setOnProgress(0)
+
+              } catch (err) {
+                Alert.alert(err.message)
+              }
+
             }
+
+            uploadImages()
           })
+
 
           // Finds the recipe that contains the recipe images since it would be the most unique
           // value in the document
-          const findRecipeRef = query(collection(db, 'recipes'), where('recipeImages', '==', imagesArray))
-          const findUserRef = query(collection(db, 'users'), where('user_id', '==', auth?.currentUser?.uid))
+          const findRecipeRef = doc(db, 'recipes', recipeAdd?.id)
+          // Finds the user associated with the user_id
+          const findUserRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
 
           async function findRecipe() {
-            const recipeSnap = await getDocs(findRecipeRef)
             const userSnap = await getDocs(findUserRef)
 
-            let userArray = []
+            let userInfo;
 
             userSnap.forEach(doc => {
-              userArray.push(doc.data())
+              userInfo = doc.data()
             })
 
-            if (userArray.length) {
-              recipeSnap.forEach(doc => {
-                async function findUserRecipe() {
-                  // Matches the recipe exactly to the correct recipe for extra assurance
-                  if (doc.data().user_id === auth?.currentUser?.uid && doc.data().recipeName === selectedName && doc.data().id === recipeRef.id) {
-                    // Add the recipe id to the existing document
-                    try {
-                      await updateDoc(doc.ref, {
-                        user: userArray
-                      })
-                    } catch(err) {
-                      console.log(err.message)
-                    }
-                  }
-                }
-  
-                findUserRecipe()
+            try {
+              await updateDoc(findRecipeRef, {
+                id: recipeAdd?.id,
+                user: userInfo,
+                fileNames: fileNameArray
               })
+              Alert.alert('Recipe has been successfully added!')
+            } catch (err) {
+              Alert.alert(err.message)
             }
+              
           }
           findRecipe()
-        }
+          }
         createRecipe()
         setLoading(false)
-        setImageMessage('')
-        setNameMessage('')
-        setIngredientsMessage('')
-        setInstructionsMessage('')
-        setInputMessage('')
-        setApplyMessage('')
+
+        setImagesArray([])
+
+        setSelectedName("");
+        setSelectedDuration('');
+        setCourseType("");
+        setSelectedDifficulty("");
+        setSelectedCalories("");
+        setSelectedHeat('');
+        setSelectedServings('');
+        setSelectedCuisine('')
+
+        setListedIngredients([]);
+        setListedMeasurements([]);
+        setQuantity("");
+        setMeasure("");
+        setItemName("");
+
+        setInstructionsArray([]);
+        setInstructionStep("");
+      
+        // TAGS STATE
+        setTagsArray([]);
+        setTag("");
+      
+        // SAY YES TO ALL THAT APPLY SECTION
+        setSelectedVegetarian("Yes");
+        setSelectedLowCarb("Yes");
+        setSelectedLowSodium("Yes");
+        setSelectedGlutenFree("Yes");
+        setSelectedDairyFree("Yes");
+        setSelectedVegan("Yes");
+
       } catch (err) {
-        setError(err.message)
+        Alert.alert(err.message)
         setLoading(false)
-        setTimeout(function() {
-          setError('')
-        }, 4000)
       }
 
     }
@@ -596,11 +631,13 @@ const Create = () => {
             </View>
             {/* SUBMIT RECIPE FORM */}
             {loading ? 
-            <ActivityIndicator size='small' color={COLORS.textColorFull}/>
+            <View style={{ marginBottom: 60}}>
+              <ActivityIndicator size='small' color={COLORS.textColorFull}/>
+            </View>
             :
             <TouchableOpacity
               onPress={handleSubmit}
-              style={[generalStyles.button, { marginBottom: 20 }]}
+              style={[generalStyles.button, { marginBottom: 60 }]}
             >
               <Text style={generalStyles.buttonText}>Submit</Text>
             </TouchableOpacity>

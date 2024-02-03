@@ -21,7 +21,7 @@ import Modal from "../Modal";
 import ReAuthenticate from "../ReAuthenticate";
 import * as ImagePicker from "expo-image-picker";
 import { UserIcon, PhotoIcon, XMarkIcon } from "react-native-heroicons/solid";
-
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { auth, db } from "../../firebase/config";
 import { query, where, collection, getDocs, setDocs, doc, updateDoc } from "firebase/firestore";
 
@@ -100,7 +100,45 @@ const EditProfile = () => {
     }
   };
 
-  // Loads user information on first loadc
+  function loadProfileImage(profileImage) {
+    if (profileImage) {
+      const storage = getStorage();
+      const userRef = ref(storage, 'users', auth?.currentUser?.uid, 'profileImage', profileImage);
+  
+      // Get the download URL
+      getDownloadURL(userRef)
+      .then((url) => {
+          // Insert url into an <img> tag to "download"
+          setProfileImagePick(url)
+      })
+      .catch((error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          
+      });
+    }
+  }
+
+  function loadBackgroundImage(backgroundImage) {
+    if (backgroundImage) {
+      const storage = getStorage();
+      const userRef = ref(storage, 'users', auth?.currentUser?.uid, 'backgroundImage', backgroundImage);
+  
+      // Get the download URL
+      getDownloadURL(userRef)
+      .then((url) => {
+          // Insert url into an <img> tag to "download"
+          setBackgroundImagePick(url)
+      })
+      .catch((error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          
+      });
+    }
+  }
+
+  // Loads user information on first load
   function loadUserInfo() {
     const userRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
 
@@ -112,10 +150,11 @@ const EditProfile = () => {
         userArray.push(doc.data())
       })
 
+      
       setNewName(userArray[0]?.name)
       setNewUsername(userArray[0]?.username)
-      setImagePick(userArray[0]?.profileImage)
-      setBackgroundImagePick(userArray[0]?.profileBackgroundImage)
+      loadProfileImage(userArray[0]?.profileImage)     
+      loadBackgroundImage(userArray[0]?.profileBackgroundImage)
       setNewPronouns(userArray[0]?.pronouns)
       setNewBio(userArray[0]?.bio) 
     }
@@ -134,6 +173,9 @@ const EditProfile = () => {
       setLoading(true)
       const userRef = doc(db, 'users', auth?.currentUser?.uid)
 
+      const imageName = imagePick.split('/').pop()
+      const backgroundName = backgroundImagePick.split('/').pop()
+
       async function updateUserInfo() {
         try {
           await updateDoc(userRef, {
@@ -141,8 +183,8 @@ const EditProfile = () => {
             username: newUsername,
             bio: newBio,
             pronouns: newPronouns,
-            profileImage: imagePick,
-            profileBackgroundImage: backgroundImagePick
+            profileImage: imageName,
+            profileBackgroundImage: backgroundName
           })
           setError('Updated successfully!')
           setMessageOpen(true)

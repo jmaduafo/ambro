@@ -43,12 +43,21 @@ export const provider = new GoogleAuthProvider(app)
 
 const storage = getStorage();
 
-export async function uploadToStorage(uri, base, id, fileName, setOnProgress) {
+export async function uploadToStorage(uri, base, id, fileName, setOnProgress, userType) {
   const fetchResponse = await fetch(uri)
   const blob = await fetchResponse.blob()
 
-  // Base example ('recipe', 'user')
-  const storageRef = ref(storage, `images/${base}/${id}/${fileName}`);
+  // Base example ('recipes', 'users')
+  let storageRef;
+  
+  if (base === 'recipes') {
+    storageRef = ref(storage, `images/${base}/${id}/${fileName}`);
+  } else if (base === 'users') {
+    // userType example (can either be 'backgroundImage' or 'profileImage')
+    // images/users/JHhs9828223/backgroundImage/Hhgshgsshdh.png -> saves the users background image
+    storageRef = ref(storage, `images/${base}/${id}/${userType}/${fileName}`);
+  }
+    
 
   const uploadTask = uploadBytesResumable(storageRef, blob);
 
@@ -59,7 +68,7 @@ export async function uploadToStorage(uri, base, id, fileName, setOnProgress) {
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-      progress && setOnProgress(progress)
+      //  && setOnProgress(progress)
     }, 
     (error) => {
       // Handle unsuccessful uploads

@@ -21,6 +21,7 @@
     "@react-navigation/stack": "^6.3.20",
     "axios": "^1.6.5",
     "expo": "~49.0.15",
+    "expo-cached-image": "^49.0.2",
     "expo-checkbox": "~2.4.0",
     "expo-font": "~11.4.0",
     "expo-image-picker": "~14.3.2",

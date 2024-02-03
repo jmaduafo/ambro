@@ -6,8 +6,10 @@ import { categories } from "../../utils/popularCategories";
 import axios from "axios";
 import CategoryDisplay from "../CategoryDisplay";
 import { COLORS } from "../../constant/default";
+import { useNavigation } from "@react-navigation/native";
 
-const PopularCategories = () => {
+const PopularCategories = ({ navigate }) => {
+
   const [ selectedCategory, setSelectedCategory ] = useState('Beef')
   const [categoryDisplay, setCategoryDisplay] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,6 +44,7 @@ const PopularCategories = () => {
       
       <View>
         {categories?.length ? (
+          // Horizontal scroll for category names
           <FlatList
             data={categories}
             renderItem={({ item, index }) => (
@@ -74,6 +77,7 @@ const PopularCategories = () => {
       </View>
       <View style={styles.display}>
         {categoryDisplay?.length && !loading ? (
+          // Display of recipes depending on selected category
           <FlatList
             data={categoryDisplay}
             renderItem={({ item, index }) => (
@@ -84,8 +88,11 @@ const PopularCategories = () => {
               }}
               >
                 <CategoryDisplay
+                  navigate={navigate}
+                  item={item}
                   title={item.strMeal}
                   backgroundImage={item.strMealThumb}
+                  isApi={true}
                 />
               </View>
         )}

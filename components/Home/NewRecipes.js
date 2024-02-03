@@ -9,6 +9,7 @@ import { auth, db } from "../../firebase/config";
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { ActivityIndicator } from "react-native-paper";
 import { COLORS } from "../../constant/default";
+import { useNavigation } from "@react-navigation/native";
 
 const NewRecipes = ({ navigate }) => {
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ const NewRecipes = ({ navigate }) => {
 
   useEffect(function () {
     getLatestRecipes();
-  }, [allRecipes]);
+  }, []);
 
   if (loading) <ActivityIndicator size={"small"} color={COLORS.textColorFull} />
 
@@ -63,11 +64,19 @@ const NewRecipes = ({ navigate }) => {
               <CategoryDisplay 
               title={item.recipeName} 
               duration={item.duration}
-              backgroundImage={item.recipeImages[0]}
+              item={item}
+              navigate={navigate}
+              isApi={false}
+              // recipeID={item.id ? item.id : 'testID'}
+              // userId={item.user_id}
+              // username={item.user?.username ? item.user?.username : ''}
+              // userFile={item.user?.profileImage ? item.user?.profileImage : ''}
+              // fileNames={item.fileNames ? item.fileNames : []}
+              // isApi={false}
               />
             </View>
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.id ? item.id : item.recipeName}
           horizontal
         
         />

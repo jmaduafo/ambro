@@ -7,6 +7,7 @@ import pic from '../assets/images/search.png'
 import { AntDesign } from '@expo/vector-icons';
 import { signInWithEmailAndPassword, signInWithCredential } from 'firebase/auth'
 import { auth, provider } from '../firebase/config'
+import HomeGroup from '../components/Navigations/HomeGroup'
 
 const Login = ({navigation}) => {
   const [ email, setEmail ] = useState('')
@@ -32,7 +33,7 @@ const Login = ({navigation}) => {
           setPassword('')
           setEmail('')
           setLoading(false)
-          navigation.navigate('Root')
+          navigation.navigate('Root', { screen: 'HomeGroup' })
         })
         .catch(err => {
           setError('The email or password is incorrect. Please try again.')

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
+  ScrollView
 } from "react-native";
 import React, { useState } from "react";
 import { COLORS } from "../constant/default";
@@ -64,7 +65,7 @@ const SignUp = ({ navigation }) => {
                 setEmail("");
                 setError("")
                 setLoading(false);
-                navigation.navigate("Root");
+                navigation.navigate("TagCategories");
 
               } catch (err) {
                 setError(err.message)
@@ -84,7 +85,7 @@ const SignUp = ({ navigation }) => {
 
   return (
     <SafeAreaView style={generalStyles.default}>
-      <View style={generalStyles.loginSignupSection}>
+      <ScrollView style={[generalStyles.loginSignupSection, { marginBottom: 260}]}>
         <Text style={generalStyles.loginSignupTitle}>Register</Text>
         <View>
           {/* ERROR MESSAGE */}
@@ -161,7 +162,7 @@ const SignUp = ({ navigation }) => {
             </TouchableOpacity>
           )}
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

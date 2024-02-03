@@ -18,6 +18,7 @@ import Root from "./components/Navigations/Root";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
+import TagCategories from "./screens/TagCategories";
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +33,7 @@ export default function App({navigation}) {
     "Satoshi-Bold": require("./assets/fonts/Satoshi-Bold.otf"),
     "Satoshi-Black": require("./assets/fonts/Satoshi-Black.otf"),
 
-    "Boska-Light": require("./assets/fonts/Boska-Extralight.otf"),
+    "Boska-ExtraLight": require("./assets/fonts/Boska-Extralight.otf"),
     "Boska-Light": require("./assets/fonts/Boska-Light.otf"),
     "Boska-Regular": require("./assets/fonts/Boska-Regular.otf"),
     "Boska-Medium": require("./assets/fonts/Boska-Medium.otf"),
@@ -71,50 +72,50 @@ export default function App({navigation}) {
 
 
   if (!showHome) {
-    return Onboarding();
+    return <Onboarding slides={slides} setShowHome={setShowHome}/>;
   }
 
   return (
-    <>
       <NavigationContainer>
         <Stack.Navigator initialRouteName={checkLog}>
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
             <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+            <Stack.Screen name="TagCategories" component={TagCategories} options={{ headerShown: false }} />
             <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} /> 
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    
   );
 
-  // ONBOARDING SLIDES COMPONENT
-  function Onboarding() {
-    return (
-      <>
-        <AppIntroSlider
-          data={slides}
-          renderItem={({ item }) => {
-            return (
-              <OnboardingSlide
-                image={item.image}
-                title={item.title}
-                description={item.description}
-              />
-            );
-          }}
-          dotStyle={{ backgroundColor: "rgba(214, 109, 64, .4)" }}
-          activeDotStyle={{ backgroundColor: "rgb(214, 109, 64)", width: 20 }}
-          showSkipButton
-          renderSkipButton={() => <OnboardingButton text="Skip" />}
-          renderNextButton={() => <OnboardingButton text="Next" />}
-          renderDoneButton={() => <OnboardingButton text="Done" />}
-          onSkip={() => {
-            setShowHome(true)
-          }}
-          onDone={() => {
-            setShowHome(true)
-          }}
-        />
-      </>
-    );
-  }
+}
+
+// ONBOARDING SLIDES COMPONENT
+function Onboarding({ slides, setShowHome}) {
+  return (
+      <AppIntroSlider
+        data={slides}
+        renderItem={({ item }) => {
+          return (
+            <OnboardingSlide
+              image={item.image}
+              title={item.title}
+              description={item.description}
+            />
+          );
+        }}
+        dotStyle={{ backgroundColor: "rgba(214, 109, 64, .4)" }}
+        activeDotStyle={{ backgroundColor: "rgb(214, 109, 64)", width: 20 }}
+        showSkipButton
+        renderSkipButton={() => <OnboardingButton text="Skip" />}
+        renderNextButton={() => <OnboardingButton text="Next" />}
+        renderDoneButton={() => <OnboardingButton text="Done" />}
+        onSkip={() => {
+          setShowHome(true)
+        }}
+        onDone={() => {
+          setShowHome(true)
+        }}
+      />
+    
+  );
 }
