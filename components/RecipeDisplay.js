@@ -4,33 +4,26 @@ import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
 import { COLORS, SHADOW } from '../constant/default'
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { FireIcon as FireOutline } from 'react-native-heroicons/outline'
-import { FireIcon as FireSolid } from 'react-native-heroicons/solid'
+import { FireIcon as FireOutline, ChatBubbleOvalLeftEllipsisIcon as CommentIcon, HeartIcon as HeartOutline } from 'react-native-heroicons/outline'
+import { FireIcon as FireSolid, HeartIcon as HeartSolid } from 'react-native-heroicons/solid'
 import HeaderTitle from './HeaderTitle'
 import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
 import axios from 'axios'
+import Cover from './Cover'
 
 const RecipeDisplay = ({ navigation, isApi, item }) => {
+    // Receives data from third party API
     const [ apiData, setApiData] = useState(null)
+    // Set loading state when getting data from third party API
     const [ loading, setLoading ] = useState(false)
+
     const [ measurementData, setMeasurementData ] = useState([])
     const [ ingredientsData, setIngredientsData ] = useState([])
-    const [ iFrame, setIFrame] = useState('https://youtu.be/QpfAyQgphgw?si=L5QIYZCqV1ZHIWvG')
-
-    const tags = {
-        vegetarian: true,
-        lowCarb: true,
-        lowSodium: true,
-        glutenFree: false,
-        vegan: true,
-        dairyFree: false
-    }
   
     useEffect(function() {
-      setLoading(true)
-      
       if (isApi) {
+        setLoading(true)
         const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${item.idMeal}`
 
         async function getData() {
@@ -40,24 +33,24 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
             if (response) {
               setApiData(response?.data?.meals[0])
 
-              console.log(apiData)
-
-              let measureArray = []
-              let ingredientArray = []
-
-              Object.keys(apiData).forEach(obj => {
-                {obj.includes('strMeasure') && measureArray.push(obj)}
-                {obj.includes('strIngredient') && ingredientArray.push(obj)}
-              })
-
-              setIngredientsData(ingredientArray)
-              setMeasurementData(measureArray)
-
-              console.log(measurementData)
-              console.log(ingredientsData)
-              
+              if (apiData) {
+                try {
+                  let measureArray = []
+                  let ingredientArray = []
+      
+                  Object.keys(apiData)?.forEach(obj => {
+                    {obj.includes('strMeasure') && apiData[obj]?.length &&  measureArray.push(obj)}
+                    {obj.includes('strIngredient') && apiData[obj]?.length && ingredientArray.push(obj)}
+                  })
+      
+                  setIngredientsData(ingredientArray)
+                  setMeasurementData(measureArray)
+      
+                } catch(err) {
+                  Alert.alert(err.message)
+                }
+              }
             }
-            
             setLoading(false)
           } catch(err) {
             Alert.alert(err.message)
@@ -65,16 +58,16 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
           }
 
         }
-        getData()    
-      }
+        getData()
 
-  
+      }   
     }, [item])
 
   return (
     <>
       <ScrollView>
-        {/* IMAGE CAROUSEL OR SINGULAR IMAGE SECTION */}
+        {/* IMAGE CAROUSEL IF FROM FIREBASE BACKEND OR 
+        SINGULAR IMAGE SECTION IF FROM THIRD PARTY API*/}
         {isApi && apiData ?
         <View style={[ styles.image ]}>
           <Image
@@ -84,25 +77,43 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
             />
         </View>
         :
-        <View style={{ backgroundColor: 'gray', width: '100%', height: 300}}>
-
+        <View style={styles.reviewHeartContainer}>
+          <Cover/>
+          <View style={{ padding: 10 }}>
+            <View>
+              <TouchableOpacity style={styles.reviewHeartClick}>
+                <CommentIcon size={36} strokeWidth={1} color={COLORS.backgroundFull}/>
+              </TouchableOpacity>
+              <Text style={styles.reviewHeartText}>234</Text>
+            </View>
+            <View>
+              <HeartClick/>
+            </View>
+          </View>
         </View>
 
         }
         <View style={styles.bottom}>
-          {/* IF FIREBASE, RECIPE INFORMATION, AND IF API, RECIPE ABOUT SECTION */}
+          {/* IF FIREBASE, DISPLAY RECIPE ITEM FROM BACKEND, AND IF API, DISPLAY RECIPE FROM
+          THIRD PARTY API */}
           <View style={styles.recipeCard}>
             {isApi ? 
             <APIRecipe name={apiData?.strMeal} description={'hi'}/>
             :
-            <UserRecipe navigation={navigation}/>
+            <UserRecipe navigation={navigation} item={item}/>
             } 
           </View>
           {/* RECIPE TAGS */}
           <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 20, flexWrap: 'wrap'}]}>
+            {/* COURSE TYPE */}
+            {!isApi && item?.courseType &&
+            <View style={generalStyles.tagSection}>      
+                <Text style={generalStyles.tag}>{item?.courseType}</Text>
+            </View>
+            }
             {/* CUISINE */}
             <View style={generalStyles.tagSection}>      
-                {isApi ? <Text style={generalStyles.tag}>{apiData?.strArea}</Text> : <Text style={generalStyles.tag}>Mexican</Text>}
+                {isApi ? <Text style={generalStyles.tag}>{apiData?.strArea}</Text> : <Text style={generalStyles.tag}>{item?.cuisine}</Text>}
             </View>
             {/* CATEGORY */}
             {isApi && apiData && 
@@ -111,31 +122,31 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
             </View>
             }
             {/* VEGETARIAN */}
-            {!isApi && tags.vegetarian && 
+            {!isApi && item?.vegetarian &&
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Vegetarian</Text>
             </View>
             }
             {/* LOW CARB */}
-            {!isApi && tags.lowCarb && 
+            {!isApi && item?.lowCarb && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Low Carb</Text>
             </View>
             }
             {/* LOW SODIUM */}
-            {!isApi && tags.lowSodium && 
+            {!isApi && item?.lowSodium && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Low Sodium</Text>
             </View>
             }
             {/* VEGAN */}
-            {!isApi && tags.vegan && 
+            {!isApi && item?.vegan && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Vegan</Text>
             </View>
             }
             {/* DAIRY FREE */}
-            {!isApi && tags.dairyFree && 
+            {!isApi && item?.dairyFree && 
             <View style={generalStyles.tagSection}>      
                 <Text style={generalStyles.tag}>Dairy Free</Text>
             </View>
@@ -156,10 +167,10 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
                   }
                 })
               :
-                [1, 2, 3, 4, 5, 6].map(list => {
+                item?.ingredientsItems?.map((list, index) => {
                     return (
                         <View key={list}>
-                            <IngredientList measurement={'1 cup'} ingredient={'oranges'}/>
+                            <IngredientList measurement={item?.ingredientsMeasurements[index]} ingredient={list}/>
                         </View>
                     )
                 })
@@ -174,18 +185,14 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
           </View>
           <View>
             {isApi && apiData ?
-            // apiData?.strInstructions?.split()?.map((list, index) => {
-            //    return (
               <View>
                   <InstructionList isApi={isApi} instruction={apiData?.strInstructions}/>
               </View>
-            //     )
-            // })
             :
-            [1, 2, 3, 4].map((list, index) => {
+            item?.instructions?.map((list, index) => {
                 return (
                     <View key={list}>
-                        <InstructionList index={index}/>
+                        <InstructionList index={index} instruction={list} isApi={isApi}/>
                     </View>
                 )
             })
@@ -194,20 +201,19 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
 
           {/* IF API AND YOUTUBE SOURCE ISN'T AN EMPTY STRING, THEN DISPLAY YOUTUBE VIDEO */}
           <View>
-        {isApi && apiData && apiData?.strYoutube?.length && 
-        <WebView
-          scalesPageToFit={true}
-          bounces={false}
-          javaScriptEnabled
-          style={{ height: 300, width: '100%', borderRadius: 20, marginTop: 10, marginBottom: 20 }}
-          source={{
-            uri: apiData?.strYoutube,
-          }}
-          originWhitelist={['*']}
-          automaticallyAdjustContentInsets={false}
-        />
-        }
-          
+            {isApi && apiData && apiData?.strYoutube?.length && 
+            <WebView
+              scalesPageToFit={true}
+              bounces={false}
+              javaScriptEnabled
+              style={{ height: 300, width: '100%', borderRadius: 20, marginTop: 10, marginBottom: 20 }}
+              source={{
+                uri: apiData?.strYoutube,
+              }}
+              originWhitelist={['*']}
+              automaticallyAdjustContentInsets={false}
+            />
+            } 
           </View>
         </View>
       </ScrollView>
@@ -217,28 +223,40 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
 
 export default RecipeDisplay
 
-// The recipe displayed from the firebase backend
-function UserRecipe({navigate}) {
+function HeartClick() {
+  const [ isSaved, setIsSaved] = useState(false)
+  return (
+    <>
+      <TouchableOpacity style={[styles.reviewHeartClick, { marginTop: 5}]} onPress={() => setIsSaved(prev => !prev)}>
+        {isSaved ? <HeartSolid size={36} strokeWidth={1} color={COLORS.backgroundFull}/> : <HeartOutline size={36} strokeWidth={1} color={COLORS.backgroundFull}/>}
+      </TouchableOpacity>
+      <Text style={styles.reviewHeartText}>1.2K</Text>
+    </>
+  )
+}
+
+// THE RECIPE DISPLAYED FROM THE FIREBASE BACKEND
+function UserRecipe({navigation, item}) {
     const info = [
       {
         title: 'duration',
-        result: '20 mins'
+        result: `${item.duration} mins`
       },
       {
         title: 'difficulty',
-        result: 'Low'
+        result: item.difficulty
       },
       {
         title: 'calories',
-        result: '< 500'
+        result: item.calories
       },
       {
         title: 'heat',
-        result: 1
+        result: item.heatLevel
       },
     ]
   
-    // Displays the heat icons depending on how spicy the recipe is
+    // DISPLAYS THE HEAT ICONS DEPENDING ON HOW SPICY THE RECIPE IS
     function fireCount(quantity) {
       if (quantity === 1) {
         return (
@@ -271,27 +289,30 @@ function UserRecipe({navigate}) {
   
     return (
       <>
+        {/* USERNAME WITH PROFILE IMAGE AND NUMBER OF RECIPES BY USER */}
         <View style={[generalStyles.rowCenter, { gap: 10}]}>
-          <Pressable style={styles.userImage} onPress={() => navigate('SearchUserPage')}>
+          <Pressable style={styles.userImage} onPress={() => navigation.navigate('SearchUserPage')}>
 
           </Pressable>
           <View>
-            <Text style={styles.userName}>@jmaduafo</Text>
+            <Text style={styles.userName}>@{item?.user?.username ? item?.user?.username : ''}</Text>
             <Text style={styles.userRecipeCount}>34 recipes</Text>
           </View>
         </View>
         <View style={{ marginTop: 10}}>
-          <Text style={styles.recipeTitle}>Cranberry Sangria <Text style={styles.servings}>| 3 servings</Text></Text>
+          <Text style={styles.recipeTitle}>{item.recipeName} <Text style={styles.servings}>| {item?.servings} servings</Text></Text>
         </View>
-        <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}>
+        {/* RATINGS SECTION */}
+        <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}> 
           <StarRatingDisplay
-            rating={4.6}
+            rating={0}
             color={COLORS.textColorFull}
             starSize={20}
             style={{ borderRadius: 40 }}
           />
-          <Text style={styles.ratingText}>4.1</Text>
+          <Text style={styles.ratingText}>0.0</Text>
         </View>
+        {/* DURATION, DIFFICULTY, CALORIES, AND HEAT LEVEL SECTION */}
         <View style={styles.recipeAdditionalInfoSection}>
           {info.map((data, index) => {
             return (
@@ -299,7 +320,7 @@ function UserRecipe({navigate}) {
               <Fragment key={data.title}>
                 <View>
                   <Text style={styles.recipeInfoTitle}>{data.title}</Text>
-                  {index + 1 === info.length ? fireCount(data.result) : <Text style={styles.recipeInfoResult}>{data.result}</Text>}
+                  {index + 1 === info.length ? fireCount(+data.result) : <Text style={styles.recipeInfoResult}>{data.result}</Text>}
                 </View>
                 {index + 1 !== info.length && <View style={styles.separator}></View>}
               </Fragment>
@@ -310,7 +331,7 @@ function UserRecipe({navigate}) {
     )
   }
   
-  // The recipe from the third party API
+  // THE RECIPE FOR THE THIRD PARTY API
   function APIRecipe({ name, description}) {
     return (
       <View>
@@ -322,7 +343,7 @@ function UserRecipe({navigate}) {
     )
   }
 
-  // Ingredients checklist
+  // INGREDIENTS CHECKLIST
   function IngredientList({measurement, ingredient}) {
     const [isSelected, setSelection] = useState(false);
 
@@ -339,10 +360,8 @@ function UserRecipe({navigate}) {
     )
   }
 
-  // Instructions display with number and text
+  // INSTRUCTIONS DISPLAY WITH NUMBER AND TEXT
   function InstructionList({index, instruction, isApi}) {
-    const [isSelected, setSelection] = useState(false);
-
     return (
       <>
       {isApi && instruction.length ? 
@@ -362,6 +381,22 @@ function UserRecipe({navigate}) {
   }
 
 const styles = StyleSheet.create({
+    reviewHeartContainer: {
+      backgroundColor: 'gray',
+      width: '100%',
+      height: 300,
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
+      position: 'relative'
+    },
+    reviewHeartText: {
+      color: COLORS.backgroundFull,
+      fontFamily: 'Satoshi-Medium',
+      fontSize: 11,
+      textAlign: 'center',
+      
+    },
     bottom: {
         paddingRight: 30,
         paddingLeft: 30,
@@ -450,5 +485,6 @@ const styles = StyleSheet.create({
       ingredient: {
         fontFamily: 'Satoshi-Medium',
         color: COLORS.textColorFull,
+        textTransform:'lowercase'
       },
 })

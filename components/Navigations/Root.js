@@ -4,11 +4,8 @@ import React, { useState } from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome } from "react-native-vector-icons";
 
-import Home from "../../screens/Home";
 import Create from "../../screens/Create";
 import Notification from "../../screens/Notification";
-import Profile from "../../screens/Profile";
-import Search from "../../screens/Search";
 
 // Import Search components as a stack navigation to nest within tab navigator
 import SearchGroup from './SearchGroup';
