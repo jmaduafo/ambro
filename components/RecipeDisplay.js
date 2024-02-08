@@ -12,7 +12,7 @@ import WebView from 'react-native-webview'
 import axios from 'axios'
 import Cover from './Cover'
 
-const RecipeDisplay = ({ navigation, isApi, item }) => {
+const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     // Receives data from third party API
     const [ apiData, setApiData] = useState(null)
     // Set loading state when getting data from third party API
@@ -80,12 +80,14 @@ const RecipeDisplay = ({ navigation, isApi, item }) => {
         <View style={styles.reviewHeartContainer}>
           <Cover/>
           <View style={{ padding: 10 }}>
+            {/* REVIEW/COMMENT ICON */}
             <View>
-              <TouchableOpacity style={styles.reviewHeartClick}>
-                <CommentIcon size={36} strokeWidth={1} color={COLORS.backgroundFull}/>
+              <TouchableOpacity style={styles.reviewHeartClick} onPress={() => navigation.navigate('HomeReviewDisplay', {item: item})}>
+                <CommentIcon size={36} strokeWidth={.7} color={COLORS.backgroundFull}/>
               </TouchableOpacity>
               <Text style={styles.reviewHeartText}>234</Text>
             </View>
+            {/* HEART ICON */}
             <View>
               <HeartClick/>
             </View>
@@ -228,7 +230,7 @@ function HeartClick() {
   return (
     <>
       <TouchableOpacity style={[styles.reviewHeartClick, { marginTop: 5}]} onPress={() => setIsSaved(prev => !prev)}>
-        {isSaved ? <HeartSolid size={36} strokeWidth={1} color={COLORS.backgroundFull}/> : <HeartOutline size={36} strokeWidth={1} color={COLORS.backgroundFull}/>}
+        {isSaved ? <HeartSolid size={36} strokeWidth={1} color={COLORS.backgroundFull}/> : <HeartOutline size={36} strokeWidth={.7} color={COLORS.backgroundFull}/>}
       </TouchableOpacity>
       <Text style={styles.reviewHeartText}>1.2K</Text>
     </>
@@ -291,9 +293,11 @@ function UserRecipe({navigation, item}) {
       <>
         {/* USERNAME WITH PROFILE IMAGE AND NUMBER OF RECIPES BY USER */}
         <View style={[generalStyles.rowCenter, { gap: 10}]}>
+          {/* USER PROFILE IMAGE */}
           <Pressable style={styles.userImage} onPress={() => navigation.navigate('SearchUserPage')}>
 
           </Pressable>
+          {/* USERNAME AND NUMBER OF RECIPES POSTED BY USER */}
           <View>
             <Text style={styles.userName}>@{item?.user?.username ? item?.user?.username : ''}</Text>
             <Text style={styles.userRecipeCount}>34 recipes</Text>
@@ -326,7 +330,7 @@ function UserRecipe({navigation, item}) {
               </Fragment>
             )
           })}
-        </View>
+        </View> 
       </>
     )
   }

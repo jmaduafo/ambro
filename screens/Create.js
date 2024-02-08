@@ -3,7 +3,6 @@ import {
   Text,
   View,
   TextInput,
-  FlatList,
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
@@ -13,7 +12,6 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
-import CreateRecipeForm from "../components/Create/CreateRecipeForm";
 import { COLORS } from "../constant/default";
 import generalStyles from "../constant/generalStyles";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -139,6 +137,7 @@ const Create = () => {
             ingredientsItems: listedIngredients,
             instructions: instructionsArray,
             tags: tagsArray,
+            calories: selectedCalories,
             courseType: selectedCourseType,
             cuisine: selectedCuisine,
             difficulty: selectedDifficulty,
@@ -172,12 +171,8 @@ const Create = () => {
             async function uploadImages() {
               try {
                 // Call the upload to storage function and assign uri, collection name, 
-                // recipeID, filename, and the state to show progress bar
+                // recipeID, and filename
                 await uploadToStorage(uri, 'recipes', recipeAdd?.id, fileName)
-
-                // Then set progress count back to 0 or 0% so 
-                // that it's not visible
-                setOnProgress(0)
 
               } catch (err) {
                 Alert.alert(err.message)

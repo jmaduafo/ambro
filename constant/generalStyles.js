@@ -14,6 +14,11 @@ const generalStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
+    center: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     lineBreak: {
         width: '100%',
         height: 1,

@@ -5,8 +5,7 @@ import { getAuth, GoogleAuthProvider, initializeAuth, getReactNativePersistence 
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { API_KEY, AUTH_DOMAIN, PROJECT_ID, 
     STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env'
-  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Alert } from "react-native";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 

@@ -10,6 +10,7 @@ import {
   Pressable,
   TouchableOpacity,
   ActivityIndicator,
+  Alert
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import generalStyles from "../../constant/generalStyles";
@@ -22,7 +23,7 @@ import ReAuthenticate from "../ReAuthenticate";
 import * as ImagePicker from "expo-image-picker";
 import { UserIcon, PhotoIcon, XMarkIcon } from "react-native-heroicons/solid";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { auth, db } from "../../firebase/config";
+import { auth, db, uploadToStorage } from "../../firebase/config";
 import { query, where, collection, getDocs, setDocs, doc, updateDoc } from "firebase/firestore";
 
 const EditProfile = () => {
@@ -36,6 +37,8 @@ const EditProfile = () => {
 
   const [ messageOpen, setMessageOpen ] = useState(false)
   const [imagePick, setImagePick] = useState(null);
+  const [imageURI, setImageURI] = useState(null);
+  const [backgroundImageURI, setBackgroundImageURI] = useState(null);
   const [backgroundImagePick, setBackgroundImagePick] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -65,7 +68,7 @@ const EditProfile = () => {
       if (!result.canceled) { 
 
           // Append to images array when image is added
-          setBackgroundImagePick(result.assets[0].uri); 
+          setBackgroundImageURI(result.assets[0].uri); 
           // Clear any previous errors 
       } 
   }
@@ -94,7 +97,7 @@ const EditProfile = () => {
 
         if (!result.canceled) { 
             // Append to images array when image is added
-            setImagePick(result.assets[0].uri); 
+            setImageURI(result.assets[0].uri); 
             // Clear any previous errors 
         } 
     }
@@ -155,6 +158,8 @@ const EditProfile = () => {
       setNewUsername(userArray[0]?.username)
       loadProfileImage(userArray[0]?.profileImage)     
       loadBackgroundImage(userArray[0]?.profileBackgroundImage)
+      setBackgroundImageURI(userArray[0]?.profileBackgroundURI)
+      setImageURI(userArray[0]?.profileImageURI)
       setNewPronouns(userArray[0]?.pronouns)
       setNewBio(userArray[0]?.bio) 
     }
@@ -173,8 +178,28 @@ const EditProfile = () => {
       setLoading(true)
       const userRef = doc(db, 'users', auth?.currentUser?.uid)
 
-      const imageName = imagePick.split('/').pop()
-      const backgroundName = backgroundImagePick.split('/').pop()
+      // On first load, display the firebase storage image
+      // If user decides to change their pics, display the uri from image picker
+          // uri is contained in 
+      // When user submits, upload the uri with filename to firebase
+      // Update to user profile and set the uri and filenames
+
+      const imageName = imageURI.split('/').pop()
+      const backgroundName = backgroundImageURI.split('/').pop()
+
+      async function uploadImageToStorage() {
+        try {
+          await uploadToStorage(imageURI, 'users', auth?.currentUser?.uid, 'profileImage', imageName)
+          await uploadToStorage(backgroundImageURI, 'users', auth?.currentUser?.uid, 'backgroundImage', backgroundName)
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      }
+
+      uploadImageToStorage()
+
+      
+
 
       async function updateUserInfo() {
         try {
@@ -183,6 +208,8 @@ const EditProfile = () => {
             username: newUsername,
             bio: newBio,
             pronouns: newPronouns,
+            profileImageURI: imageURI,
+            profileBackgroundURI: backgroundImageURI,
             profileImage: imageName,
             profileBackgroundImage: backgroundName
           })

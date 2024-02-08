@@ -10,7 +10,7 @@ const HomeRecipeDetail = ({ navigation, route }) => {
 
   return (
     <View style={generalStyles.default}>
-      <RecipeDisplay navigation={navigation} isApi={isApi} item={item}/>
+      <RecipeDisplay navigation={navigation} route={route} isApi={isApi} item={item}/>
     </View>
   )
 }
