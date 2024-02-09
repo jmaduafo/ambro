@@ -6,7 +6,7 @@ import generalStyles from '../constant/generalStyles'
 import { PaperAirplaneIcon } from 'react-native-heroicons/solid'
 
 
-const UserReviewInput = ({ rating, setRating, userReview, setUserReview}) => {
+const UserReviewInput = ({ rating, setRating, userReview, setUserReview, setReview }) => {
   return (
     <View style={styles.userReview}>
         <Text style={styles.topText}>Rate this recipe</Text>
@@ -31,7 +31,7 @@ const UserReviewInput = ({ rating, setRating, userReview, setUserReview}) => {
                 multiline
                 editable
             />
-            <TouchableOpacity style={[styles.send, { flexDirection: 'row', justifyContent: 'flex-end'}]}>
+            <TouchableOpacity onPress={setReview} style={[styles.send, { flexDirection: 'row', justifyContent: 'flex-end'}]}>
                 <View style={[generalStyles.center, styles.sendButton]}>
                     <PaperAirplaneIcon size={16} color={COLORS.backgroundFull}/>
                 </View>
