@@ -16,14 +16,14 @@ const HomeReviewDisplay = ({ navigation, route }) => {
   const [userReply, setUserReply] = useState("");
 
   async function setReview() {
-    if (userReview.length) {
+    if (userReview.length && item?.id) {
         try {
             const reviewRef = collection(db, 'reviews')
         
             // ADDS THE REVIEW OF THE PERSON CURRENTLY COMMENTING
             const review = await addDoc(reviewRef, {
                 reviewText: userReview,
-                recipe_id: item.id,
+                recipe_id: item?.id,
                 user_id: auth?.currentUser?.uid,
                 rating: rating,
                 createdAt: serverTimestamp()
@@ -51,6 +51,9 @@ const HomeReviewDisplay = ({ navigation, route }) => {
     
                     updateReview()
                     Alert.alert('Review sent successfully!')
+
+                    setUserReview('')
+                    setRating(0)
 
                 } catch (err) {
                     Alert.alert(err.message)
@@ -101,6 +104,9 @@ const HomeReviewDisplay = ({ navigation, route }) => {
     
                     updateReply()
                     Alert.alert('Reply sent successfully!')
+
+                    setUserReply('')
+                    setRating(0)
 
                 } catch (err) {
                     Alert.alert(err.message)

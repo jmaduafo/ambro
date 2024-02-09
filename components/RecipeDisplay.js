@@ -11,6 +11,8 @@ import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
 import axios from 'axios'
 import Cover from './Cover'
+import { db, auth } from '../firebase/config'
+import { onSnapshot, where, collection, query } from 'firebase/firestore'
 
 const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     // Receives data from third party API
@@ -20,8 +22,33 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
     const [ measurementData, setMeasurementData ] = useState([])
     const [ ingredientsData, setIngredientsData ] = useState([])
-  
-    useEffect(function() {
+
+    
+    const [ reviewCount, setReviewCount ] = useState(0)
+
+    async function getReviewsCount() {
+      if (!isApi && item?.id) {
+        try {
+            const reviewCountRef = query(collection(db, 'reviews'), where('recipe_id', '==', item?.id))
+    
+            const unsub  = onSnapshot(reviewCountRef, (snap) => {
+                let reviews = []
+    
+                snap.forEach(doc => {
+                    reviews.push(doc.data())
+                })
+    
+                setReviewCount(reviews?.length)
+            })
+        } catch (err) {
+            Alert.alert(err.message)
+        }
+      } else if (!isApi && !item?.id) {
+        setReviewCount(0)
+      }
+    }
+
+    async function getApiData() {
       if (isApi) {
         setLoading(true)
         const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${item.idMeal}`
@@ -59,8 +86,12 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
         }
         getData()
-
-      }   
+      }
+    }
+  
+    useEffect(function() {
+      getApiData()
+      getReviewsCount()
     }, [item])
 
   return (
@@ -85,7 +116,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
               <TouchableOpacity style={styles.reviewHeartClick} onPress={() => navigation.navigate('HomeReviewDisplay', {item: item})}>
                 <CommentIcon size={36} strokeWidth={.7} color={COLORS.backgroundFull}/>
               </TouchableOpacity>
-              <Text style={styles.reviewHeartText}>234</Text>
+              <Text style={styles.reviewHeartText}>{reviewCount}</Text>
             </View>
             {/* HEART ICON */}
             <View>
