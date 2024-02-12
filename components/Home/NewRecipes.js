@@ -1,13 +1,9 @@
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import { StyleSheet, Text, View, FlatList, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import HeaderTitle from "../HeaderTitle";
-import useFetch from "../../hooks/useFetch";
-import axios from "axios";
-import RecipeDisplay from "../RecipeDisplay";
 import CategoryDisplay from "../CategoryDisplay";
 import { auth, db } from "../../firebase/config";
-import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
-import { ActivityIndicator } from "react-native-paper";
+import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
 import { COLORS } from "../../constant/default";
 import { useNavigation } from "@react-navigation/native";
 
@@ -15,32 +11,27 @@ const NewRecipes = ({ navigate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [allRecipes, setAllRecipes] = useState()
+  const [allRecipes, setAllRecipes] = useState(null)
 
-  function getLatestRecipes() {
+  async function getLatestRecipes() {
     setLoading(true)
     const recipeRef = query(collection(db, "recipes"), orderBy('createdAt', 'desc'), limit(12));
 
-    async function getRecipes() {
-      const recipeSnap = await getDocs(recipeRef);
+    const unsub = onSnapshot(recipeRef, (snap) => {
+      let recipes = []
 
-      let array = [];
-      recipeSnap.forEach((doc) => {
-        array.push({... doc.data()});
-      });
+      snap.forEach(doc => {
+        recipes.push(doc.data())
+      })
 
-      setAllRecipes(array);
-      
-    }
-    getRecipes();
+      setAllRecipes(recipes)
+    })
     setLoading(false)
   }
 
   useEffect(function () {
     getLatestRecipes();
   }, []);
-
-  if (loading) <ActivityIndicator size={"small"} color={COLORS.textColorFull} />
 
   return (
     <View style={{ marginBottom: 20}}>
@@ -52,7 +43,7 @@ const NewRecipes = ({ navigate }) => {
         paddingLeft={30}
         paddingRight={30}
       />
-      {loading || !allRecipes?.length ? (
+      {loading || !allRecipes? (
         <View>
           <ActivityIndicator size={"small"} color={COLORS.textColorFull} />
         </View>

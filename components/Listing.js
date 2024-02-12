@@ -1,9 +1,21 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../constant/default';
+import { auth } from '../firebase/config';
+import { getFollowsByUser, totalRecipesByUser } from '../firebase/firebaseOperations';
+import generalStyles from '../constant/generalStyles';
 
 const Listing = (props) => {
+    const [ isFollowing, setIsFollowing ] = useState(false)
+    const [ followCount, setFollowCount ] = useState(0)
+    const [ recipeCount, setRecipeCount ] = useState(0)
+
+    useMemo(function() {
+        getFollowsByUser( auth?.currentUser?.uid, props.id, setFollowCount, setIsFollowing)
+        totalRecipesByUser(props.id, setRecipeCount)
+    }, [props])
+
   return (
     <View style={styles.background}>
         {props.image ? 
@@ -25,13 +37,27 @@ const Listing = (props) => {
         </View>
         }
         <View>
-            <Text style={styles.text}>{props.searchType === 'user' ? props.name : props.name.toLowerCase()}</Text>
-            {props.searchType === 'user' && 
-            <View style={styles.userDisplay}>
-                <Text style={styles.userText}>Following</Text>
-                <Text style={styles.userText}>&#x2022;</Text>
-                <Text style={styles.userText}>32 recipes</Text>
-            </View>}
+            {props.searchType === 'user' ? 
+            <View style={[generalStyles.rowCenter, { gap: 5}]}>
+                <Text style={styles.text}>{props.name}</Text>
+                <Text style={styles.username}>|</Text>
+                <Text style={styles.username}>@{props.username}</Text>
+            </View>
+             : <Text style={[styles.text, { textTransform: 'lowercase'}]}>{props.name}</Text>}
+            {props.searchType === 'user' ? 
+                isFollowing ? 
+                <View style={styles.userDisplay}>
+                    <Text style={styles.userText}>Following</Text>
+                    <Text style={styles.userText}>&#x2022;</Text>
+                    <Text style={styles.userText}>{followCount} recipes</Text>
+                </View> 
+                :
+                <View>
+                    <Text style={styles.userText}>{recipeCount} recipes</Text>
+                </View>
+            :
+            <View></View>
+            }
         </View>
       
     </View>
@@ -68,14 +94,19 @@ const styles = StyleSheet.create({
         borderRadius: '50%'
     },
     text: {
-        fontSize: 14,
+        fontSize: 13,
         color: COLORS.textColorFull,
+        fontFamily: 'Satoshi-Regular'
+    },
+    username: {
+        fontSize: 11,
+        color: COLORS.textColor75,
         fontFamily: 'Satoshi-Regular'
     },
     userDisplay: {
         flexDirection: 'row',
         gap: 5,
-        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 0
     },
     userText: {

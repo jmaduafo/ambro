@@ -3,13 +3,16 @@ import React from 'react'
 import { COLORS, SHADOW } from '../constant/default'
 import { Ionicons } from '@expo/vector-icons';
 
-const SearchEngine = ({ marginTop, marginBottom, placeholderText }) => {
+const SearchEngine = ({ search, setSearch, marginTop, marginBottom, placeholderText }) => {
   return (
     <View style={[ styles.searchSection, { marginTop: marginTop, marginBottom: marginBottom } ]}>
         <TextInput
             placeholder={placeholderText}
             placeholderTextColor={COLORS.textColor50}
-            style={styles.searchInput}/>
+            style={styles.searchInput}
+            onChangeText={text => setSearch(text)}
+            value={search}
+            />
         <Pressable style={styles.searchButton}>
         <Ionicons name="search-outline" size={24} color={COLORS.textColorFull} />
         </Pressable>

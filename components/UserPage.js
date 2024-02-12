@@ -7,7 +7,7 @@ import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 
-const UserPage = ({ navigate, profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
+const UserPage = ({ navigate, user, profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()

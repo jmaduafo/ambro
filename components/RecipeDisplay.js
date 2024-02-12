@@ -86,7 +86,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
         setRatingCount(0)
       }
       
-    }, [item])
+    }, [auth, item])
 
   return (
     <>
