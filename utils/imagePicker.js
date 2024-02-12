@@ -1,21 +1,62 @@
 import * as ImagePicker from 'expo-image-picker';
 
-export const pickImage = async () => {
-    let image;
+// Handles profile pic image picker
+export const profileImagePicker = async (setImageURI, Alert) => {
+  // No permissions request is necessary for launching the image library
+  const { status } = await ImagePicker. 
+      requestMediaLibraryPermissionsAsync(); 
+
+  if (status !== "granted") { 
+
+      // If permission is denied, show an alert 
+      Alert.alert( 
+          "Permission Denied", 
+          `Sorry, we need camera  
+            roll permission to upload images.` 
+      ); 
+  } else { 
+
+      // Launch the image library and get 
+      // the selected image 
+      const result = 
+          await ImagePicker.launchImageLibraryAsync(); 
+
+      if (!result.canceled) { 
+          // Append to images array when image is added
+          setImageURI(result.assets[0].uri); 
+          // Clear any previous errors 
+      } 
+  }
+};
+
+
+  // Handles background pic image picker
+export const backgroundImagePicker = async (setBackgroundImageURI, Alert) => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const { status } = await ImagePicker. 
+      requestMediaLibraryPermissionsAsync(); 
 
-    if (!result.canceled) {
-      image = result.assets[0].uri;
+  if (status !== "granted") { 
 
-      return { img: image }
-    }
+      // If permission is denied, show an alert 
+      Alert.alert( 
+          "Permission Denied", 
+          `Sorry, we need camera  
+            roll permission to upload images.` 
+      ); 
+  } else { 
+
+      // Launch the image library and get 
+      // the selected image 
+      const result = 
+          await ImagePicker.launchImageLibraryAsync(); 
+
+      if (!result.canceled) { 
+
+          // Append to images array when image is added
+          setBackgroundImageURI(result.assets[0].uri); 
+          // Clear any previous errors 
+      } 
+  }
   };
 
-
-  

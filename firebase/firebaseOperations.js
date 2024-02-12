@@ -129,7 +129,8 @@ export async function getDislikesByUser(userId, reviewId, setDislikedCount, setI
     }
 }
 
-export async function follows(userId, followId, isFollowed) {
+// ALLOWS USER TO FOLLOW AND UNFOLLOW ON BUTTON CLICK
+export async function follow(userId, followId, isFollowed) {
     try {
         const followRef = doc(db, 'followings', `${userId}-${followId}`)
 
@@ -147,9 +148,10 @@ export async function follows(userId, followId, isFollowed) {
     }
 }
 
+// FINDS AND COUNTS ALL THE USERS THAT FOLLOWED A SPECIFIC USER AND SETS A BOOLEAN IF 
+// CURRENT USER IS FOLLOWING THE PERSON
 export async function getFollowsByUser(userId, followId, setFollowedCount, setIsFollowed) {
     try {
-        // Find where the recipe id matches the passed in recipe id
         const followRef = query(collection(db, 'followings'), where('follow_id', '==', followId))
     
         const unsub = onSnapshot(followRef, (snap) => {
@@ -171,10 +173,51 @@ export async function getFollowsByUser(userId, followId, setFollowedCount, setIs
     }
 }
 
-export async function getFollows(followId, setFollowedCount) {
+// COUNTS THE NUMBER OF FOLLOWINGS
+export async function getFollowingsCount(userId, setFollowingCount) {
     try {
         // Find where the recipe id matches the passed in recipe id
-        const followRef = query(collection(db, 'followings'), where('follow_id', '==', followId))
+        const followRef = query(collection(db, 'followings'), where('user_id', '==', userId))
+    
+        const unsub = onSnapshot(followRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let follows = []
+            snap.forEach(doc => {
+                follows.push(doc.data())
+            })
+
+            setFollowingCount(follows.length)
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+// COUNTS THE NUMBER OF FOLLOWERS
+export async function getFollowersCount(userId, setFollowedCount) {
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const followRef = query(collection(db, 'followings'), where('follow_id', '==', userId))
+    
+        const unsub = onSnapshot(followRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let follows = []
+            snap.forEach(doc => {
+                follows.push(doc.data())
+            })
+
+            setFollowedCount(follows.length)
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+// GETS ALL THE FOLLOWS
+export async function getAllFollows(setFollowedCount) {
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const followRef = query(collection(db, 'followings'))
     
         const unsub = onSnapshot(followRef, (snap) => {
             // Collect all of the saves of the recipe

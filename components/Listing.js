@@ -1,9 +1,9 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../constant/default';
 import { auth } from '../firebase/config';
-import { getFollowsByUser, totalRecipesByUser } from '../firebase/firebaseOperations';
+import { getFollowsByUser, totalRecipesByUser, getAllFollows } from '../firebase/firebaseOperations';
 import generalStyles from '../constant/generalStyles';
 
 const Listing = (props) => {
@@ -11,9 +11,22 @@ const Listing = (props) => {
     const [ followCount, setFollowCount ] = useState(0)
     const [ recipeCount, setRecipeCount ] = useState(0)
 
+    const [ allFollows, setAllFollows ] = useState([])
+
+    useEffect(function() {
+        getAllFollows(setAllFollows)
+    }, [])
+
     useMemo(function() {
-        getFollowsByUser( auth?.currentUser?.uid, props.id, setFollowCount, setIsFollowing)
-        totalRecipesByUser(props.id, setRecipeCount)
+        if (allFollows?.length) {
+            getFollowsByUser( auth?.currentUser?.uid, props.id, setFollowCount, setIsFollowing)
+        }
+    }, [allFollows])
+
+    useMemo(function() {
+        if (props.id) {
+            totalRecipesByUser(props.id, setRecipeCount)
+        }
     }, [props])
 
   return (
@@ -43,13 +56,15 @@ const Listing = (props) => {
                 <Text style={styles.username}>|</Text>
                 <Text style={styles.username}>@{props.username}</Text>
             </View>
-             : <Text style={[styles.text, { textTransform: 'lowercase'}]}>{props.name}</Text>}
+             : 
+             <Text style={[styles.text, { textTransform: 'lowercase'}]}>{props.name}</Text>
+            }
             {props.searchType === 'user' ? 
                 isFollowing ? 
                 <View style={styles.userDisplay}>
                     <Text style={styles.userText}>Following</Text>
                     <Text style={styles.userText}>&#x2022;</Text>
-                    <Text style={styles.userText}>{followCount} recipes</Text>
+                    <Text style={styles.userText}>{recipeCount} recipes</Text>
                 </View> 
                 :
                 <View>

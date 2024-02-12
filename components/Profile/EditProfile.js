@@ -18,13 +18,11 @@ import { COLORS } from "../../constant/default";
 import { SelectList } from "react-native-dropdown-select-list";
 import { editPronouns } from "../../utils/userEdit";
 import { ChevronRightIcon } from "react-native-heroicons/outline";
-import Modal from "../Modal";
 import ReAuthenticate from "../ReAuthenticate";
-import * as ImagePicker from "expo-image-picker";
-import { UserIcon, PhotoIcon, XMarkIcon } from "react-native-heroicons/solid";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { backgroundImagePicker, profileImagePicker } from "../../utils/imagePicker";
+import { UserIcon, PhotoIcon } from "react-native-heroicons/solid";
 import { auth, db, uploadToStorage } from "../../firebase/config";
-import { query, where, collection, getDocs, setDocs, doc, updateDoc } from "firebase/firestore";
+import { query, where, collection, getDocs, doc, updateDoc } from "firebase/firestore";
 
 const EditProfile = () => {
   const [newBio, setNewBio] = useState('');
@@ -36,109 +34,23 @@ const EditProfile = () => {
   const [open, setOpen] = useState(false);
 
   const [ messageOpen, setMessageOpen ] = useState(false)
+
   const [imagePick, setImagePick] = useState(null);
   const [imageURI, setImageURI] = useState(null);
   const [backgroundImageURI, setBackgroundImageURI] = useState(null);
   const [backgroundImagePick, setBackgroundImagePick] = useState(null);
 
+  const [ currentImage, setCurrentImage ] = useState([])
+  const [ currentBackground, setCurrentBackground ] = useState([])
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  // Handles background pic image picker
-  const backgroundImage = async () => {
-    // No permissions request is necessary for launching the image library
-    const { status } = await ImagePicker. 
-      requestMediaLibraryPermissionsAsync(); 
-
-  if (status !== "granted") { 
-
-      // If permission is denied, show an alert 
-      Alert.alert( 
-          "Permission Denied", 
-          `Sorry, we need camera  
-            roll permission to upload images.` 
-      ); 
-  } else { 
-
-      // Launch the image library and get 
-      // the selected image 
-      const result = 
-          await ImagePicker.launchImageLibraryAsync(); 
-
-      if (!result.canceled) { 
-
-          // Append to images array when image is added
-          setBackgroundImageURI(result.assets[0].uri); 
-          // Clear any previous errors 
-      } 
-  }
-  };
-
-  // Handles profile pic image picker
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    const { status } = await ImagePicker. 
-        requestMediaLibraryPermissionsAsync(); 
-
-    if (status !== "granted") { 
-
-        // If permission is denied, show an alert 
-        Alert.alert( 
-            "Permission Denied", 
-            `Sorry, we need camera  
-              roll permission to upload images.` 
-        ); 
-    } else { 
-
-        // Launch the image library and get 
-        // the selected image 
-        const result = 
-            await ImagePicker.launchImageLibraryAsync(); 
-
-        if (!result.canceled) { 
-            // Append to images array when image is added
-            setImageURI(result.assets[0].uri); 
-            // Clear any previous errors 
-        } 
-    }
-  };
-
-  function loadProfileImage(profileImage) {
-    if (profileImage) {
-      const storage = getStorage();
-      const userRef = ref(storage, 'users', auth?.currentUser?.uid, 'profileImage', profileImage);
-  
-      // Get the download URL
-      getDownloadURL(userRef)
-      .then((url) => {
-          // Insert url into an <img> tag to "download"
-          setProfileImagePick(url)
-      })
-      .catch((error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          
-      });
-    }
+  function handleBackgroundImage() {
+    backgroundImagePicker(setBackgroundImageURI, Alert)
   }
 
-  function loadBackgroundImage(backgroundImage) {
-    if (backgroundImage) {
-      const storage = getStorage();
-      const userRef = ref(storage, 'users', auth?.currentUser?.uid, 'backgroundImage', backgroundImage);
-  
-      // Get the download URL
-      getDownloadURL(userRef)
-      .then((url) => {
-          // Insert url into an <img> tag to "download"
-          setBackgroundImagePick(url)
-      })
-      .catch((error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          
-      });
-    }
+  function handleProfileImage() {
+    profileImagePicker(setImageURI, Alert)
   }
 
   // Loads user information on first load
@@ -152,14 +64,11 @@ const EditProfile = () => {
       userSnap.forEach(doc => {
         userArray.push(doc.data())
       })
-
       
       setNewName(userArray[0]?.name)
       setNewUsername(userArray[0]?.username)
-      loadProfileImage(userArray[0]?.profileImage)     
-      loadBackgroundImage(userArray[0]?.profileBackgroundImage)
-      setBackgroundImageURI(userArray[0]?.profileBackgroundURI)
-      setImageURI(userArray[0]?.profileImageURI)
+      setImagePick(userArray[0]?.profileImage[0])
+      setBackgroundImagePick(userArray[0]?.profileBackgroundImage[0])
       setNewPronouns(userArray[0]?.pronouns)
       setNewBio(userArray[0]?.bio) 
     }
@@ -173,33 +82,20 @@ const EditProfile = () => {
 
   function handleSubmit() {
     if (!newUsername.length || !newName.length) {
-      setError('Name and username must not be empty')
+      Alert.alert('Name and username must not be empty')
     } else {
       setLoading(true)
       const userRef = doc(db, 'users', auth?.currentUser?.uid)
 
-      // On first load, display the firebase storage image
-      // If user decides to change their pics, display the uri from image picker
-          // uri is contained in 
-      // When user submits, upload the uri with filename to firebase
-      // Update to user profile and set the uri and filenames
-
       const imageName = imageURI.split('/').pop()
       const backgroundName = backgroundImageURI.split('/').pop()
 
-      async function uploadImageToStorage() {
-        try {
-          await uploadToStorage(imageURI, 'users', auth?.currentUser?.uid, 'profileImage', imageName)
-          await uploadToStorage(backgroundImageURI, 'users', auth?.currentUser?.uid, 'backgroundImage', backgroundName)
-        } catch (err) {
-          Alert.alert(err.message)
-        }
+      try {
+        uploadToStorage(imageURI, 'users', auth?.currentUser?.uid, imageName, 'profileImage', currentImage, setCurrentImage)
+        uploadToStorage(backgroundImageURI, 'users', auth?.currentUser?.uid, backgroundName, 'backgroundImage', currentBackground, setCurrentBackground)
+      } catch (err) {
+        Alert.alert(err.message)
       }
-
-      uploadImageToStorage()
-
-      
-
 
       async function updateUserInfo() {
         try {
@@ -208,17 +104,13 @@ const EditProfile = () => {
             username: newUsername,
             bio: newBio,
             pronouns: newPronouns,
-            profileImageURI: imageURI,
-            profileBackgroundURI: backgroundImageURI,
-            profileImage: imageName,
-            profileBackgroundImage: backgroundName
+            profileImage: currentImage,
+            profileBackgroundImage: currentBackground
           })
-          setError('Updated successfully!')
-          setMessageOpen(true)
+          Alert.alert('Updated successfully!')
           setLoading(false)
         } catch(err) {
-          setError('Something went wrong while')
-          setMessageOpen(true)
+          Alert.alert(err.message)
           setLoading(false)
         }      
   
@@ -231,7 +123,7 @@ const EditProfile = () => {
   return (
     <View style={[generalStyles.default, { position: "relative" }]}>
       {open && <ReAuthenticate setOpen={setOpen} />}
-      { messageOpen && 
+      {/* { messageOpen && 
       <Modal>
         <View>
           <Text style={[generalStyles.defaultParagraph, {textAlign: 'center'}]}>{error}</Text>
@@ -240,13 +132,13 @@ const EditProfile = () => {
           <Text style={generalStyles.buttonText}>Okay</Text>
         </Pressable>
       </Modal>
-      }
+      } */}
 
       <ScrollView style={{ marginTop: 40, paddingLeft: 20, paddingRight: 20 }}>
         {/* BACKGROUND IMAGE SELECT */}
         <View style={styles.backgroundImageSection}>
           <View style={styles.backgroundImage}>
-            {backgroundImagePick ? (
+            {backgroundImagePick?.length ? (
               <Image
                 source={{ uri: backgroundImagePick }}
                 style={{ width: "100%", height: "100%", borderRadius: 10 }}
@@ -257,13 +149,13 @@ const EditProfile = () => {
             )}
           </View>
         </View>
-        <TouchableOpacity onPress={backgroundImage} style={[generalStyles.button, {borderRadius: 5, marginTop: 20}]}>
+        <TouchableOpacity onPress={handleBackgroundImage} style={[generalStyles.button, {borderRadius: 5, marginTop: 20}]}>
           <Text style={generalStyles.tag}>Select your background image</Text>
         </TouchableOpacity>
         {/* PROFILE IMAGE SELECT */}
         <View style={styles.profileImageSection}>
           <View style={styles.profileImage}>
-            {imagePick ? (
+            {imagePick?.length ? (
               <Image
                 source={{ uri: imagePick }}
                 style={{ width: "100%", height: "100%", borderRadius: 10000 }}
@@ -274,7 +166,7 @@ const EditProfile = () => {
             )}
           </View>
         </View>
-        <TouchableOpacity onPress={pickImage}  style={[generalStyles.button, {borderRadius: 5, marginTop: 20}]}>
+        <TouchableOpacity onPress={handleProfileImage}  style={[generalStyles.button, {borderRadius: 5, marginTop: 20}]}>
           <Text style={generalStyles.tag}>Select your profile image</Text>
         </TouchableOpacity>
         {/* USER USERNAME */}

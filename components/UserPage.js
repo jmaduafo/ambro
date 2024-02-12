@@ -1,16 +1,50 @@
 import { ScrollView, StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { COLORS } from '../constant/default'
 import pic from '../assets/test.png'
 import { HeartIcon, ListBulletIcon, EllipsisVerticalIcon } from 'react-native-heroicons/outline'
 import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
+import { totalRecipesByUser, follow, getFollowingsCount, getAllFollows, getFollowsByUser } from '../firebase/firebaseOperations'
+import { auth } from '../firebase/config'
 
-const UserPage = ({ navigate, user, profileImage, bgImage, name, username, pronouns, bio, type, numberOfRecipes, numberOfFollowers, numberOfFollowing, allRecipes, allSaves}) => {
+const UserPage = ({ navigate, user, type, allRecipes, allSaves}) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
+
+  const [ isFollowed, setIsFollowed ] = useState(false)
+
+  const [ followersCount, setFollowersCount ] = useState(0)
+  const [ followingCount, setFollowingCount ] = useState(0)
+  const [ recipeCount, setRecipeCount ] = useState(0)
+
+  const [ allFollows, setAllFollows ] = useState(null)
+
+  useEffect(function() {
+    getAllFollows(setAllFollows)
+  }, [])
+
+  useMemo(function() {
+    totalRecipesByUser(user.id, setRecipeCount)
+
+    if (allFollows) {
+      getFollowingsCount(user.id, setFollowingCount)
+    }
+
+    if (allFollows) {
+      getFollowsByUser(auth?.currentUser?.uid, user.id, setFollowersCount, setIsFollowed)
+    }
+  }, [user])
+
+  
+  function handleFollow() {
+    follow(auth?.currentUser?.uid, user.id, isFollowed)
+  }
+  
+  useMemo(function() {
+  }, [user])
 
   // MASONRY LIST DATA ARRAY
   function categoriesArray() {
@@ -32,10 +66,10 @@ const UserPage = ({ navigate, user, profileImage, bgImage, name, username, prono
         {/* <Pressable style={{ paddingLeft: 20, paddingRight: 20, marginTop: 40, zIndex: 20, width: '100%', position: 'absolute', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
           <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
         </Pressable> */}
-        <ImageBackground
-        source={{ uri: bgImage && bgImage }}
+        {/* <ImageBackground
+        source={{ uri: user.profileBackgroundImage ? user.profileBackgroundImage : pic }}
         resizeMode='cover'
-        style={{ width: '100%', height: '100%'}}/>
+        style={{ width: '100%', height: '100%'}}/> */}
       </View>
       {/* USER INFO WITH USERNAME, PRONOUNS, AND BUTTONS */}
       <View style={styles.bottom}>
@@ -43,50 +77,61 @@ const UserPage = ({ navigate, user, profileImage, bgImage, name, username, prono
           <View style={styles.userIntro}>
             <View style={{ flexBasis: '30%' }}>
               <View style={{ width: 80, height: 80, borderRadius: 80/2 }}>
-                <Image
-                  source={{ uri: profileImage ? profileImage : pic }}
+                {/* <Image
+                  source={{ uri: user.profileImage ? user.profileImage : pic }}
                   resizeMode='cover'
-                  style={{ width: '100%', height: '100%', borderRadius: 100000}}/>
+                  style={{ width: '100%', height: '100%', borderRadius: 100000}}/> */}
               </View>
             </View>
             {/* USERNAME, PRONOUNS, BUTTONS */}
             <View style={{ flexBasis: '70%'}}>
-            {username ? 
+            {user.username ? 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View>
-                  <Text style={styles.nameTitle}>{name}</Text>
-                  <Text style={styles.username}>@{username}</Text>
-                  {pronouns && <Text style={styles.pronouns}>{pronouns}</Text>}
+                  <Text style={styles.nameTitle}>{user.name}</Text>
+                  <Text style={styles.username}>@{user.username}</Text>
+                  {user.pronouns && <Text style={styles.pronouns}>{user.pronouns}</Text>}
                 </View>
+                {type === 'user' ?
                 <View>
                   <Pressable onPress={() => {navigate('Settings')}}>
                     <EllipsisVerticalIcon color={COLORS.textColorFull} strokeWidth={1.5}/>
                   </Pressable>
                 </View>
+                :
+                <View></View>
+                }
               </View> :
               <ActivityIndicator color={COLORS.textColorFull}/>
               }
               <View style={styles.buttonsContainer}>
                 {/* if 'type' equals 'user', don't show follow button; if null, show follow button */}
-                {type && type === 'user' && <TouchableOpacity style={styles.buttons}>
-                  <Text style={styles.buttonsText}>Follow</Text>
-                </TouchableOpacity>}
-                <TouchableOpacity style={styles.buttons} onPress={() => navigate('Edit Profile')}>
-                  <Text style={styles.buttonsText}>Edit Profile</Text>
-                </TouchableOpacity>
+                {type !== 'user' ?
+                  <TouchableOpacity style={[styles.buttons, {backgroundColor: isFollowed ? COLORS.textColorFull : 'transparent'}]} onPress={handleFollow}>
+                    {isFollowed ? <Text style={[styles.buttonsText, { color: COLORS.backgroundFull}]}>Following</Text> : <Text style={styles.buttonsText}>Follow</Text>}
+                  </TouchableOpacity>
+                  :
+                  null}
+                {type && type === 'user' ?
+                  <TouchableOpacity style={styles.buttons} onPress={() => navigate('Edit Profile')}>
+                    <Text style={styles.buttonsText}>Edit Profile</Text>
+                  </TouchableOpacity>
+                  :
+                  null
+                }
               </View>
             </View>
           </View>
           {/* FOLLOW AND RECIPES STATS */}
           <View style={styles.followStats}>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfRecipes ? numberOfRecipes : '0'}</Text> recipes</Text>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfFollowers ? numberOfFollowers : '0'}</Text> followers</Text>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>{numberOfFollowing ? numberOfFollowing : '0'}</Text> following</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{recipeCount}</Text> recipes</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{followersCount}</Text> followers</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{followingCount}</Text> following</Text>
           </View>
           {/* USER BIO */}
           <View style={{ marginTop: 10, paddingLeft: 20, paddingRight: 20}}>
             <Text style={generalStyles.defaultParagraph}>
-              {bio ? bio : 'No bio yet'}</Text>
+              {user.bio ? user.bio : 'No bio yet'}</Text>
           </View>
           {/* LINE BREAK */}
           <View style={[generalStyles.lineBreak, { marginTop: 20}]}></View>
@@ -154,7 +199,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 15,
     marginTop: 10
   },
   buttons: {

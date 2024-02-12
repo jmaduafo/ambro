@@ -8,6 +8,10 @@ import { COLORS } from '../constant/default'
 const ReAuthenticate = ({ setOpen }) => {
     const [ oldPassword, setOldPassword] = useState('')
     const [ newPassword, setNewPassword] = useState('')
+
+    const [ credentials, setCredentials ] = useState(null)
+
+    const [ next, setNext ] = useState(false)
     
   return (
     <>
@@ -17,8 +21,11 @@ const ReAuthenticate = ({ setOpen }) => {
                 <XMarkIcon color={COLORS.textColorFull}/>
             </TouchableOpacity>
         </View>
-        {/* <OldPassword oldPassword={oldPassword} setOldPassword={setOldPassword}/> */}
-        <NewPassword newPassword={newPassword} setNewPassword={setNewPassword}/>
+        {next ?
+            <OldPassword oldPassword={oldPassword} setOldPassword={setOldPassword}/>
+            :
+            <NewPassword newPassword={newPassword} setNewPassword={setNewPassword}/>
+        }
       </Modal>
     </>
   )
@@ -31,6 +38,7 @@ function OldPassword({oldPassword, setOldPassword }) {
     function handleSubmit() {
 
     }
+
     return (
         <>  
             <View style={[generalStyles.error, { marginBottom: 15}]}>

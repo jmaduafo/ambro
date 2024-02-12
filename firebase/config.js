@@ -39,8 +39,7 @@ if (!getApps().length) {
 
 export const db = getFirestore(app)
 export const provider = new GoogleAuthProvider(app)
-
-const storage = getStorage();
+export const storage = getStorage();
 
 export async function uploadToStorage(uri, base, id, fileName, setOnProgress, userType) {
   const fetchResponse = await fetch(uri)

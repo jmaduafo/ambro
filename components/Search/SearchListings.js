@@ -33,8 +33,8 @@ const SearchListings = () => {
         if (search.length) {
             setFilterUsers(allUsers?.filter(user => user?.name?.toLowerCase().includes(search.toLowerCase())))
             setFilterRecipes(allRecipes?.filter(recipe => recipe?.recipeName?.toLowerCase().includes(search.toLowerCase())))
-            // setFilterCategories(allRecipes?.filter(recipe => recipe?.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))))
-            setFilterCuisine(allRecipes?.filter(recipe => recipe?.cuisine?.includes(search.toLowerCase())))
+            setFilterCategories(allRecipes?.filter(recipe => recipe?.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))))
+            setFilterCuisine(allRecipes?.filter(recipe => recipe?.cuisine?.toLowerCase().includes(search.toLowerCase())))
         }
     }
 
@@ -46,9 +46,8 @@ const SearchListings = () => {
     <SafeAreaView style={generalStyles.default}>
       <SearchEngine setSearch={setSearch} search={search} marginTop={20} marginBottom={10} placeholderText={'Search'}/>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.searchSection}>
+        <View style={filterCuisine && filterCuisine?.length && styles.searchSection}>
             <View>
-                {/* {filterCategories && filterCategories?.length ? <Text style={styles.searchTitle}>Categories</Text> : null}
                 {!loading ? 
                     (filterCategories?.length ? 
                         filterCategories?.map(category => {
@@ -61,30 +60,30 @@ const SearchListings = () => {
                         )
                         })
                         :
-                        <View style={{ marginTop: 10, marginBottom: 10}}></View>
+                        <View></View>
                     )
                     :
                     <ActivityIndicator size={'small'} color={COLORS.textColorFull}/>
-                } */}
+                }
                 {!loading ? 
                     (filterCuisine?.length ? 
                         filterCuisine?.map(category => {
                         return (
                             <Pressable key={category.id} onPress={() => navigate('SearchViewAll', { category: category})}>
-                                <Listing name={category.cuisine} image={pic} />
+                                <Listing name={category.cuisine} />
                             </Pressable>
 
                         )
                         })
                         :
-                        <View></View>
+                        null
                     )
                     :
                     <ActivityIndicator size={'small'} color={COLORS.textColorFull}/>
                 }
             </View>
         </View>
-        <View style={styles.searchSection}>
+        <View style={filterRecipes && filterRecipes?.length && styles.searchSection}>
             {filterRecipes && filterRecipes?.length ? <Text style={styles.searchTitle}>Recipes</Text> : null}
             <View>
                 {!loading ? 
@@ -92,20 +91,20 @@ const SearchListings = () => {
                         filterRecipes?.map(recipe => {
                         return (
                             <Pressable key={recipe.id} onPress={() => navigate('SearchRecipeDisplay', { item: recipe })}>
-                                <Listing name={recipe.recipeName} image={pic} />
+                                <Listing name={recipe.recipeName} />
                             </Pressable>
 
                         )
                         })
                         :
-                        <View></View>
+                        null
                     )
                     :
                     <ActivityIndicator size={'small'} color={COLORS.textColorFull}/>
                 }
             </View>
         </View>
-        <View style={styles.searchSection}>
+        <View style={filterUsers && filterUsers?.length && styles.searchSection}>
             {filterUsers && filterUsers?.length ? <Text style={styles.searchTitle}>Users</Text> : null}
             <View>
                 {!loading ? 
@@ -118,7 +117,7 @@ const SearchListings = () => {
                         )
                         })
                         :
-                        <View></View>
+                        null
                     )
                     :
                     <ActivityIndicator size={'small'} color={COLORS.textColorFull}/>

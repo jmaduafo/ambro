@@ -44,12 +44,8 @@ const UserProfile = () => {
         return (
         <View key={profile.id} style={{ flex: 1 }}>
             <UserPage
-              name={profile.name}
-              username={profile.username}
-              pronouns={profile.pronouns}
-              bio={profile.bio}
-              profileImage={profile.profileImage}
-              bgImage={profile.profileBackgroundImage}
+              user={profile}
+              type={'user'}
               navigate={navigate}
             />
         </View>
