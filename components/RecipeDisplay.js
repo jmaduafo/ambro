@@ -13,7 +13,7 @@ import axios from 'axios'
 import Cover from './Cover'
 import { db, auth } from '../firebase/config'
 import { onSnapshot, where, collection, query, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
-import { saveThisRecipe, getSaveByUser } from '../firebase/firebaseOperations'
+import { saveThisRecipe, getSaveByUser, getRatingCount, getReviewsCount } from '../firebase/firebaseOperations'
 
 const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     // Receives data from third party API
@@ -24,67 +24,8 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     const [ measurementData, setMeasurementData ] = useState([])
     const [ ingredientsData, setIngredientsData ] = useState([])
 
-    
     const [ reviewCount, setReviewCount ] = useState(0)
     const [ ratingCount, setRatingCount ] = useState(0)
-
-    // COUNTS THE NUMBER OF REVIEWS
-    async function getReviewsCount() {
-      if (!isApi && item?.id) {
-        try {
-            const reviewCountRef = query(collection(db, 'reviews'), where('recipe_id', '==', item?.id))
-    
-            const unsub  = onSnapshot(reviewCountRef, (snap) => {
-                let reviews = []
-    
-                snap.forEach(doc => {
-                    reviews.push(doc.data())
-                })
-    
-                setReviewCount(reviews?.length)
-            })
-        } catch (err) {
-            Alert.alert(err.message)
-        }
-      } else if (!isApi && !item?.id) {
-        setReviewCount(0)
-      }
-    }
-
-    // CALCULATES THE RATINGS ON FIRST LOAD
-    async function getRatingCount() {
-      if (!isApi && item?.id) {
-        try {
-            const ratingCountRef = query(collection(db, 'reviews'), where('recipe_id', '==', item?.id))
-    
-            const unsub  = onSnapshot(ratingCountRef, (snap) => {
-                let ratings = []
-    
-                snap.forEach(doc => {
-                    ratings.push(doc.data().rating)
-                })
-
-                // ACCUMULATES RATINGS OF ALL USERS
-                const totalRatings = ratings?.reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                );
-
-                const totalReviews = ratings?.length 
-
-                // DIVIDE TOTAL SUM OF ALL RATINGS BY THE NUMBER OF REVIEWS TO
-                // GET THE AVERAGE
-                const averageRating = totalRatings / totalReviews
-    
-                setRatingCount(averageRating)
-            })
-        } catch (err) {
-            Alert.alert(err.message)
-        }
-      } else if (!isApi && !item?.id) {
-        setRatingCount(0)
-      }
-    }
 
     // RETRIEVES DATA FROM THE THIRD PARTY API
     async function getApiData() {
@@ -128,10 +69,23 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
       }
     }
   
-    useEffect(function() {
+    useMemo(function() {
       getApiData()
-      getReviewsCount()
-      getRatingCount()
+
+      // IF API ISN'T THE THIRD PARTY API, THEN COUNT THE NUMBER OF REVIEWS
+      if (!isApi && item?.id) {
+        getReviewsCount(item, setReviewCount, Alert)
+      } else {
+        setReviewCount(0)
+      }
+
+      // IF API ISN'T THE THIRD PARTY API, CALCULATE THE RATINGS ON FIRST LOAD
+      if (!isApi && item?.id) {
+        getRatingCount(item, setRatingCount, Alert)
+      } else {
+        setRatingCount(0)
+      }
+      
     }, [item])
 
   return (
