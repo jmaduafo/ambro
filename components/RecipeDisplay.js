@@ -1,5 +1,5 @@
 import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect, useMemo } from 'react'
 import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
 import { COLORS, SHADOW } from '../constant/default'
@@ -12,7 +12,8 @@ import WebView from 'react-native-webview'
 import axios from 'axios'
 import Cover from './Cover'
 import { db, auth } from '../firebase/config'
-import { onSnapshot, where, collection, query } from 'firebase/firestore'
+import { onSnapshot, where, collection, query, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
+import { saveThisRecipe, getSaveByUser } from '../firebase/firebaseOperations'
 
 const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     // Receives data from third party API
@@ -25,7 +26,9 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
     
     const [ reviewCount, setReviewCount ] = useState(0)
+    const [ ratingCount, setRatingCount ] = useState(0)
 
+    // COUNTS THE NUMBER OF REVIEWS
     async function getReviewsCount() {
       if (!isApi && item?.id) {
         try {
@@ -48,6 +51,42 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
       }
     }
 
+    // CALCULATES THE RATINGS ON FIRST LOAD
+    async function getRatingCount() {
+      if (!isApi && item?.id) {
+        try {
+            const ratingCountRef = query(collection(db, 'reviews'), where('recipe_id', '==', item?.id))
+    
+            const unsub  = onSnapshot(ratingCountRef, (snap) => {
+                let ratings = []
+    
+                snap.forEach(doc => {
+                    ratings.push(doc.data().rating)
+                })
+
+                // ACCUMULATES RATINGS OF ALL USERS
+                const totalRatings = ratings?.reduce(
+                  (accumulator, currentValue) => accumulator + currentValue,
+                  0,
+                );
+
+                const totalReviews = ratings?.length 
+
+                // DIVIDE TOTAL SUM OF ALL RATINGS BY THE NUMBER OF REVIEWS TO
+                // GET THE AVERAGE
+                const averageRating = totalRatings / totalReviews
+    
+                setRatingCount(averageRating)
+            })
+        } catch (err) {
+            Alert.alert(err.message)
+        }
+      } else if (!isApi && !item?.id) {
+        setRatingCount(0)
+      }
+    }
+
+    // RETRIEVES DATA FROM THE THIRD PARTY API
     async function getApiData() {
       if (isApi) {
         setLoading(true)
@@ -92,6 +131,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
     useEffect(function() {
       getApiData()
       getReviewsCount()
+      getRatingCount()
     }, [item])
 
   return (
@@ -120,7 +160,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
             </View>
             {/* HEART ICON */}
             <View>
-              <HeartClick/>
+              <HeartClick item={item}/>
             </View>
           </View>
         </View>
@@ -133,7 +173,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
             {isApi ? 
             <APIRecipe name={apiData?.strMeal} description={'hi'}/>
             :
-            <UserRecipe navigation={navigation} item={item}/>
+            <UserRecipe rating={ratingCount} navigation={navigation} item={item}/>
             } 
           </View>
           {/* RECIPE TAGS */}
@@ -256,20 +296,33 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
 export default RecipeDisplay
 
-function HeartClick() {
+function HeartClick({ item }) {
   const [ isSaved, setIsSaved] = useState(false)
+  const [ allSaves, setAllSaves ] = useState(null)
+
+  const [ savedCount, setSavedCount ] = useState(0)
+  
+  // SAVES OR UNSAVES RECIPE ON HEART CLICK
+  async function saveRecipe() {
+    saveThisRecipe(auth?.currentUser?.uid, item.id, isSaved)  
+  }
+
+  // GETS ALL THE SAVED COUNTS AND BOOLEAN BASED ON IF SAVED IS CLICKED OR NOT
+  useMemo(function() {
+    getSaveByUser(auth?.currentUser?.uid, item.id, setSavedCount, setIsSaved)
+  }, [auth, item])
+
   return (
     <>
-      <TouchableOpacity style={[styles.reviewHeartClick, { marginTop: 5}]} onPress={() => setIsSaved(prev => !prev)}>
+      <TouchableOpacity style={[styles.reviewHeartClick, { marginTop: 5}]} onPress={saveRecipe}>
         {isSaved ? <HeartSolid size={36} strokeWidth={1} color={COLORS.backgroundFull}/> : <HeartOutline size={36} strokeWidth={.7} color={COLORS.backgroundFull}/>}
       </TouchableOpacity>
-      <Text style={styles.reviewHeartText}>1.2K</Text>
+      <Text style={styles.reviewHeartText}>{savedCount}</Text>
     </>
   )
 }
-
 // THE RECIPE DISPLAYED FROM THE FIREBASE BACKEND
-function UserRecipe({navigation, item}) {
+function UserRecipe({navigation, item, rating}) {
     const info = [
       {
         title: 'duration',
@@ -340,12 +393,12 @@ function UserRecipe({navigation, item}) {
         {/* RATINGS SECTION */}
         <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}> 
           <StarRatingDisplay
-            rating={0}
+            rating={rating}
             color={COLORS.textColorFull}
             starSize={20}
             style={{ borderRadius: 40 }}
           />
-          <Text style={styles.ratingText}>0.0</Text>
+          <Text style={styles.ratingText}>{rating?.toFixed(1)}</Text>
         </View>
         {/* DURATION, DIFFICULTY, CALORIES, AND HEAT LEVEL SECTION */}
         <View style={styles.recipeAdditionalInfoSection}>

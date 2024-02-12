@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native'
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useMemo, useState } from 'react'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { HandThumbUpIcon as HandThumbUpOutline, HandThumbDownIcon as HandThumbDownOutline } from 'react-native-heroicons/outline'
 import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from 'react-native-heroicons/solid'
@@ -7,6 +7,7 @@ import { COLORS } from '../constant/default'
 import generalStyles from '../constant/generalStyles'
 import { db, auth } from '../firebase/config'
 import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
+import { likedReview, getLikesByUser, dislikedReview, getDislikesByUser  } from '../firebase/firebaseOperations'
 
 const ReviewDisplay = ({ item }) => {
     const [ allReviews, setAllReviews ] = useState(null)
@@ -21,7 +22,7 @@ const ReviewDisplay = ({ item }) => {
                 let reviews = []
     
                 snap.forEach(doc => {
-                    reviews.push(doc.data())
+                    doc.data().recipe_id === item.id && reviews.push(doc.data())
                 })
     
                 setAllReviews(reviews)
@@ -48,17 +49,16 @@ const ReviewDisplay = ({ item }) => {
             (allReviews !== null 
                 ?
                 allReviews?.map(review => {
-                if (review.recipe_id === item.id) {
                     return (  
                         <Fragment key={review?.id}>
-                            <UserReview reviewCount={reviewCount} name={review?.user?.name} text={review?.reviewText} rating={review?.rating}/>
+                            <UserReview id={review?.id} name={review?.user?.name} text={review?.reviewText} rating={review?.rating}/>
                         </Fragment>
                     )
-                }
+                
                 })
                 :
                 <View style={{ marginTop: 20 }}>
-                    <Text>Be the first to write a review</Text>
+                    <Text style={[generalStyles.defaultParagraph, { textAlign: 'center', color: COLORS.textColorFull}]}>Be the first to write a review</Text>
                 </View>
             )
         }
@@ -69,7 +69,7 @@ const ReviewDisplay = ({ item }) => {
 
 export default ReviewDisplay
 
-function UserReview({ name, rating, text, reviewCount }) {
+function UserReview({ name, rating, text, id }) {
     const [ isShowMore, setIsShowMore ] = useState()
     const [ reviewText, setReviewText ] = useState(text)
     return (
@@ -82,13 +82,26 @@ function UserReview({ name, rating, text, reviewCount }) {
                 <StarRatingDisplay
                     rating={rating}
                     color={COLORS.textColorFull}
-                    starSize={18}
+                    starSize={14}
                     starStyle={{ marginRight: 0 }}
-                    style={{ marginTop: 5}}
+                    style={{ marginTop: 2}}
                 />
-                <View style={{ marginTop: 10, paddingRight: 50}}>
-                    {reviewText.length <= 120 ? <Text style={generalStyles.defaultParagraph}>{reviewText}</Text> : isShowMore ? <Text style={generalStyles.defaultParagraph}>{reviewText}</Text> : <Text style={generalStyles.defaultParagraph}>{reviewText.substring(0, 120) + '...'}</Text>}
+                <View style={{ marginTop: 5, width: 270 }}>
+                    {/* SHOWS THE ENTIRE TEXT IF THE TEXT LENGTH IS LESS THAN OR EQUAL TO 120;
+                    IF GREATER THAN 120, EITHER SHOW A PORTION OF THE TEXT IF 'SHOW MORE' IS NOT CLICKED OR
+                    SHOW THE ENTIRE TEXT IF 'SHOW MORE' IS CLICKED */}
+                    {reviewText.length <= 120 ? 
+                        <Text style={[generalStyles.defaultParagraph, {fontSize: 13, width: '100%' }]}>{reviewText}</Text> 
+                        : 
+                        ( isShowMore ? 
+                        <Text style={[generalStyles.defaultParagraph, {fontSize: 13, width: '100%' }]}>{reviewText}</Text> 
+                        : 
+                        <Text style={[generalStyles.defaultParagraph, {fontSize: 13, width: '100%' }]}>{reviewText.substring(0, 120) + '...'}</Text>
+                        )
+                    }
                 </View>
+                {/* EVALUATES IF THE SHOW MORE BUTTON SHOULD BE VISIBLE
+                DEPENDING ON THE LENGTH OF THE TEXT */}
                 {reviewText.length > 120 ?
                     isShowMore ?
                     <TouchableOpacity style={{ width: '100%', padding: 10 }} onPress={() => setIsShowMore(false)}>
@@ -102,34 +115,50 @@ function UserReview({ name, rating, text, reviewCount }) {
                 <View style={{ marginTop: 10 }}></View>
                 }
                 <View style={styles.thumbsSection}>
-                    <ThumbsUp/>
-                    <ThumbsDown/>
+                    <ThumbsUp id={id}/>
+                    <ThumbsDown id={id}/>
                 </View>
             </View>
         </View>
     )
 }
 
-function ThumbsUp() {
+function ThumbsUp({ id }) {
     const [ isLiked, setIsLiked ] = useState(false)
     const [ count, setCount] = useState(0)
 
+    function likeReview() {
+        likedReview(auth?.currentUser?.uid, id, isLiked)
+    }
+
+    useMemo(function() {
+        getLikesByUser(auth?.currentUser?.uid, id, setCount, setIsLiked)
+    }, [id])
+
     return (
-        <TouchableOpacity onPress={() => setIsLiked(prev => !prev)}>
-            {isLiked ? <HandThumbUpSolid size={18} strokeWidth={1} color={COLORS.textColorFull}/> : <HandThumbUpOutline size={18} strokeWidth={1} color={COLORS.textColorFull}/>}
-            <Text style={styles.thumbsText}>0</Text>
+        <TouchableOpacity onPress={likeReview}>
+            {isLiked ? <HandThumbUpSolid size={16} strokeWidth={1} color={COLORS.textColorFull}/> : <HandThumbUpOutline size={16} strokeWidth={1} color={COLORS.textColorFull}/>}
+            <Text style={styles.thumbsText}>{count}</Text>
         </TouchableOpacity>
     )
 }
 
-function ThumbsDown() {
+function ThumbsDown({ id }) {
     const [ isDisliked, setIsDisliked ] = useState(false)
     const [ count, setCount] = useState(0)
 
+    function dislikeReview() {
+        dislikedReview(auth?.currentUser?.uid, id, isDisliked)
+    }
+
+    useMemo(function() {
+        getDislikesByUser(auth?.currentUser?.uid, id, setCount, setIsDisliked)
+    }, [id])
+
     return (
-        <TouchableOpacity onPress={() => setIsDisliked(prev => !prev)}>
-           {isDisliked ? <HandThumbDownSolid size={18} strokeWidth={1} color={COLORS.textColorFull}/> : <HandThumbDownOutline size={18} strokeWidth={1} color={COLORS.textColorFull}/>}
-           <Text style={styles.thumbsText}>0</Text>
+        <TouchableOpacity onPress={dislikeReview}>
+           {isDisliked ? <HandThumbDownSolid size={16} strokeWidth={1} color={COLORS.textColorFull}/> : <HandThumbDownOutline size={16} strokeWidth={1} color={COLORS.textColorFull}/>}
+           <Text style={styles.thumbsText}>{count}</Text>
         </TouchableOpacity>
     )
 }
@@ -138,13 +167,14 @@ const styles = StyleSheet.create({
     format: {
         paddingLeft: 30,
         paddingRight: 30,
+        paddingTop: 20,
         position: 'relative'
     },
     reviewContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         gap: 20,
-        marginTop: 20,
+        marginTop: 5,
     },
     profilePic: {
         width: 40,
@@ -155,7 +185,7 @@ const styles = StyleSheet.create({
     nameText: {
         fontFamily: 'Satoshi-Medium',
         color: COLORS.textColorFull,
-        fontSize: 15
+        fontSize: 13
     },
     show: {
         textAlign: 'center',
@@ -170,7 +200,7 @@ const styles = StyleSheet.create({
     thumbsText: {
         fontFamily: 'Satoshi-Medium',
         color: COLORS.textColorFull,
-        fontSize: 12,
+        fontSize: 11,
         textAlign: 'center',
         marginTop: 3
     }
