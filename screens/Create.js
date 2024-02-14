@@ -8,41 +8,54 @@ import {
   SafeAreaView,
   Keyboard,
   ActivityIndicator,
-  Alert
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
 import { COLORS } from "../constant/default";
 import generalStyles from "../constant/generalStyles";
 import { SelectList } from "react-native-dropdown-select-list";
+import { measurement, courses, difficulty, heat } from "../utils/cookingTerms";
+import { categories } from "../utils/popularCategories";
 import {
-  measurement,
-  courses,
-  difficulty,
-  heat,
-} from "../utils/cookingTerms";
-import { PlusCircleIcon, XCircleIcon, PencilIcon } from "react-native-heroicons/solid";
+  PlusCircleIcon,
+  XCircleIcon,
+  PencilIcon,
+} from "react-native-heroicons/solid";
 import Modal from "../components/Modal";
 import { auth, db } from "../firebase/config";
-import { doc, collection, addDoc, serverTimestamp, query, where, updateDoc, getDocs } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  updateDoc,
+  getDocs,
+} from "firebase/firestore";
 import { uploadToRecipeStorage } from "../firebase/handleStorage";
 import { useNavigation } from "@react-navigation/native";
 
 const Create = () => {
-  const { navigate } = useNavigation()
+  const { navigate } = useNavigation();
   const [loading, setLoading] = useState(false);
 
   const [imagesArray, setImagesArray] = useState([]);
 
   const [selectedName, setSelectedName] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState('');
+  const [selectedDuration, setSelectedDuration] = useState("");
   const [selectedCourseType, setCourseType] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [selectedCalories, setSelectedCalories] = useState("");
-  const [selectedHeat, setSelectedHeat] = useState('');
-  const [selectedServings, setSelectedServings] = useState('');
+  const [selectedHeat, setSelectedHeat] = useState("");
+  const [selectedServings, setSelectedServings] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("");
 
+  // CATEGORIES STATE
+  const [categoryArray, setCategoryArray] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
+  
   // INGREDIENTS STATE
   const [listedIngredients, setListedIngredients] = useState([]);
   const [listedMeasurements, setListedMeasurements] = useState([]);
@@ -54,6 +67,7 @@ const Create = () => {
   const [instructionsArray, setInstructionsArray] = useState([]);
   const [instructionStep, setInstructionStep] = useState("");
 
+  
   // TAGS STATE
   const [tagsArray, setTagsArray] = useState([]);
   const [tag, setTag] = useState("");
@@ -74,63 +88,70 @@ const Create = () => {
   const [applyMessage, setApplyMessage] = useState("");
   const [error, setError] = useState("");
 
-  const [ onProgress, setOnProgress] = useState(0)
-  const [ currentImage, setCurrentImage ] = useState(null)
-  const [ currentImages, setCurrentImages ] = useState([])
+  const [onProgress, setOnProgress] = useState(0);
+  const [currentImage, setCurrentImage] = useState(null);
+  const [currentImages, setCurrentImages] = useState([]);
 
   // BOOLEAN STATE FOR CALORIES BUTTONS
   const [isRange, setIsRange] = useState(true);
 
-  const [ recipeID, setRecipeID ] = useState(null)
+  const [recipeID, setRecipeID] = useState(null);
 
   function handleSubmit() {
     // Checks the length of each section and sets the states
     // to empty string after 15 seconds
     if (!imagesArray.length) {
-      setImageMessage('* You must select an image')
-      setTimeout(function() {
-        setImageMessage('')
-      }, 15000)
-    }
-    else if (!selectedName.length) {
-      setNameMessage('* You must enter a name')
-      setTimeout(function() {
-        setNameMessage('')
-      }, 15000)
-    } 
-    else if (!listedIngredients.length || !listedMeasurements.length) {
-      setIngredientsMessage('* You must add at least one ingredient')
-      setTimeout(function() {
-        setIngredientsMessage('')
-      }, 15000)
-    } 
-    else if (!instructionsArray.length) {
-      setInstructionsMessage('* You must add at least one instruction')
-      setTimeout(function() {
-        setInstructionsMessage('')
-      }, 15000)
-    } 
-    else if (!selectedDuration.length || !selectedCourseType.length || !selectedDifficulty.length ||
-      !selectedCalories.length || !selectedHeat.length || !selectedServings.length) {
-      setInputMessage('* Entries must not be left empty')
-      setTimeout(function() {
-        setInputMessage('')
-      }, 15000)
-    } 
-    else if (!selectedVegetarian.length || !selectedLowCarb.length || !selectedLowSodium.length ||
-      !selectedGlutenFree.length || !selectedDairyFree.length || !selectedVegan.length) {
-        setApplyMessage('* You must select an option')
-        setTimeout(function() {
-          setApplyMessage('')
-        }, 15000)
-    } 
-    else {
+      setImageMessage("* You must select an image");
+      setTimeout(function () {
+        setImageMessage("");
+      }, 15000);
+    } else if (!selectedName.length) {
+      setNameMessage("* You must enter a name");
+      setTimeout(function () {
+        setNameMessage("");
+      }, 15000);
+    } else if (!listedIngredients.length || !listedMeasurements.length) {
+      setIngredientsMessage("* You must add at least one ingredient");
+      setTimeout(function () {
+        setIngredientsMessage("");
+      }, 15000);
+    } else if (!instructionsArray.length) {
+      setInstructionsMessage("* You must add at least one instruction");
+      setTimeout(function () {
+        setInstructionsMessage("");
+      }, 15000);
+    } else if (
+      !selectedDuration.length ||
+      !selectedCourseType.length ||
+      !selectedDifficulty.length ||
+      !selectedCalories.length ||
+      !selectedHeat.length ||
+      !selectedServings.length ||
+      !categoryArray.length
+    ) {
+      setInputMessage("* Entries must not be left empty");
+      setTimeout(function () {
+        setInputMessage("");
+      }, 15000);
+    } else if (
+      !selectedVegetarian.length ||
+      !selectedLowCarb.length ||
+      !selectedLowSodium.length ||
+      !selectedGlutenFree.length ||
+      !selectedDairyFree.length ||
+      !selectedVegan.length
+    ) {
+      setApplyMessage("* You must select an option");
+      setTimeout(function () {
+        setApplyMessage("");
+      }, 15000);
+    } else {
       // Start the loading process
-      setLoading(true)
+      setLoading(true);
 
-      const recipeRef = collection(db, 'recipes')
+      const recipeRef = collection(db, "recipes");
 
-      try { 
+      try {
         async function createRecipe() {
           // Adds a new document to firestore database under the recipes
           // collection, adding all the appropriate inputs
@@ -141,6 +162,7 @@ const Create = () => {
             ingredientsItems: listedIngredients,
             instructions: instructionsArray,
             tags: tagsArray,
+            categories: categoryArray,
             calories: selectedCalories,
             courseType: selectedCourseType,
             cuisine: selectedCuisine,
@@ -148,80 +170,87 @@ const Create = () => {
             duration: selectedDuration,
             servings: selectedServings,
             heatLevel: selectedHeat,
-            vegetarian: selectedVegetarian === 'Yes',
-            lowCarb: selectedLowCarb === 'Yes',
-            glutenFree: selectedGlutenFree === 'Yes',
-            dairyFree: selectedDairyFree === 'Yes',
-            lowSodium: selectedLowSodium === 'Yes',
-            vegan: selectedVegan === 'Yes',
-            createdAt: serverTimestamp()
-          })
-          
-          setRecipeID(recipeAdd?.id)
+            vegetarian: selectedVegetarian === "Yes",
+            lowCarb: selectedLowCarb === "Yes",
+            glutenFree: selectedGlutenFree === "Yes",
+            dairyFree: selectedDairyFree === "Yes",
+            lowSodium: selectedLowSodium === "Yes",
+            vegan: selectedVegan === "Yes",
+            createdAt: serverTimestamp(),
+          });
+
+          setRecipeID(recipeAdd?.id);
           // UPLOADS IMAGE TO FIREBASE STORAGE
-          imagesArray.forEach(image => {
+          imagesArray.forEach((image) => {
             // Image output is 'fileName uri' so must split them up by ' ' for each
             // element in the imagesArray
-            
-            let separate = image.split(' ')
-            
-            const fileName = separate[0]
-            const uri = separate[1]
 
-            console.log(fileName)
+            let separate = image.split(" ");
+
+            const fileName = separate[0];
+            const uri = separate[1];
+
+            console.log(fileName);
 
             try {
-              // Call the upload to storage function and assign uri, collection name, 
+              // Call the upload to storage function and assign uri, collection name,
               // recipeID, and filename
-              uploadToRecipeStorage(uri, 'recipes', recipeAdd?.id, fileName, setCurrentImage)
-
+              uploadToRecipeStorage(
+                uri,
+                "recipes",
+                recipeAdd?.id,
+                fileName,
+                setCurrentImage
+              );
             } catch (err) {
-              Alert.alert(err.message)
+              Alert.alert(err.message);
             }
-        })
-          
-        // Finds the recipe that contains the recipe images since it would be the most unique
-        // value in the document
-        const findRecipeRef = doc(db, 'recipes', recipeAdd?.id)
-        // Finds the user associated with the user_id
-        const findUserRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
+          });
 
-        async function findRecipe() {
-          const userSnap = await getDocs(findUserRef)
+          // Finds the recipe that contains the recipe images since it would be the most unique
+          // value in the document
+          const findRecipeRef = doc(db, "recipes", recipeAdd?.id);
+          // Finds the user associated with the user_id
+          const findUserRef = query(
+            collection(db, "users"),
+            where("id", "==", auth?.currentUser?.uid)
+          );
 
-          let userInfo;
+          async function findRecipe() {
+            const userSnap = await getDocs(findUserRef);
 
-          userSnap.forEach(doc => {
-            userInfo = doc.data()
-          })
+            let userInfo;
 
-          try {
-            await updateDoc(findRecipeRef, {
-              id: recipeAdd?.id,
-              user: userInfo
-            })
-            Alert.alert('Recipe has been successfully added!')
-          } catch (err) {
-            Alert.alert(err.message)
+            userSnap.forEach((doc) => {
+              userInfo = doc.data();
+            });
+
+            try {
+              await updateDoc(findRecipeRef, {
+                id: recipeAdd?.id,
+                user: userInfo,
+              });
+              Alert.alert("Recipe has been successfully added!");
+            } catch (err) {
+              Alert.alert(err.message);
+            }
           }
-              
-          }
-          findRecipe()
+          findRecipe();
         }
 
-        createRecipe()
-        setLoading(false)
+        createRecipe();
+        setLoading(false);
 
-        setImagesArray([])
+        setImagesArray([]);
 
         setSelectedName("");
-        setSelectedDuration('');
+        setSelectedDuration("");
         setCourseType("");
         setSelectedDifficulty("");
         setSelectedCalories("");
-        setSelectedHeat('');
-        setSelectedServings('');
-        setSelectedCuisine('')
+        setSelectedHeat("");
+        setSelectedServings("");
+        setSelectedCuisine("");
 
         setListedIngredients([]);
         setListedMeasurements([]);
@@ -231,11 +260,11 @@ const Create = () => {
 
         setInstructionsArray([]);
         setInstructionStep("");
-      
+
         // TAGS STATE
         setTagsArray([]);
         setTag("");
-      
+
         // SAY YES TO ALL THAT APPLY SECTION
         setSelectedVegetarian("Yes");
         setSelectedLowCarb("Yes");
@@ -243,40 +272,40 @@ const Create = () => {
         setSelectedGlutenFree("Yes");
         setSelectedDairyFree("Yes");
         setSelectedVegan("Yes");
-
       } catch (err) {
-        Alert.alert(err.message)
-        setLoading(false)
+        Alert.alert(err.message);
+        setLoading(false);
       }
-
     }
   }
 
-  useEffect(function() {
-    // Finds the recipe that contains the recipe images since it would be the most unique
-    // value in the document
-    if (currentImage && recipeID) {
-      console.log(currentImage)
+  useEffect(
+    function () {
+      // Finds the recipe that contains the recipe images since it would be the most unique
+      // value in the document
+      if (currentImage && recipeID) {
+        console.log(currentImage);
 
-      setCurrentImages([currentImage, ...currentImage])
-      
-      console.log(currentImages)
+        setCurrentImages([currentImage, ...currentImage]);
 
-      async function updateImages() {
-        try {
-          const findRecipeRef = doc(db, 'recipes', recipeID)
+        console.log(currentImages);
 
-          await updateDoc(findRecipeRef, {
-            images: currentImages
-          })
-        } catch(err) {
-          console.log(err.message)
+        async function updateImages() {
+          try {
+            const findRecipeRef = doc(db, "recipes", recipeID);
+
+            await updateDoc(findRecipeRef, {
+              images: currentImages,
+            });
+          } catch (err) {
+            console.log(err.message);
+          }
         }
+        updateImages();
       }
-      updateImages()
-    }
-
-  }, [currentImage])
+    },
+    [currentImage]
+  );
 
   const selection = [
     {
@@ -325,17 +354,33 @@ const Create = () => {
 
   return (
     <View style={[generalStyles.default, { position: "relative" }]}>
-      <View style={{ height: 2, backgroundColor: COLORS.textColorFull, width: `${onProgress}%`  }}></View>
-      {error && error.length && 
-      <Modal>
-        <Text style={{ fontFamily: 'Satoshi-Medium', color: COLORS.textColorFull, textAlign: 'center'}}>{error}</Text>
-        <TouchableOpacity style={[generalStyles.button, { marginTop: 10 }]}>
-          <Text style={[generalStyles.buttonText]}>Submit</Text>
-        </TouchableOpacity>
-      </Modal>
-      }
+      <View
+        style={{
+          height: 2,
+          backgroundColor: COLORS.textColorFull,
+          width: `${onProgress}%`,
+        }}
+      ></View>
+      {error && error.length && (
+        <Modal>
+          <Text
+            style={{
+              fontFamily: "Satoshi-Medium",
+              color: COLORS.textColorFull,
+              textAlign: "center",
+            }}
+          >
+            {error}
+          </Text>
+          <TouchableOpacity style={[generalStyles.button, { marginTop: 10 }]}>
+            <Text style={[generalStyles.buttonText]}>Submit</Text>
+          </TouchableOpacity>
+        </Modal>
+      )}
       <SafeAreaView>
-        <ScrollView style={[styles.view, { paddingBottom: 80, paddingTop: 20 }]}>
+        <ScrollView
+          style={[styles.view, { paddingBottom: 80, paddingTop: 20 }]}
+        >
           <AccessCamera
             imagesArray={imagesArray}
             setImagesArray={setImagesArray}
@@ -352,12 +397,15 @@ const Create = () => {
           <View>
             {/* RECIPE NAME */}
             <View style={generalStyles.loginSignupInputSection}>
-              {
-                nameMessage && nameMessage.length &&
-              <View style={{ marginTop: 10, marginBottom: 10}}>
-                <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{nameMessage}</Text>
-              </View>
-              }
+              {nameMessage && nameMessage.length && (
+                <View style={{ marginTop: 10, marginBottom: 10 }}>
+                  <Text
+                    style={[generalStyles.defaultParagraph, { color: "red" }]}
+                  >
+                    {nameMessage}
+                  </Text>
+                </View>
+              )}
               <Text style={generalStyles.loginSignupLabel}>Recipe Name</Text>
               <TextInput
                 onChangeText={(text) => setSelectedName(text)}
@@ -374,12 +422,15 @@ const Create = () => {
               ]}
             ></View>
             {/* INGREDIENTS INPUT */}
-            {
-              ingredientsMessage && ingredientsMessage.length &&
-            <View style={{ marginTop: 10, marginBottom: 10}}>
-              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{ingredientsMessage}</Text>
-            </View>
-            }
+            {ingredientsMessage && ingredientsMessage.length && (
+              <View style={{ marginTop: 10, marginBottom: 10 }}>
+                <Text
+                  style={[generalStyles.defaultParagraph, { color: "red" }]}
+                >
+                  {ingredientsMessage}
+                </Text>
+              </View>
+            )}
             <IngredientsInput
               setListedIngredients={setListedIngredients}
               setListedMeasurements={setListedMeasurements}
@@ -400,12 +451,15 @@ const Create = () => {
               ]}
             ></View>
             {/* INSTRUCTIONS INPUT */}
-            {
-              instructionsMessage && instructionsMessage.length &&
-            <View style={{ marginTop: 10, marginBottom: 10}}>
-              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{instructionsMessage}</Text>
-            </View>
-            }
+            {instructionsMessage && instructionsMessage.length && (
+              <View style={{ marginTop: 10, marginBottom: 10 }}>
+                <Text
+                  style={[generalStyles.defaultParagraph, { color: "red" }]}
+                >
+                  {instructionsMessage}
+                </Text>
+              </View>
+            )}
             <InstructionsInput
               instructionStep={instructionStep}
               instructionsArray={instructionsArray}
@@ -420,21 +474,22 @@ const Create = () => {
               ]}
             ></View>
             {/* DURATION */}
-            {
-              inputMessage && inputMessage.length &&
-            <View style={{ marginTop: 10, marginBottom: 10}}>
-              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{inputMessage}</Text>
-            </View>
-            }
+            {inputMessage && inputMessage.length && (
+              <View style={{ marginTop: 10, marginBottom: 10 }}>
+                <Text
+                  style={[generalStyles.defaultParagraph, { color: "red" }]}
+                >
+                  {inputMessage}
+                </Text>
+              </View>
+            )}
             <View style={generalStyles.loginSignupInputSection}>
               <Text style={generalStyles.loginSignupLabel}>
                 Duration (in minutes)
               </Text>
               {/* Only accepts numbers */}
               <TextInput
-                onChangeText={(text) =>
-                  setSelectedDuration(text)
-                }
+                onChangeText={(text) => setSelectedDuration(text)}
                 value={selectedDuration}
                 keyboardType="numeric"
                 style={generalStyles.loginSignupInput}
@@ -461,6 +516,13 @@ const Create = () => {
                 }}
               />
             </View>
+            {/* CATEGORIES SELECT */}
+            <CategoriesInput
+              setCategoryArray={setCategoryArray}
+              categoryArray={categoryArray}
+              categoryName={categoryName}
+              setCategoryName={setCategoryName}
+            />
             {/* LEVEL OF DIFFICULTY */}
             <View style={generalStyles.loginSignupInputSection}>
               <Text style={generalStyles.loginSignupLabel}>
@@ -566,9 +628,7 @@ const Create = () => {
               </Text>
               {/* Only accepts numbers */}
               <TextInput
-                onChangeText={(text) =>
-                  setSelectedServings(text)
-                }
+                onChangeText={(text) => setSelectedServings(text)}
                 value={selectedServings}
                 keyboardType="numeric"
                 style={generalStyles.loginSignupInput}
@@ -602,12 +662,15 @@ const Create = () => {
               ]}
             ></View>
             {/* ALL THAT APPLY (YES OR NO) SECTION */}
-            {
-             applyMessage && applyMessage.length &&
-            <View style={{ marginTop: 10, marginBottom: 10}}>
-              <Text style={[generalStyles.defaultParagraph, { color: 'red'}]}>{applyMessage}</Text>
-            </View>
-            }
+            {applyMessage && applyMessage.length && (
+              <View style={{ marginTop: 10, marginBottom: 10 }}>
+                <Text
+                  style={[generalStyles.defaultParagraph, { color: "red" }]}
+                >
+                  {applyMessage}
+                </Text>
+              </View>
+            )}
             <Text
               style={{
                 fontFamily: "Satoshi-Medium",
@@ -647,18 +710,18 @@ const Create = () => {
               })}
             </View>
             {/* SUBMIT RECIPE FORM */}
-            {loading ? 
-            <View style={{ marginBottom: 60}}>
-              <ActivityIndicator size='small' color={COLORS.textColorFull}/>
-            </View>
-            :
-            <TouchableOpacity
-              onPress={handleSubmit}
-              style={[generalStyles.button, { marginBottom: 60 }]}
-            >
-              <Text style={generalStyles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-            }
+            {loading ? (
+              <View style={{ marginBottom: 60 }}>
+                <ActivityIndicator size="small" color={COLORS.textColorFull} />
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={[generalStyles.button, { marginBottom: 60 }]}
+              >
+                <Text style={generalStyles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -681,9 +744,8 @@ const IngredientsInput = ({
   setItemName,
   itemName,
 }) => {
-  const [ isEdit, setIsEdit ] = useState(false)
-  const [ editIndex, setEditIndex ] = useState()
-
+  const [isEdit, setIsEdit] = useState(false);
+  const [editIndex, setEditIndex] = useState();
 
   function handleIngredient() {
     if (quantity.length && measure.length && itemName.length && !isEdit) {
@@ -691,8 +753,8 @@ const IngredientsInput = ({
 
       ing += quantity + " " + measure;
 
-      setListedMeasurements([...listedMeasurements, ing]);
-      setListedIngredients([...listedIngredients, itemName]);
+      setListedMeasurements([...new Set([...listedMeasurements, ing])]);
+      setListedIngredients([...new Set([...listedIngredients, itemName])]);
 
       setQuantity("");
       setMeasure("");
@@ -704,12 +766,12 @@ const IngredientsInput = ({
 
       ing += quantity + " " + measure;
 
-      listedMeasurements[editIndex] = ing
-      listedIngredients[editIndex] = itemName
+      listedMeasurements[editIndex] = ing;
+      listedIngredients[editIndex] = itemName;
 
       // Exit edit mode and set input to empty string
-      setIsEdit(false)
-      setItemName('')
+      setIsEdit(false);
+      setItemName("");
     }
   }
 
@@ -725,11 +787,11 @@ const IngredientsInput = ({
 
   function handleEdit(item, index) {
     // Set to edit mode
-    setIsEdit(true)
+    setIsEdit(true);
     // Assign the input to the text that we want updated
-    setItemName(listedIngredients[index])
+    setItemName(listedIngredients[index]);
     // Set a state to get the index in order to use it in another function
-    setEditIndex(index)
+    setEditIndex(index);
   }
 
   return (
@@ -745,28 +807,33 @@ const IngredientsInput = ({
         Ingredients
       </Text>
       <View style={{ marginTop: 15 }}>
-        {listedMeasurements &&
-          listedMeasurements.map((item, index) => {
+        {listedIngredients &&
+          listedIngredients.map((item, index) => {
             return (
-              <View key={item}>
-              <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end'}} onPress={() => handleEdit(item, index)}>
-                <PencilIcon size={18} color={COLORS.textColorFull}/>
-              </TouchableOpacity>
-              <View
-                key={item}
-                style={[generalStyles.rowCenter, { gap: 10, marginBottom: 5 }]}
-              >
-                <XCircleIcon
-                  onPress={() => handleCancel(item, index)}
-                  color={COLORS.textColorFull}
-                />
-                <View style={[generalStyles.rowCenter, { gap: 5 }]}>
-                  <Text style={styles.measure}>{item}</Text>
-                  <Text style={styles.ingredient}>
-                    {listedIngredients[index]}
-                  </Text>
+              <View key={`${item}-${index}`}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                  onPress={() => handleEdit(item, index)}
+                >
+                  <PencilIcon size={18} color={COLORS.textColorFull} />
+                </TouchableOpacity>
+                <View
+                  style={[
+                    generalStyles.rowCenter,
+                    { gap: 10, marginBottom: 5 },
+                  ]}
+                >
+                  <XCircleIcon
+                    onPress={() => handleCancel(item, index)}
+                    color={COLORS.textColorFull}
+                  />
+                  <View style={[generalStyles.rowCenter, { gap: 5 }]}>
+                    <Text style={styles.measure}>{listedMeasurements[index]}</Text>
+                    <Text style={styles.ingredient}>
+                      {item}
+                    </Text>
+                  </View>
                 </View>
-              </View>
               </View>
             );
           })}
@@ -834,7 +901,9 @@ const IngredientsInput = ({
             ]}
           >
             <PlusCircleIcon color={COLORS.backgroundFull} />
-            <Text style={generalStyles.tag}>{isEdit ? 'Edit' : 'Add'} Ingredient</Text>
+            <Text style={generalStyles.tag}>
+              {isEdit ? "Edit" : "Add"} Ingredient
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -849,24 +918,23 @@ function InstructionsInput({
   setInstructionsArray,
   instructionsArray,
 }) {
-
-  const [ isEdit, setIsEdit ] = useState(false)
-  const [ editIndex, setEditIndex ] = useState()
+  const [isEdit, setIsEdit] = useState(false);
+  const [editIndex, setEditIndex] = useState();
 
   function handleInstructions() {
     if (instructionStep.length && !isEdit) {
-      setInstructionsArray([...instructionsArray, instructionStep]);
+      setInstructionsArray([...new Set([...instructionsArray, instructionStep])]);
       setInstructionStep("");
-      Keyboard.dismiss()
+      Keyboard.dismiss();
     } else if (instructionStep.length && isEdit) {
       // In edit mode, once done button is clicked, replace the text of the instruction step
       // with the newly updated text from the input
-      instructionsArray[editIndex] = instructionStep
+      instructionsArray[editIndex] = instructionStep;
 
       // Exit edit mode and set input to empty string
-      setIsEdit(false)
-      setInstructionStep('')
-      Keyboard.dismiss()
+      setIsEdit(false);
+      setInstructionStep("");
+      Keyboard.dismiss();
     }
   }
 
@@ -878,11 +946,11 @@ function InstructionsInput({
 
   function handleEdit(item, index) {
     // Set to edit mode
-    setIsEdit(true)
+    setIsEdit(true);
     // Assign the input to the text that we want updated
-    setInstructionStep(item)
+    setInstructionStep(item);
     // Set a state to get the index in order to use it in another function
-    setEditIndex(index)
+    setEditIndex(index);
   }
   return (
     <View style={{ marginBottom: 10 }}>
@@ -900,38 +968,42 @@ function InstructionsInput({
         {instructionsArray &&
           instructionsArray.map((item, index) => {
             return (
-              <View 
-              key={item} 
-              style={[{
-                marginBottom: 10
-                }]}>
-
               <View
+                key={item}
                 style={[
                   {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: 'space-between',
-                    marginBottom: 0,
+                    marginBottom: 10,
                   },
                 ]}
               >
-                <View style={[generalStyles.rowCenter, {gap: 10}]}>
-                  <XCircleIcon
-                    onPress={() => handleCancel(item)}
-                    color={COLORS.textColorFull}
-                  />
-                  <View style={{}}>
-                    <Text style={[styles.step, { marginBottom: 5 }]}>
-                      Step {index + 1}
-                    </Text>
+                <View
+                  style={[
+                    {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 0,
+                    },
+                  ]}
+                >
+                  <View style={[generalStyles.rowCenter, { gap: 10 }]}>
+                    <XCircleIcon
+                      onPress={() => handleCancel(item)}
+                      color={COLORS.textColorFull}
+                    />
+                    <View style={{}}>
+                      <Text style={[styles.step, { marginBottom: 5 }]}>
+                        Step {index + 1}
+                      </Text>
+                    </View>
                   </View>
+                  <TouchableOpacity onPress={() => handleEdit(item, index)}>
+                    <PencilIcon size={18} color={COLORS.textColorFull} />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => handleEdit(item, index)}>
-                  <PencilIcon size={18} color={COLORS.textColorFull}/>
-                </TouchableOpacity>
-                </View>
-                <Text style={[styles.instructions, { paddingLeft: 35 }]}>{item}</Text>
+                <Text style={[styles.instructions, { paddingLeft: 35 }]}>
+                  {item}
+                </Text>
               </View>
             );
           })}
@@ -965,7 +1037,9 @@ function InstructionsInput({
             ]}
           >
             <PlusCircleIcon color={COLORS.backgroundFull} />
-            <Text style={generalStyles.tag}>{isEdit ? 'Edit' : 'Add'} Instruction</Text>
+            <Text style={generalStyles.tag}>
+              {isEdit ? "Edit" : "Add"} Instruction
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -977,7 +1051,8 @@ function InstructionsInput({
 function TagsInput({ setTag, tag, setTagsArray, tagsArray }) {
   function handleTags() {
     if (tag.length) {
-      setTagsArray([...tagsArray, tag]);
+      // ENSURES THAT TAGS ARRAY IS UNIQUE SO THAT THERE ARE NO REPLICATES
+      setTagsArray([...new Set([...tagsArray, tag])]);
       setTag("");
     }
   }
@@ -1035,6 +1110,104 @@ function TagsInput({ setTag, tag, setTagsArray, tagsArray }) {
         >
           <PlusCircleIcon color={COLORS.backgroundFull} />
           <Text style={generalStyles.tag}>Add Tag</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+// TAGS SECTION COMPONENT
+function CategoriesInput({
+  setCategoryName,
+  categoryName,
+  setCategoryArray,
+  categoryArray,
+}) {
+  let categoryNameArray = [];
+
+  categories.forEach((cat) => {
+    categoryNameArray.push(cat.strCategory);
+  });
+
+  function handleCategories() {
+    if (categoryName.length ) {
+      // ENSURES THAT CATEGORY ARRAY IS UNIQUE SO THAT THERE ARE NO REPLICATES
+      setCategoryArray([...new Set([...categoryArray, categoryName])]);
+      setCategoryName("");
+
+      console.log(categoryArray)
+    } else {
+      Alert.alert('Please select a category name')
+    }
+  }
+
+  function handleCancel(item) {
+    const newCategory = categoryArray.filter((obj) => obj !== item);
+
+    setCategoryArray(newCategory);
+  }
+
+  return (
+    <View>
+      {/* CATEGORIES LIST */}
+      <View
+        style={[
+          generalStyles.rowCenter,
+          { flexWrap: "wrap", gap: 15, marginBottom: 15 },
+        ]}
+      >
+        {categoryArray &&
+          categoryArray?.map((item, index) => {
+            return (
+              <View key={item} style={[generalStyles.rowCenter, { gap: 10 }]}>
+                <XCircleIcon
+                  onPress={() => handleCancel(item)}
+                  color={COLORS.textColorFull}
+                />
+                <Text style={styles.instructions}>{item}</Text>
+              </View>
+            );
+          })}
+      </View>
+      {/* CATEGORY FORM */}
+      <View style={generalStyles.loginSignupInputSection}>
+        <Text style={generalStyles.loginSignupLabel}>Categories</Text>
+        <SelectList
+          setSelected={(val) => setCategoryName(val)}
+          data={categoryNameArray}
+          save="value"
+          placeholder="Select category"
+          inputStyles={{
+            fontFamily: "Satoshi-Regular",
+            color: COLORS.textColorFull,
+          }}
+          boxStyles={{
+            borderColor: COLORS.textColorFull,
+            backgroundColor: COLORS.backgroundLight,
+            paddingTop: 7,
+            paddingBottom: 7,
+          }}
+          search={false}
+          searchicon={() => <View></View>}
+        />
+        <Text style={[generalStyles.defaultParagraph, { marginTop: 4, fontSize: 12}]}>{categoryArray.length} / 3 selected</Text>
+        <TouchableOpacity
+          onPress={handleCategories}
+          disabled={categoryArray.length <= 2 ? false : true}
+          style={[
+            generalStyles.button,
+            generalStyles.rowCenter,
+            {
+              justifyContent: "center",
+              gap: 10,
+              borderRadius: 5,
+              marginTop: 20,
+              backgroundColor: categoryArray.length <= 2 ? COLORS.textColorFull : COLORS.textColor60,
+            },
+          ]}
+        >
+          <PlusCircleIcon color={COLORS.backgroundFull} />
+          <Text style={generalStyles.tag}>Add Category</Text>
         </TouchableOpacity>
       </View>
     </View>

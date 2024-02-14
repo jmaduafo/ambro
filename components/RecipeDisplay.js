@@ -85,24 +85,6 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
       }
     }, [isApi, auth, item])
 
-    // useMemo(function() {
-    //   // IF API ISN'T THE THIRD PARTY API, THEN COUNT THE NUMBER OF REVIEWS
-    //   if (!isApi && item?.id) {
-    //     totalRecipesByUser(item?.user_id, setRecipeCount)
-    //     getReviewsCount(item, setReviewCount, Alert)
-    //   } else {
-    //     setReviewCount(0)
-    //   }
-
-    //   // IF API ISN'T THE THIRD PARTY API, CALCULATE THE RATINGS ON FIRST LOAD
-    //   if (!isApi && item?.id) {
-    //     getRatingCount(item, setRatingCount, Alert)
-    //   } else {
-    //     setRatingCount(0)
-    //   }
-      
-    // }, [auth, item])
-
   return (
     <>
       <ScrollView>
