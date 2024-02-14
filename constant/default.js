@@ -4,6 +4,7 @@ export const COLORS = {
     backgroundLight: '#FFFFFF',
     textColorFull: '#000',
     textColor75: 'rgba(0, 0, 0, .75)',
+    textColor60: 'rgba(0, 0, 0, .60)',
     textColor50: 'rgba(0, 0, 0, .5)',
     textColor40: 'rgba(0, 0, 0, .4)',
     textColor20: 'rgba(0, 0, 0, .2)',

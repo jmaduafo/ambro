@@ -161,9 +161,20 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
             </View>
             }
             {/* CUISINE */}
-            <View style={generalStyles.tagSection}>      
-                {isApi ? <Text style={generalStyles.tag}>{apiData?.strArea}</Text> : <Text style={generalStyles.tag}>{item?.cuisine}</Text>}
-            </View>
+            {isApi ?
+              <View style={generalStyles.tagSection}>      
+                  <Text style={generalStyles.tag}>{apiData?.strArea}</Text>
+              </View>
+              :
+              (
+                item?.cuisine?.length ?
+                  <View style={generalStyles.tagSection}>      
+                    <Text style={generalStyles.tag}>{item?.cuisine}</Text>
+                  </View>
+                  :
+                  null
+              )
+            }
             {/* CATEGORY */}
             {isApi && apiData && 
             <View style={generalStyles.tagSection}>      
@@ -371,7 +382,7 @@ function UserRecipe({navigation, item, rating, recipeCount}) {
         <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}> 
           <StarRatingDisplay
             rating={rating}
-            color={isNaN(rating) ? COLORS.textColor50 : COLORS.textColorFull}
+            color={isNaN(rating) ? COLORS.textColor60 : COLORS.textColorFull}
             starSize={20}
             style={{ borderRadius: 40 }}
           />
