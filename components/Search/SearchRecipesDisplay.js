@@ -6,11 +6,13 @@ import { COLORS, SHADOW } from '../../constant/default'
 import RecipeDisplay from '../RecipeDisplay'
 import { useNavigation } from '@react-navigation/native'
 
-const SearchRecipesDisplay = () => {
-  const {navigate} = useNavigation()
+const SearchRecipesDisplay = ({navigation, route}) => {
+
+  const { item } = route.params
+
   return (
     <View style={generalStyles.default}>
-      <RecipeDisplay navigate={navigate}/>
+      <RecipeDisplay navigation={navigation} isApi={false} item={item} navigationName={'SearchReviewDisplay'}/>
     </View>
   )
 }

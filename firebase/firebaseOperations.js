@@ -272,6 +272,58 @@ export async function getAllRecipes(setAllRecipes) {
     }
 }
 
+export async function getAllRecipesByUser(userId, setAllRecipes) {
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const recipeRef = query(collection(db, 'recipes'), where('user_id', '==', userId))
+    
+        const unsub = onSnapshot(recipeRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let recipes = []
+            snap.forEach(doc => {
+                recipes.push(doc.data())
+            })
+
+            setAllRecipes(recipes)
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+export async function getAllSavesByUser(userId, setSavedRecipes) {
+    // Get all saves of the user in the saves collection
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const saveRef = query(collection(db, 'saves'), where('user_id', '==', userId))
+    
+        const unsub = onSnapshot(saveRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let saves = []
+            snap.forEach(doc => {
+                saves.push(doc.data())
+            })
+
+            saves?.map(s => {
+                const recipeRef = query(collection(db, 'recipes'), where('id', '==', s.recipe_id))
+
+                const unsub = onSnapshot(recipeRef, (snapshot) => {
+                    let array = []
+
+                    snapshot.forEach(doc => {
+                        array.push(doc.data())
+                    })
+
+                    setSavedRecipes(array)
+                })
+
+            })
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
 export async function getAllUsers(setAllUsers) {
     try {
         // Find where the recipe id matches the passed in recipe id
@@ -343,3 +395,107 @@ export async function getReviewsCount(item, setReviewCount, Alert) {
     }
   }
 
+export async function setReview(userReview, item, setUserReview, setRating, Alert) {
+    if (userReview.length && item?.id) {
+        try {
+            const reviewRef = collection(db, 'reviews')
+        
+            // ADDS THE REVIEW OF THE PERSON CURRENTLY COMMENTING
+            const review = await addDoc(reviewRef, {
+                reviewText: userReview,
+                recipe_id: item?.id,
+                user_id: auth?.currentUser?.uid,
+                rating: rating,
+                createdAt: serverTimestamp()
+            })
+        
+            const findReviewRef = doc(db, 'reviews', review?.id)
+            const userRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
+        
+            const unsub = onSnapshot(userRef, (snapshot) => {
+                try {
+                    let userInfo;
+    
+                    snapshot.forEach(doc => {
+                        userInfo = doc.data()
+                    })
+    
+                    async function updateReview() {
+                        // UPDATES RECENTLY ADDED REVIEW AND ADDS CURRENT USER INFO WITH
+                        // THE REVIEW ID
+                        await updateDoc(findReviewRef, {
+                            user: userInfo,
+                            id: review?.id
+                        })
+                    }
+    
+                    updateReview()
+                    Alert.alert('Review sent successfully!')
+
+                    setUserReview('')
+                    setRating(0)
+
+                } catch (err) {
+                    Alert.alert(err.message)
+                }
+            })       
+
+        } catch(err) {
+            Alert.alert(err.message)
+        }
+    } else {
+        Alert.alert("You cannot send an empty review")
+    }
+
+  }
+
+export async function setReply(userReply, item, setUserReply, Alert) {
+    if (userReply.length && item.id) {
+          try {
+              const replyRef = collection(db, 'replies')
+          
+              // ADDS THE REVIEW OF THE PERSON CURRENTLY COMMENTING
+              const reply = await addDoc(replyRef, {
+                  replyText: userReply,
+                  review_id: review_id,
+                  user_id: auth?.currentUser?.uid,
+                  createdAt: serverTimestamp()
+              })
+          
+              const findReviewRef = doc(db, 'replies', reply?.id)
+              const userRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
+          
+              const unsub = onSnapshot(userRef, (snapshot) => {
+                  try {
+                      let userInfo;
+      
+                      snapshot.forEach(doc => {
+                          userInfo = doc.data()
+                      })
+      
+                      async function updateReply() {
+                          // UPDATES RECENTLY ADDED REVIEW AND ADDS CURRENT USER INFO WITH
+                          // THE REVIEW ID
+                          await updateDoc(findReviewRef, {
+                              user: userInfo,
+                              id: reply?.id
+                          })
+                      }
+      
+                      updateReply()
+                      Alert.alert('Reply sent successfully!')
+  
+                      setUserReply('')  
+                  } catch (err) {
+                      Alert.alert(err.message)
+                  }
+              })       
+  
+          } catch(err) {
+              Alert.alert(err.message)
+          }
+      } else {
+          Alert.alert("You cannot send an empty reply")
+      }
+
+}

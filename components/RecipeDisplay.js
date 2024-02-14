@@ -1,4 +1,4 @@
-import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
+import { Button, Pressable, StyleSheet, Text, View, TouchableOpacity, Image, Alert, ImageBackground } from 'react-native'
 import React, { Fragment, useState, useEffect, useMemo } from 'react'
 import { ScrollView } from 'react-native'
 import generalStyles from '../constant/generalStyles'
@@ -11,11 +11,10 @@ import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
 import axios from 'axios'
 import Cover from './Cover'
-import { db, auth } from '../firebase/config'
-import { onSnapshot, where, collection, query, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
-import { saveThisRecipe, getSaveByUser, getRatingCount, getReviewsCount } from '../firebase/firebaseOperations'
+import { auth } from '../firebase/config'
+import { saveThisRecipe, getSaveByUser, getRatingCount, getReviewsCount, totalRecipesByUser } from '../firebase/firebaseOperations'
 
-const RecipeDisplay = ({ navigation, route, isApi, item }) => {
+const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
     // Receives data from third party API
     const [ apiData, setApiData] = useState(null)
     // Set loading state when getting data from third party API
@@ -26,6 +25,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
     const [ reviewCount, setReviewCount ] = useState(0)
     const [ ratingCount, setRatingCount ] = useState(0)
+    const [ recipeCount, setRecipeCount ] = useState(0)
 
     // RETRIEVES DATA FROM THE THIRD PARTY API
     async function getApiData() {
@@ -66,27 +66,42 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
 
         }
         getData()
+      } else {
+        totalRecipesByUser(item?.user_id, setRecipeCount)
+        getReviewsCount(item, setReviewCount, Alert)
+        getRatingCount(item, setRatingCount, Alert)
       }
     }
-  
-    useMemo(function() {
+
+    useEffect(function() {
       getApiData()
+    }, [])
 
-      // IF API ISN'T THE THIRD PARTY API, THEN COUNT THE NUMBER OF REVIEWS
-      if (!isApi && item?.id) {
+    useMemo(function() {
+      if (!isApi) {
+        totalRecipesByUser(item?.user_id, setRecipeCount)
         getReviewsCount(item, setReviewCount, Alert)
-      } else {
-        setReviewCount(0)
-      }
-
-      // IF API ISN'T THE THIRD PARTY API, CALCULATE THE RATINGS ON FIRST LOAD
-      if (!isApi && item?.id) {
         getRatingCount(item, setRatingCount, Alert)
-      } else {
-        setRatingCount(0)
       }
+    }, [isApi, auth, item])
+
+    // useMemo(function() {
+    //   // IF API ISN'T THE THIRD PARTY API, THEN COUNT THE NUMBER OF REVIEWS
+    //   if (!isApi && item?.id) {
+    //     totalRecipesByUser(item?.user_id, setRecipeCount)
+    //     getReviewsCount(item, setReviewCount, Alert)
+    //   } else {
+    //     setReviewCount(0)
+    //   }
+
+    //   // IF API ISN'T THE THIRD PARTY API, CALCULATE THE RATINGS ON FIRST LOAD
+    //   if (!isApi && item?.id) {
+    //     getRatingCount(item, setRatingCount, Alert)
+    //   } else {
+    //     setRatingCount(0)
+    //   }
       
-    }, [auth, item])
+    // }, [auth, item])
 
   return (
     <>
@@ -103,11 +118,18 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
         </View>
         :
         <View style={styles.reviewHeartContainer}>
+          <View style={[styles.image, { position: 'absolute'}]}>
+            <ImageBackground
+              source={{ uri: item?.images[0] }}
+              style={{ width: '100%', height: '100%'}}
+              resizeMode='cover'
+            />
+          </View>
           <Cover/>
           <View style={{ padding: 10 }}>
             {/* REVIEW/COMMENT ICON */}
             <View>
-              <TouchableOpacity style={styles.reviewHeartClick} onPress={() => navigation.navigate('HomeReviewDisplay', {item: item})}>
+              <TouchableOpacity style={styles.reviewHeartClick} onPress={() => navigation.navigate(navigationName, {item: item})}>
                 <CommentIcon size={36} strokeWidth={.7} color={COLORS.backgroundFull}/>
               </TouchableOpacity>
               <Text style={styles.reviewHeartText}>{reviewCount}</Text>
@@ -127,7 +149,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item }) => {
             {isApi ? 
             <APIRecipe name={apiData?.strMeal} description={'hi'}/>
             :
-            <UserRecipe rating={ratingCount} navigation={navigation} item={item}/>
+            <UserRecipe recipeCount={recipeCount} rating={ratingCount} navigation={navigation} item={item}/>
             } 
           </View>
           {/* RECIPE TAGS */}
@@ -252,18 +274,18 @@ export default RecipeDisplay
 
 function HeartClick({ item }) {
   const [ isSaved, setIsSaved] = useState(false)
-  const [ allSaves, setAllSaves ] = useState(null)
 
   const [ savedCount, setSavedCount ] = useState(0)
   
   // SAVES OR UNSAVES RECIPE ON HEART CLICK
   async function saveRecipe() {
-    saveThisRecipe(auth?.currentUser?.uid, item.id, isSaved)  
+    saveThisRecipe(auth?.currentUser?.uid, item?.id, isSaved)  
   }
 
   // GETS ALL THE SAVED COUNTS AND BOOLEAN BASED ON IF SAVED IS CLICKED OR NOT
   useMemo(function() {
-    getSaveByUser(auth?.currentUser?.uid, item.id, setSavedCount, setIsSaved)
+    getSaveByUser(auth?.currentUser?.uid, item?.id, setSavedCount, setIsSaved)
+    totalRecipesByUser(item?.user_ID)
   }, [auth, item])
 
   return (
@@ -276,23 +298,24 @@ function HeartClick({ item }) {
   )
 }
 // THE RECIPE DISPLAYED FROM THE FIREBASE BACKEND
-function UserRecipe({navigation, item, rating}) {
+function UserRecipe({navigation, item, rating, recipeCount}) {
+  
     const info = [
       {
         title: 'duration',
-        result: `${item.duration} mins`
+        result: `${item?.duration} mins`
       },
       {
         title: 'difficulty',
-        result: item.difficulty
+        result: item?.difficulty
       },
       {
         title: 'calories',
-        result: item.calories
+        result: item?.calories
       },
       {
         title: 'heat',
-        result: item.heatLevel
+        result: item?.heatLevel
       },
     ]
   
@@ -326,7 +349,7 @@ function UserRecipe({navigation, item, rating}) {
         return <Text style={styles.recipeInfoResult}>None</Text>
       }
     }
-  
+
     return (
       <>
         {/* USERNAME WITH PROFILE IMAGE AND NUMBER OF RECIPES BY USER */}
@@ -338,31 +361,31 @@ function UserRecipe({navigation, item, rating}) {
           {/* USERNAME AND NUMBER OF RECIPES POSTED BY USER */}
           <View>
             <Text style={styles.userName}>@{item?.user?.username ? item?.user?.username : ''}</Text>
-            <Text style={styles.userRecipeCount}>34 recipes</Text>
+            <Text style={styles.userRecipeCount}>{recipeCount} recipes</Text>
           </View>
         </View>
         <View style={{ marginTop: 10}}>
-          <Text style={styles.recipeTitle}>{item.recipeName} <Text style={styles.servings}>| {item?.servings} servings</Text></Text>
+          <Text style={styles.recipeTitle}>{item?.recipeName} <Text style={styles.servings}>| {item?.servings} servings</Text></Text>
         </View>
         {/* RATINGS SECTION */}
         <View style={[generalStyles.rowCenter, { gap: 10, marginTop: 5}]}> 
           <StarRatingDisplay
             rating={rating}
-            color={COLORS.textColorFull}
+            color={isNaN(rating) ? COLORS.textColor50 : COLORS.textColorFull}
             starSize={20}
             style={{ borderRadius: 40 }}
           />
-          <Text style={styles.ratingText}>{rating?.toFixed(1)}</Text>
+          {isNaN(rating) ? <Text style={styles.noReviews}>No reviews</Text> : <Text style={styles.ratingText}>{rating?.toFixed(1)}</Text>}
         </View>
         {/* DURATION, DIFFICULTY, CALORIES, AND HEAT LEVEL SECTION */}
         <View style={styles.recipeAdditionalInfoSection}>
           {info.map((data, index) => {
             return (
               // Adding a fragment to place the unique key
-              <Fragment key={data.title}>
+              <Fragment key={data?.title}>
                 <View>
-                  <Text style={styles.recipeInfoTitle}>{data.title}</Text>
-                  {index + 1 === info.length ? fireCount(+data.result) : <Text style={styles.recipeInfoResult}>{data.result}</Text>}
+                  <Text style={styles.recipeInfoTitle}>{data?.title}</Text>
+                  {index + 1 === info.length ? fireCount(+data?.result) : <Text style={styles.recipeInfoResult}>{data?.result}</Text>}
                 </View>
                 {index + 1 !== info.length && <View style={styles.separator}></View>}
               </Fragment>
@@ -493,6 +516,11 @@ const styles = StyleSheet.create({
       ratingText: {
         fontFamily: 'Satoshi-Medium',
         color: COLORS.textColorFull,
+      },
+      noReviews: {
+        fontFamily: 'Satoshi-Medium',
+        color: COLORS.textColor75,
+        fontSize: 13
       },
       recipeAdditionalInfoSection: {
         flexDirection: 'row',

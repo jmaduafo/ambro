@@ -6,10 +6,11 @@ import { HeartIcon, ListBulletIcon, EllipsisVerticalIcon } from 'react-native-he
 import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
-import { totalRecipesByUser, follow, getFollowingsCount, getAllFollows, getFollowsByUser } from '../firebase/firebaseOperations'
+import { totalRecipesByUser, follow, getFollowingsCount, getAllFollows,
+  getFollowsByUser, getAllRecipesByUser, getAllSavesByUser } from '../firebase/firebaseOperations'
 import { auth } from '../firebase/config'
 
-const UserPage = ({ navigate, user, type, allRecipes, allSaves}) => {
+const UserPage = ({ navigate, user, type }) => {
 
   const [ select, setSelect ] = useState('Recipe')
   const [ categoryArray, setCategoryArray ] = useState()
@@ -21,14 +22,17 @@ const UserPage = ({ navigate, user, type, allRecipes, allSaves}) => {
   const [ recipeCount, setRecipeCount ] = useState(0)
 
   const [ allFollows, setAllFollows ] = useState(null)
+  const [ allRecipes, setAllRecipes ] = useState(null)
+  const [ allSaves, setAllSaves ] = useState(null)
 
-  useEffect(function() {
+  const [ loading, setLoading ] = useState(false)
+
+  useMemo(function() {
     getAllFollows(setAllFollows)
+    totalRecipesByUser(user.id, setRecipeCount)
   }, [])
 
   useMemo(function() {
-    totalRecipesByUser(user.id, setRecipeCount)
-
     if (allFollows) {
       getFollowingsCount(user.id, setFollowingCount)
     }
@@ -36,15 +40,25 @@ const UserPage = ({ navigate, user, type, allRecipes, allSaves}) => {
     if (allFollows) {
       getFollowsByUser(auth?.currentUser?.uid, user.id, setFollowersCount, setIsFollowed)
     }
-  }, [user])
+  }, [allFollows])
+
+  useMemo(function() {
+    if (select === 'Recipe') {
+      setLoading(true)
+      getAllRecipesByUser(user.id, setAllRecipes)
+      setLoading(false)
+    } else if (select === 'Saves') {
+      setLoading(true)
+      getAllSavesByUser(user.id, setAllSaves)
+      setLoading(false)
+    }
+
+  }, [select])
 
   
   function handleFollow() {
     follow(auth?.currentUser?.uid, user.id, isFollowed)
   }
-  
-  useMemo(function() {
-  }, [user])
 
   // MASONRY LIST DATA ARRAY
   function categoriesArray() {
@@ -152,7 +166,18 @@ const UserPage = ({ navigate, user, type, allRecipes, allSaves}) => {
           </View>
           {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ flex: 1, marginTop: 10}}>
-            <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+            { loading ?
+              <View>
+                <ActivityIndicator color={COLORS.textColorFull}/> 
+              </View>
+              :
+              (
+                select === 'Recipe' ?
+                <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                :
+                <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+              )
+            }
           </View>
       </View>
     </>

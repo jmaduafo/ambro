@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Alert
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AccessCamera from "../components/Create/AccessCamera";
 import { COLORS } from "../constant/default";
 import generalStyles from "../constant/generalStyles";
@@ -25,7 +25,7 @@ import { PlusCircleIcon, XCircleIcon, PencilIcon } from "react-native-heroicons/
 import Modal from "../components/Modal";
 import { auth, db } from "../firebase/config";
 import { doc, collection, addDoc, serverTimestamp, query, where, updateDoc, getDocs } from "firebase/firestore";
-import { uploadToStorage } from "../firebase/config";
+import { uploadToRecipeStorage } from "../firebase/handleStorage";
 import { useNavigation } from "@react-navigation/native";
 
 const Create = () => {
@@ -75,9 +75,13 @@ const Create = () => {
   const [error, setError] = useState("");
 
   const [ onProgress, setOnProgress] = useState(0)
+  const [ currentImage, setCurrentImage ] = useState(null)
+  const [ currentImages, setCurrentImages ] = useState([])
 
   // BOOLEAN STATE FOR CALORIES BUTTONS
   const [isRange, setIsRange] = useState(true);
+
+  const [ recipeID, setRecipeID ] = useState(null)
 
   function handleSubmit() {
     // Checks the length of each section and sets the states
@@ -144,75 +148,67 @@ const Create = () => {
             duration: selectedDuration,
             servings: selectedServings,
             heatLevel: selectedHeat,
-            vegetarian: selectedVegetarian === 'Yes' ? true : false,
-            lowCarb: selectedLowCarb === 'Yes' ? true : false,
-            glutenFree: selectedGlutenFree === 'Yes' ? true : false,
-            dairyFree: selectedDairyFree === 'Yes' ? true : false,
-            lowSodium: selectedLowSodium === 'Yes' ? true : false,
-            vegan: selectedVegan === 'Yes' ? true : false,
+            vegetarian: selectedVegetarian === 'Yes',
+            lowCarb: selectedLowCarb === 'Yes',
+            glutenFree: selectedGlutenFree === 'Yes',
+            dairyFree: selectedDairyFree === 'Yes',
+            lowSodium: selectedLowSodium === 'Yes',
+            vegan: selectedVegan === 'Yes',
             createdAt: serverTimestamp()
           })
-
-          let fileNameArray = []
-
-          // Section uploads image to firebase storage
+          
+          setRecipeID(recipeAdd?.id)
+          // UPLOADS IMAGE TO FIREBASE STORAGE
           imagesArray.forEach(image => {
             // Image output is 'fileName uri' so must split them up by ' ' for each
             // element in the imagesArray
             
             let separate = image.split(' ')
-
+            
             const fileName = separate[0]
             const uri = separate[1]
 
-            uriArray.push(uri)
-            fileNameArray.push(fileName)
-
-            async function uploadImages() {
-              try {
-                // Call the upload to storage function and assign uri, collection name, 
-                // recipeID, and filename
-                await uploadToStorage(uri, 'recipes', recipeAdd?.id, fileName)
-
-              } catch (err) {
-                Alert.alert(err.message)
-              }
-
-            }
-
-            uploadImages()
-          })
-
-
-          // Finds the recipe that contains the recipe images since it would be the most unique
-          // value in the document
-          const findRecipeRef = doc(db, 'recipes', recipeAdd?.id)
-          // Finds the user associated with the user_id
-          const findUserRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
-
-          async function findRecipe() {
-            const userSnap = await getDocs(findUserRef)
-
-            let userInfo;
-
-            userSnap.forEach(doc => {
-              userInfo = doc.data()
-            })
+            console.log(fileName)
 
             try {
-              await updateDoc(findRecipeRef, {
-                id: recipeAdd?.id,
-                user: userInfo,
-                fileNames: fileNameArray
-              })
-              Alert.alert('Recipe has been successfully added!')
+              // Call the upload to storage function and assign uri, collection name, 
+              // recipeID, and filename
+              uploadToRecipeStorage(uri, 'recipes', recipeAdd?.id, fileName, setCurrentImage)
+
             } catch (err) {
               Alert.alert(err.message)
             }
+        })
+          
+        // Finds the recipe that contains the recipe images since it would be the most unique
+        // value in the document
+        const findRecipeRef = doc(db, 'recipes', recipeAdd?.id)
+        // Finds the user associated with the user_id
+        const findUserRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
+
+        async function findRecipe() {
+          const userSnap = await getDocs(findUserRef)
+
+          let userInfo;
+
+          userSnap.forEach(doc => {
+            userInfo = doc.data()
+          })
+
+          try {
+            await updateDoc(findRecipeRef, {
+              id: recipeAdd?.id,
+              user: userInfo
+            })
+            Alert.alert('Recipe has been successfully added!')
+          } catch (err) {
+            Alert.alert(err.message)
+          }
               
           }
           findRecipe()
-          }
+        }
+
         createRecipe()
         setLoading(false)
 
@@ -255,6 +251,32 @@ const Create = () => {
 
     }
   }
+
+  useEffect(function() {
+    // Finds the recipe that contains the recipe images since it would be the most unique
+    // value in the document
+    if (currentImage && recipeID) {
+      console.log(currentImage)
+
+      setCurrentImages([currentImage, ...currentImage])
+      
+      console.log(currentImages)
+
+      async function updateImages() {
+        try {
+          const findRecipeRef = doc(db, 'recipes', recipeID)
+
+          await updateDoc(findRecipeRef, {
+            images: currentImages
+          })
+        } catch(err) {
+          console.log(err.message)
+        }
+      }
+      updateImages()
+    }
+
+  }, [currentImage])
 
   const selection = [
     {

@@ -58,12 +58,7 @@ const NewRecipes = ({ navigate }) => {
               item={item}
               navigate={navigate}
               isApi={false}
-              // recipeID={item.id ? item.id : 'testID'}
-              // userId={item.user_id}
-              // username={item.user?.username ? item.user?.username : ''}
-              // userFile={item.user?.profileImage ? item.user?.profileImage : ''}
-              // fileNames={item.fileNames ? item.fileNames : []}
-              // isApi={false}
+              backgroundImage={item.images[0]}
               />
             </View>
           )}
