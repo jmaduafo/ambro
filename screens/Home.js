@@ -19,7 +19,7 @@ import ForYou from "../components/Home/ForYou";
 import { greeting } from "../utils/greeting";
 import { StatusBar } from "expo-status-bar";
 import { auth, db } from "../firebase/config";
-import { query, collection, getDocs, where } from "firebase/firestore";
+import { query, collection, onSnapshot, where } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "react-native";
 import { UserIcon } from "react-native-heroicons/solid";
@@ -28,6 +28,7 @@ const Home = ({ navigation }) => {
   const [date, setDate] = useState("");
   const [userInfo, setUserInfo] = useState();
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
 
   const { navigate } = useNavigation()
   const time = new Date();
@@ -36,17 +37,16 @@ const Home = ({ navigation }) => {
     setLoading(true);
     const userRef = query(collection(db, "users"), where("id", "==", auth?.currentUser?.uid));
 
-    async function username() {
-      const userSnap = await getDocs(userRef);
-
+    const unsub = onSnapshot(userRef, (snap) => {
       let user = [];
-      userSnap.forEach((doc) => {
+
+      snap.forEach((doc) => {
         user.push(doc.data());
       });
-      setUserInfo(user);
-    }
 
-    username();
+      setUserInfo(user);
+    })
+
     setLoading(false);
   }
 
@@ -59,7 +59,7 @@ const Home = ({ navigation }) => {
 
   useEffect(function () {
     getUser();
-  }, [userInfo]);
+  }, []);
 
   return (
     <View style={styles.background}>
@@ -96,7 +96,7 @@ const Home = ({ navigation }) => {
                       style={{ width: '100%', height: '100%', borderRadius: 10000}}
                       /> 
                       : 
-                      <UserIcon color={COLORS.backgroundLight}/>
+                      <UserIcon color={COLORS.textColorFull}/>
                     }
                     
                   </TouchableOpacity>
@@ -109,6 +109,9 @@ const Home = ({ navigation }) => {
           marginTop={20}
           marginBottom={0}
           placeholderText={"What would you like to cook today?"}
+          navigation={navigation}
+          setSearch={setSearch}
+          search={search}
         />
       </SafeAreaView>
       <View style={styles.mainSection}>

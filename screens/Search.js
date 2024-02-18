@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 const Search = () => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundLight}}>
+    <SafeAreaView style={generalStyles.default}>
       {/* Pass navigation to components to access navigation properties */}
       <SearchListings />
       {/* <SearchUserPage navigation={navigation}/> */}

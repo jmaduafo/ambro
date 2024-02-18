@@ -1,19 +1,22 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TextInput, ScrollView, Pressable, ActivityIndicator } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import SearchEngine from '../SearchEngine'
-import { COLORS } from '../../constant/default'
+import { COLORS, SHADOW } from '../../constant/default'
 import Listing from '../Listing'
 import pic from '../../assets/icon.png'
 import { useNavigation } from '@react-navigation/native';
 import generalStyles from '../../constant/generalStyles'
 import { getAllUsers, getAllRecipes } from '../../firebase/firebaseOperations'
 
-const SearchListings = () => {
+const SearchListings = ({ route }) => {
     const { navigate } = useNavigation()
+
+    
     const [ loading, setLoading ] = useState(false)
-
+    
     const [ search, setSearch ] = useState('')
-
+    const [ homeSearch, setHomeSearch ] = useState(null)
+    
     const [ allUsers, setAllUsers ] = useState(null)
     const [ allRecipes, setAllRecipes ] = useState(null)
     
@@ -21,6 +24,12 @@ const SearchListings = () => {
     const [ filterRecipes, setFilterRecipes ] = useState([])
     const [ filterCategories, setFilterCategories ] = useState([])
     const [ filterCuisine, setFilterCuisine ] = useState([])
+    console.log(route)
+
+    if (route) {
+        const { homeSearch } = route.params
+        setHomeSearch(homeSearch)
+    }
 
     useMemo(function() {
         setLoading(true)
@@ -42,9 +51,23 @@ const SearchListings = () => {
         handleSearch()
     }, [search])
 
+    if (homeSearch) {
+        useEffect(function() {
+            setSearch(homeSearch)
+        }, [homeSearch])
+    }
+
   return (
     <SafeAreaView style={generalStyles.default}>
-      <SearchEngine setSearch={setSearch} search={search} marginTop={20} marginBottom={10} placeholderText={'Search'}/>
+        <View style={styles.searchInputSection}>
+            <TextInput
+            placeholder={'Search'}
+            placeholderTextColor={COLORS.textColor50}
+            style={styles.searchInput}
+            onChangeText={(text) => setSearch(text)}
+            value={search}
+        />
+        </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={filterCuisine && filterCuisine?.length && styles.searchSection}>
             <View>
@@ -139,11 +162,28 @@ const styles = StyleSheet.create({
         marginTop: 15,
         marginBottom: 15
     },
+    searchInputSection: {
+        paddingLeft: 30,
+        paddingRight: 30,
+        marginTop: 20
+    },
     searchTitle: {
         fontFamily: 'Satoshi-Medium',
         letterSpacing: -1,
         fontSize: 16,
         color: COLORS.textColorFull,
         marginBottom: 5
-    }
+    },
+    searchInput: {
+        color: COLORS.textColor75,
+        fontFamily: "Satoshi-Regular",
+        backgroundColor: COLORS.backgroundLight,
+        padding: 10,
+        fontSize: 13,
+        borderRadius: 15,
+        shadowColor: SHADOW.color,
+        shadowOffset: { width: SHADOW.offsetWidth, height: SHADOW.offsetHeight },
+        shadowOpacity: SHADOW.opacity,
+        shadowRadius: SHADOW.radius,
+      },
 })
