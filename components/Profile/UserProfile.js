@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect } from "react";
 import UserPage from "../UserPage";
 import { auth, db } from "../../firebase/config";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { COLORS } from "../../constant/default";
 import { useNavigation } from "@react-navigation/native";
 import generalStyles from "../../constant/generalStyles";
@@ -20,17 +20,15 @@ const UserProfile = () => {
       where("id", "==", auth?.currentUser?.uid)
     );
 
-    async function username() {
-      const userSnap = await getDocs(userRef);
+    const unsub = onSnapshot(userRef, (snap) => {
+      let userArray = [];
+      snap.forEach(doc => {
+        userArray.push(doc.data())
+      })
 
-      let user = [];
-      userSnap.forEach((doc) => {
-        user.push(doc.data());
-      });
-      setUserInfo(user);
-    }
+      setUserInfo(userArray)
+    })
 
-    username();
     setLoading(false);
   }
 

@@ -1134,8 +1134,6 @@ function CategoriesInput({
       // ENSURES THAT CATEGORY ARRAY IS UNIQUE SO THAT THERE ARE NO REPLICATES
       setCategoryArray([...new Set([...categoryArray, categoryName])]);
       setCategoryName("");
-
-      console.log(categoryArray)
     } else {
       Alert.alert('Please select a category name')
     }

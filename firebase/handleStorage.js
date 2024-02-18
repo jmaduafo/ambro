@@ -32,7 +32,7 @@ export async function uploadToRecipeStorage(uri, base, id, fileName,setCurrentIm
     );
 }
 
-export async function uploadToUserStorage(uri, base, id, fileName, userType, currentImages, setCurrentImages) {
+export async function uploadToUserStorage(uri, base, id, fileName, userType, setCurrentImage) {
     const fetchResponse = await fetch(uri)
     const blob = await fetchResponse.blob()
   
@@ -57,7 +57,7 @@ export async function uploadToUserStorage(uri, base, id, fileName, userType, cur
     // Handle successful uploads on complete
     // For instance, get the download URL: https://firebasestorage.googleapis.com/...
     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        setCurrentImages([...currentImages, downloadURL])
+        setCurrentImage(downloadURL)
     })
     }
     );

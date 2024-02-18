@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, ImageBackground, TouchableOp
 import React, { useEffect, useState, useMemo } from 'react'
 import { COLORS } from '../constant/default'
 import pic from '../assets/test.png'
+import { UserIcon } from 'react-native-heroicons/solid'
 import { HeartIcon, ListBulletIcon, EllipsisVerticalIcon } from 'react-native-heroicons/outline'
 import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
@@ -54,7 +55,6 @@ const UserPage = ({ navigate, user, type }) => {
     }
 
   }, [select])
-
   
   function handleFollow() {
     follow(auth?.currentUser?.uid, user.id, isFollowed)
@@ -77,24 +77,32 @@ const UserPage = ({ navigate, user, type }) => {
     <>
       {/* BACKGROUND IMAGE */}
       <View style={styles.top}>
-        {/* <Pressable style={{ paddingLeft: 20, paddingRight: 20, marginTop: 40, zIndex: 20, width: '100%', position: 'absolute', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-          <EllipsisVerticalIcon color={COLORS.backgroundFull} strokeWidth={1.5}/>
-        </Pressable> */}
-        {/* <ImageBackground
-        source={{ uri: user.profileBackgroundImage ? user.profileBackgroundImage : pic }}
+       {user?.profileBackgroundImage ?
+        <ImageBackground
+        source={{ uri: user?.profileBackgroundImage }}
         resizeMode='cover'
-        style={{ width: '100%', height: '100%'}}/> */}
+        style={{ width: '100%', height: '100%'}}/>
+        :
+        <ImageBackground
+        source={pic}
+        resizeMode='cover'
+        style={{ width: '100%', height: '100%'}}/>
+      }
       </View>
       {/* USER INFO WITH USERNAME, PRONOUNS, AND BUTTONS */}
       <View style={styles.bottom}>
           {/* PROFILE IMAGE */}
           <View style={styles.userIntro}>
-            <View style={{ flexBasis: '30%' }}>
-              <View style={{ width: 80, height: 80, borderRadius: 80/2 }}>
-                {/* <Image
-                  source={{ uri: user.profileImage ? user.profileImage : pic }}
+            <View style={{ flexBasis: '30%'}}>
+              <View style={[generalStyles.center, { backgroundColor: COLORS.textColorFull, width: 80, height: 80, borderRadius: 80/2 }]}>
+                {user?.profileImage ? 
+                <Image
+                  source={{ uri: user?.profileImage }}
                   resizeMode='cover'
-                  style={{ width: '100%', height: '100%', borderRadius: 100000}}/> */}
+                  style={{ width: '100%', height: '100%', borderRadius: 100000}}/>
+                  :
+                  <UserIcon size={36} color={COLORS.backgroundFull}/>
+                }
               </View>
             </View>
             {/* USERNAME, PRONOUNS, BUTTONS */}

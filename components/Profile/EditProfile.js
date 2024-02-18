@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Alert
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import generalStyles from "../../constant/generalStyles";
 import { COLORS } from "../../constant/default";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -21,8 +21,9 @@ import { ChevronRightIcon } from "react-native-heroicons/outline";
 import ReAuthenticate from "../ReAuthenticate";
 import { backgroundImagePicker, profileImagePicker } from "../../utils/imagePicker";
 import { UserIcon, PhotoIcon } from "react-native-heroicons/solid";
-import { auth, db, uploadToStorage } from "../../firebase/config";
-import { query, where, collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { uploadToUserStorage } from "../../firebase/handleStorage";
+import { auth, db } from "../../firebase/config";
+import { query, where, collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
 
 const EditProfile = () => {
   const [newBio, setNewBio] = useState('');
@@ -33,47 +34,40 @@ const EditProfile = () => {
   const [usernameEdit, setUsernameEdit] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [ messageOpen, setMessageOpen ] = useState(false)
-
   const [imagePick, setImagePick] = useState(null);
-  const [imageURI, setImageURI] = useState(null);
-  const [backgroundImageURI, setBackgroundImageURI] = useState(null);
   const [backgroundImagePick, setBackgroundImagePick] = useState(null);
 
-  const [ currentImage, setCurrentImage ] = useState([])
-  const [ currentBackground, setCurrentBackground ] = useState([])
+  const [ currentImage, setCurrentImage ] = useState(null)
+  const [ currentBackground, setCurrentBackground ] = useState(null)
 
   const [loading, setLoading] = useState(false);
 
   function handleBackgroundImage() {
-    backgroundImagePicker(setBackgroundImageURI, Alert)
+    backgroundImagePicker(setBackgroundImagePick, Alert)
   }
 
   function handleProfileImage() {
-    profileImagePicker(setImageURI, Alert)
+    profileImagePicker(setImagePick, Alert)
   }
 
   // Loads user information on first load
   function loadUserInfo() {
     const userRef = query(collection(db, 'users'), where('id', '==', auth?.currentUser?.uid))
 
-    async function getUserInfo() {
-      const userSnap = await getDocs(userRef)
+    const unsub = onSnapshot(userRef, (snap) => {
+      let userContent;
 
-      let userArray = []
-      userSnap.forEach(doc => {
-        userArray.push(doc.data())
+      snap.forEach(doc => {
+        userContent = doc.data()
       })
-      
-      setNewName(userArray[0]?.name)
-      setNewUsername(userArray[0]?.username)
-      setImagePick(userArray[0]?.profileImage[0])
-      setBackgroundImagePick(userArray[0]?.profileBackgroundImage[0])
-      setNewPronouns(userArray[0]?.pronouns)
-      setNewBio(userArray[0]?.bio) 
-    }
 
-    getUserInfo()
+      setNewName(userContent?.name)
+      setNewUsername(userContent?.username)
+      setImagePick(userContent?.profileImage)
+      setBackgroundImagePick(userContent?.profileBackgroundImage)
+      setNewPronouns(userContent?.pronouns)
+      setNewBio(userContent?.bio) 
+    })
   }
 
   useEffect(function() {
@@ -87,14 +81,50 @@ const EditProfile = () => {
       setLoading(true)
       const userRef = doc(db, 'users', auth?.currentUser?.uid)
 
-      const imageName = imageURI.split('/').pop()
-      const backgroundName = backgroundImageURI.split('/').pop()
+      // IF IMAGE AND BACKGROUND IMAGE ARE CHANGED BY USER
+      if (imagePick?.includes('file') && backgroundImagePick?.includes('file')) {
+        try {
+          const imageName = imagePick?.split('/').pop()
+          const backgroundName = backgroundImagePick?.split('/').pop()
 
-      try {
-        uploadToStorage(imageURI, 'users', auth?.currentUser?.uid, imageName, 'profileImage', currentImage, setCurrentImage)
-        uploadToStorage(backgroundImageURI, 'users', auth?.currentUser?.uid, backgroundName, 'backgroundImage', currentBackground, setCurrentBackground)
-      } catch (err) {
-        Alert.alert(err.message)
+          async function upload() {
+            await uploadToUserStorage(imagePick, 'users', auth?.currentUser?.uid, imageName, 'profile', setCurrentImage)
+            await uploadToUserStorage(backgroundImagePick, 'users', auth?.currentUser?.uid, backgroundName, 'background', setCurrentBackground)
+          }
+
+          upload()
+
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      // IF ONLY THE PROFILE PICTURE IMAGE WAS CHANGED
+      } else if (imagePick?.includes('file') && !backgroundImagePick?.includes('file')) {
+        try {
+          const imageName = imagePick.split('/').pop()
+
+          async function upload() {
+            await uploadToUserStorage(imagePick, 'users', auth?.currentUser?.uid, imageName, 'profile', setCurrentImage)
+          }
+
+          upload()
+
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      // IF ONLY THE BACKGROUND IMAGE WAS CHANGED
+      } else if (!imagePick?.includes('file') && backgroundImagePick?.includes('file')) {
+        try {
+          const backgroundName = backgroundImagePick.split('/').pop()
+
+          async function upload() {
+            await uploadToUserStorage(backgroundImagePick, 'users', auth?.currentUser?.uid, backgroundName, 'background', setCurrentBackground)
+          }
+
+          upload()
+
+        } catch (err) {
+          Alert.alert(err.message)
+        }
       }
 
       async function updateUserInfo() {
@@ -103,10 +133,10 @@ const EditProfile = () => {
             name: newName,
             username: newUsername,
             bio: newBio,
-            pronouns: newPronouns,
-            profileImage: currentImage,
-            profileBackgroundImage: currentBackground
+            pronouns: newPronouns
           })
+
+          
           Alert.alert('Updated successfully!')
           setLoading(false)
         } catch(err) {
@@ -119,6 +149,46 @@ const EditProfile = () => {
       updateUserInfo()
     }
   }
+
+  useMemo(function() {
+    async function updateImage() {
+      const userRef = doc(db, 'users', auth?.currentUser?.uid)
+
+      if (currentImage && currentBackground) {
+        try {
+          await updateDoc(userRef, {
+            profileBackgroundImage: currentBackground,
+            profileImage: currentImage
+          })
+  
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      } else if (currentImage && !currentBackground) {
+        try {
+          await updateDoc(userRef, {
+            profileBackgroundImage: backgroundImagePick,
+            profileImage: currentImage
+          })
+  
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      } else if (!currentImage && currentBackground) {
+        try {
+          await updateDoc(userRef, {
+            profileBackgroundImage: currentBackground,
+            profileImage: imagePick
+          })
+  
+        } catch (err) {
+          Alert.alert(err.message)
+        }
+      }
+    }
+
+    updateImage()
+  }, [currentImage, currentBackground])
 
   return (
     <View style={[generalStyles.default, { position: "relative" }]}>
@@ -138,7 +208,7 @@ const EditProfile = () => {
         {/* BACKGROUND IMAGE SELECT */}
         <View style={styles.backgroundImageSection}>
           <View style={styles.backgroundImage}>
-            {backgroundImagePick?.length ? (
+            {backgroundImagePick ? (
               <Image
                 source={{ uri: backgroundImagePick }}
                 style={{ width: "100%", height: "100%", borderRadius: 10 }}
@@ -155,11 +225,11 @@ const EditProfile = () => {
         {/* PROFILE IMAGE SELECT */}
         <View style={styles.profileImageSection}>
           <View style={styles.profileImage}>
-            {imagePick?.length ? (
+            {imagePick ? (
               <Image
                 source={{ uri: imagePick }}
                 style={{ width: "100%", height: "100%", borderRadius: 10000 }}
-                resizeMode="contain"
+                resizeMode="cover"
               />
             ) : (
               <UserIcon size={60} color={COLORS.backgroundLight} />
@@ -316,7 +386,11 @@ const EditProfile = () => {
             }}
           />
         </View>
-        {loading ? <ActivityIndicator size={'small'} color={COLORS.textColorFull}/> : 
+        {loading ? 
+        <View style={{ marginTop: 20, marginBottom: 20}}>
+          <ActivityIndicator size={'small'} color={COLORS.textColorFull}/> 
+        </View>
+        : 
         <TouchableOpacity
           onPress={handleSubmit}
           style={[generalStyles.button, { marginTop: 20, marginBottom: 280 }]}

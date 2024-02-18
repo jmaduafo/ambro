@@ -15,7 +15,7 @@ const HomeReviewDisplay = ({ navigation, route }) => {
   const [userReply, setUserReply] = useState("");
 
   async function setNewReview() {
-    setReview(userReview, item, setUserReview, setRating, Alert)
+    setReview(userReview, rating, item, setUserReview, setRating, Alert)
   }
 
   async function setNewReply() {

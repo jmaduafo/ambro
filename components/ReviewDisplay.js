@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native'
 import React, { Fragment, useEffect, useMemo, useState } from 'react'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { HandThumbUpIcon as HandThumbUpOutline, HandThumbDownIcon as HandThumbDownOutline } from 'react-native-heroicons/outline'
-import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid } from 'react-native-heroicons/solid'
+import { HandThumbUpIcon as HandThumbUpSolid, HandThumbDownIcon as HandThumbDownSolid, UserIcon } from 'react-native-heroicons/solid'
 import { COLORS } from '../constant/default'
 import generalStyles from '../constant/generalStyles'
 import { db, auth } from '../firebase/config'
@@ -46,19 +46,19 @@ const ReviewDisplay = ({ item }) => {
                 <ActivityIndicator size='small' color={COLORS.textColorFull}/>
             </View>
             :
-            (allReviews !== null 
+            (allReviews && allReviews?.length 
                 ?
                 allReviews?.map(review => {
                     return (  
                         <Fragment key={review?.id}>
-                            <UserReview id={review?.id} name={review?.user?.name} text={review?.reviewText} rating={review?.rating}/>
+                            <UserReview userId={review?.user_id} image={review?.user?.profileImage} id={review?.id} name={review?.user?.name} text={review?.reviewText} rating={review?.rating}/>
                         </Fragment>
                     )
                 
                 })
                 :
-                <View style={{ marginTop: 20 }}>
-                    <Text style={[generalStyles.defaultParagraph, { textAlign: 'center', color: COLORS.textColorFull}]}>Be the first to write a review</Text>
+                <View style={{ marginTop: 10 }}>
+                    <Text style={[generalStyles.defaultParagraph, { textAlign: 'center', color: COLORS.textColor75}]}>Be the first to write a review</Text>
                 </View>
             )
         }
@@ -69,16 +69,32 @@ const ReviewDisplay = ({ item }) => {
 
 export default ReviewDisplay
 
-function UserReview({ name, rating, text, id }) {
+function UserReview({ image, name, rating, text, id, userId }) {
     const [ isShowMore, setIsShowMore ] = useState()
     const [ reviewText, setReviewText ] = useState(text)
     return (
         <View style={styles.reviewContainer}>
-            <View style={styles.profilePic}>
-
+            <View style={[generalStyles.center, styles.profilePic]}>
+                {image ? 
+                <Image
+                    source={{ uri: image }}
+                    style={{ width: '100%', height: '100%', borderRadius: 1000}}
+                    resizeMode='cover'
+                    />
+                :
+                <UserIcon size={20} color={COLORS.textColorFull}/>
+                }
             </View>
             <View>
+                {userId === auth?.currentUser?.uid ?
+                <View style={[generalStyles.rowCenter, { gap: 5 }]}>
+                    <Text style={styles.nameText}>{name}</Text>
+                    <Text style={[styles.nameText, { fontSize: 12}]}>&#x2022;</Text>
+                    <Text style={[styles.nameText, { fontSize: 12}]}>Chef</Text>
+                </View>
+                :
                 <Text style={styles.nameText}>{name}</Text>
+                }
                 <StarRatingDisplay
                     rating={rating}
                     color={COLORS.textColorFull}

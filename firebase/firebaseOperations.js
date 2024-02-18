@@ -395,7 +395,7 @@ export async function getReviewsCount(item, setReviewCount, Alert) {
     }
   }
 
-export async function setReview(userReview, item, setUserReview, setRating, Alert) {
+export async function setReview(userReview, rating, item, setUserReview, setRating, Alert) {
     if (userReview.length && item?.id) {
         try {
             const reviewRef = collection(db, 'reviews')
