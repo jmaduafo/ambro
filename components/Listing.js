@@ -3,6 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../constant/default';
 import { auth } from '../firebase/config';
+import { UserIcon, MagnifyingGlassIcon } from 'react-native-heroicons/solid';
 import { getFollowsByUser, totalRecipesByUser, getAllFollows } from '../firebase/firebaseOperations';
 import generalStyles from '../constant/generalStyles';
 
@@ -31,35 +32,45 @@ const Listing = (props) => {
 
   return (
     <View style={styles.background}>
-        {props.image ? 
-        <View style={styles.searchImage}>
-            <Image
-                source={props.image}
-                resizeMode='contain'
-                style={{width: '100%', height: '100%', borderRadius: 10}}
-            />
-        </View>
-        :
-        props.searchType === 'user' ?
-        <View style={styles.searchAlt}>
-            <AntDesign name="user" size={24} color={COLORS.backgroundFull}/>
-        </View>
-        :
-        <View style={styles.searchAlt}>
-            <Ionicons name="search-outline" size={24} color={COLORS.backgroundFull}/>
-        </View>
+        {/* SHOWS USER PIC IF THE SEARCH CATEGORY IS 'USER' IF USER PROFILE IMAGE IS NOT NULL */}
+        { props.searchType === 'user' && props.image ? 
+            <View style={styles.searchImage}>
+                <Image
+                    source={{ uri: props.image}}
+                    resizeMode='cover'
+                    style={{width: '100%', height: '100%', borderRadius: 100}}
+                    />
+            </View> 
+             : 
+             (
+                // SHOWS USER ICON IF THE SEARCH CATEGORY IS 'USER' IF PROFILE IMAGE IS NULL 
+                // SHOWS SEARCH ICON IF SEARCH CATEGORY IS NOT 'USER'
+                props.searchType === 'user' ? 
+                    <View style={styles.searchAlt}>
+                        <UserIcon size={22} color={COLORS.backgroundFull}/>
+                    </View>
+                    :
+                    <View style={styles.searchAlt}>
+                        <MagnifyingGlassIcon size={22} color={COLORS.backgroundFull}/>
+                    </View>
+             )
+            
         }
         <View>
+            {/* IF THE SEARCH SECTION IS USER */}
             {props.searchType === 'user' ? 
+            // USER'S NAME WITH USERNAME
             <View style={[generalStyles.rowCenter, { gap: 5}]}>
                 <Text style={styles.text}>{props.name}</Text>
                 <Text style={styles.username}>|</Text>
                 <Text style={styles.username}>@{props.username}</Text>
             </View>
              : 
+            //  JUST THE NAME OF THE ITEM IF SEARCH SECTION IS NOT USER
              <Text style={[styles.text, { textTransform: 'lowercase'}]}>{props.name}</Text>
             }
             {props.searchType === 'user' ? 
+                // CHECKS IF USER ACCOUNT IS FOLLOWED BY CURRENT USER
                 isFollowing ? 
                 <View style={styles.userDisplay}>
                     <Text style={styles.userText}>Following</Text>

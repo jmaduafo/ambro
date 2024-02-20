@@ -3,12 +3,12 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { COLORS } from '../constant/default'
 import pic from '../assets/test.png'
 import { UserIcon } from 'react-native-heroicons/solid'
-import { HeartIcon, ListBulletIcon, EllipsisVerticalIcon } from 'react-native-heroicons/outline'
+import { HeartIcon, ViewColumnsIcon, EllipsisVerticalIcon, LockClosedIcon } from 'react-native-heroicons/outline'
 import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
 import generalStyles from '../constant/generalStyles'
 import { totalRecipesByUser, follow, getFollowingsCount, getAllFollows,
-  getFollowsByUser, getAllRecipesByUser, getAllSavesByUser } from '../firebase/firebaseOperations'
+  getFollowsByUser, getAllRecipesByUser, getAllSavesByUser, getPrivateByUser } from '../firebase/firebaseOperations'
 import { auth } from '../firebase/config'
 
 const UserPage = ({ navigate, user, type }) => {
@@ -17,6 +17,7 @@ const UserPage = ({ navigate, user, type }) => {
   const [ categoryArray, setCategoryArray ] = useState()
 
   const [ isFollowed, setIsFollowed ] = useState(false)
+  const [ isPrivate, setIsPrivate ] = useState(false)
 
   const [ followersCount, setFollowersCount ] = useState(0)
   const [ followingCount, setFollowingCount ] = useState(0)
@@ -31,6 +32,9 @@ const UserPage = ({ navigate, user, type }) => {
   useMemo(function() {
     getAllFollows(setAllFollows)
     totalRecipesByUser(user.id, setRecipeCount)
+
+    getPrivateByUser(user.id, setIsPrivate)
+
   }, [])
 
   useMemo(function() {
@@ -161,30 +165,40 @@ const UserPage = ({ navigate, user, type }) => {
           <View style={styles.selectContainer}>
             <Pressable style={styles.press} onPress={() => setSelect('Recipe')}>
               <View style={styles.selectClick} >
-                <Text style={select === 'Recipe' ? styles.selectText : styles.noSelectText}>Recipes</Text>
+                <ViewColumnsIcon size={24} color={select === 'Recipe' ? COLORS.textColorFull : COLORS.textColor40}/>
               </View>
-                {select === 'Recipe' && <View style={styles.selectLine}></View>}
             </Pressable>
             <Pressable style={styles.press} onPress={() => setSelect('Saves')}>
               <View style={styles.selectClick} >
-                <Text style={select !== 'Recipe' ? styles.selectText : styles.noSelectText}>Saves</Text>
+                <HeartIcon size={24} color={select !== 'Recipe' ? COLORS.textColorFull : COLORS.textColor40}/>
               </View>
-              {select !== 'Recipe' && <View style={styles.selectLine}></View>}
             </Pressable>
           </View>
+          {/* LINE BREAK */}
+          <View style={[generalStyles.lineBreak, { marginTop: 10}]}></View>
           {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
-          <View style={{ flex: 1, marginTop: 10}}>
+          <View style={{ flex: 1}}>
             { loading ?
               <View>
                 <ActivityIndicator color={COLORS.textColorFull}/> 
               </View>
               :
               (
-                select === 'Recipe' ?
-                <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                isPrivate && user.id !== auth?.currentUser?.uid ?
+                <View style={[styles.privateSection, { marginTop: 50 }]}>
+                  <View style={[generalStyles.center, { backgroundColor: COLORS.textColorFull, width: 75, height: 75, borderRadius: 1000}]}>
+                    <LockClosedIcon size={50} strokeWidth={1} color={COLORS.backgroundFull}/>
+                  </View>
+                  <Text style={styles.privateText}>Follow this account to see {user?.name}'s recipes</Text>
+                </View>
                 :
-                <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
-              )
+                (
+                  select === 'Recipe' ?
+                  <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                  :
+                  <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                )
+                )
             }
           </View>
       </View>
@@ -302,5 +316,17 @@ const styles = StyleSheet.create({
   stat: {
     color: COLORS.textColor75,
     fontSize: 16,
-  }
+  },
+  privateSection: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  privateText: {
+    fontFamily: 'Satoshi-Regular',
+    color: COLORS.textColorFull,
+    marginTop: 20,
+    textAlign: 'center',
+    width: '45%'
+  },
 })

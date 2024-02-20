@@ -8,14 +8,14 @@ import { useNavigation } from '@react-navigation/native';
 import generalStyles from '../../constant/generalStyles'
 import { getAllUsers, getAllRecipes } from '../../firebase/firebaseOperations'
 
-const SearchListings = ({ route }) => {
-    const { navigate } = useNavigation()
+const SearchListings = ({ navigation }) => {
+    const { navigate } = useNavigation();
+    const routes = navigation.getState().routes[0]
 
     
     const [ loading, setLoading ] = useState(false)
     
     const [ search, setSearch ] = useState('')
-    const [ homeSearch, setHomeSearch ] = useState(null)
     
     const [ allUsers, setAllUsers ] = useState(null)
     const [ allRecipes, setAllRecipes ] = useState(null)
@@ -24,11 +24,6 @@ const SearchListings = ({ route }) => {
     const [ filterRecipes, setFilterRecipes ] = useState([])
     const [ filterCategories, setFilterCategories ] = useState([])
     const [ filterCuisine, setFilterCuisine ] = useState([])
-
-    if (route) {
-        const { homeSearch } = route.params
-        setHomeSearch(homeSearch)
-    }
 
     useMemo(function() {
         setLoading(true)
@@ -50,11 +45,18 @@ const SearchListings = ({ route }) => {
         handleSearch()
     }, [search])
 
-    if (homeSearch) {
-        useEffect(function() {
-            setSearch(homeSearch)
-        }, [homeSearch])
-    }
+
+    useEffect(function() {
+        if (routes?.params?.homeSearch) {
+            setSearch(routes?.params?.homeSearch)
+
+            setFilterUsers(allUsers?.filter(user => user?.name?.toLowerCase().includes(search.toLowerCase())))
+            setFilterRecipes(allRecipes?.filter(recipe => recipe?.recipeName?.toLowerCase().includes(search.toLowerCase())))
+            setFilterCategories(allRecipes?.filter(recipe => recipe?.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))))
+            setFilterCuisine(allRecipes?.filter(recipe => recipe?.cuisine?.toLowerCase().includes(search.toLowerCase())))
+            
+        }
+    }, [])
 
   return (
     <SafeAreaView style={generalStyles.default}>
@@ -134,7 +136,7 @@ const SearchListings = ({ route }) => {
                         filterUsers?.map(user => {
                         return (
                             <Pressable key={user.id} onPress={() => navigate('SearchUserPage', { user: user })}>
-                                <Listing searchType='user' username={user.username} name={user.name} image={pic} id={user.id}/>
+                                <Listing searchType='user' username={user.username} name={user.name} image={user.profileImage} id={user.id}/>
                             </Pressable>
                         )
                         })
