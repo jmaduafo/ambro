@@ -44,6 +44,51 @@ export async function getSaveByUser(userId, recipeId, setSavedCount, setIsSaved)
     }
 }
 
+// PRIVATE AND UNPRIVATE USER ACCOUNT 
+export async function setPrivate(userId, isPrivate) {
+    try {
+        const privateRef = doc(db, 'users', userId)
+
+        // If account is already private, set private to false
+        if (isPrivate) {
+            await updateDoc(privateRef, {
+                private: false
+            })
+        } else {
+            await updateDoc(privateRef, {
+                private: true
+            })   
+        }
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+export async function getPrivateByUser(userId, setIsPrivate) {
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const userRef = query(collection(db, 'users'), where('id', '==', userId))
+    
+        const unsub = onSnapshot(userRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let user;
+            snap.forEach(doc => {
+                user = doc.data()
+            })
+
+            // Returns a boolean of true if the searched user is included in array
+            if (user?.private === true) {
+                setIsPrivate(true)
+            } else {
+                setIsPrivate(false)
+            }
+
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
 // LIKE AND UNLIKE REVIEWS
 export async function likedReview(userId, reviewId, isLiked) {
     try {
@@ -193,7 +238,7 @@ export async function getFollowingsCount(userId, setFollowingCount) {
     }
 }
 
-// COUNTS THE NUMBER OF FOLLOWERS
+// COUNTS THE NUMBER OF FOLLOWERS OF A SPECIFIC USER
 export async function getFollowersCount(userId, setFollowedCount) {
     try {
         // Find where the recipe id matches the passed in recipe id
@@ -233,6 +278,7 @@ export async function getAllFollows(setFollowedCount) {
     }
 }
 
+// RECIPE COUNT FOR A SPECIFIC USER
 export async function totalRecipesByUser(userId, setRecipeCount) {
     try {
         // Find where the recipe id matches the passed in recipe id
@@ -272,6 +318,7 @@ export async function getAllRecipes(setAllRecipes) {
     }
 }
 
+// ALL RECIPES CREATED BY A SPECIFIC USER
 export async function getAllRecipesByUser(userId, setAllRecipes) {
     try {
         // Find where the recipe id matches the passed in recipe id
@@ -291,6 +338,7 @@ export async function getAllRecipesByUser(userId, setAllRecipes) {
     }
 }
 
+// ALL RECIPES SAVED BY A SPECIFIC USER
 export async function getAllSavesByUser(userId, setSavedRecipes) {
     // Get all saves of the user in the saves collection
     try {
@@ -395,6 +443,7 @@ export async function getReviewsCount(item, setReviewCount, Alert) {
     }
   }
 
+// ADDS A NEW REVIEW AND ONLY DISPLAYS THE REVIEWS BY THE RECIPE ID
 export async function setReview(userReview, rating, item, setUserReview, setRating, Alert) {
     if (userReview.length && item?.id) {
         try {
@@ -449,6 +498,7 @@ export async function setReview(userReview, rating, item, setUserReview, setRati
 
   }
 
+// ADDS A NEW REPLY AND ONLY DISPLAYS THE REVIEWS BY THE RECIPE ID  
 export async function setReply(userReply, item, setUserReply, Alert) {
     if (userReply.length && item.id) {
           try {
@@ -497,5 +547,4 @@ export async function setReply(userReply, item, setUserReply, Alert) {
       } else {
           Alert.alert("You cannot send an empty reply")
       }
-
 }

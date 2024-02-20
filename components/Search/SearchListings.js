@@ -24,7 +24,6 @@ const SearchListings = ({ route }) => {
     const [ filterRecipes, setFilterRecipes ] = useState([])
     const [ filterCategories, setFilterCategories ] = useState([])
     const [ filterCuisine, setFilterCuisine ] = useState([])
-    console.log(route)
 
     if (route) {
         const { homeSearch } = route.params
