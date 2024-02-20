@@ -26,10 +26,10 @@ import { auth, db } from "../../firebase/config";
 import { query, where, collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
 
 const EditProfile = () => {
-  const [newBio, setNewBio] = useState('');
-  const [newUsername, setNewUsername] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newPronouns, setNewPronouns] = useState('');
+  const [newBio, setNewBio] = useState(null);
+  const [newUsername, setNewUsername] = useState(null);
+  const [newName, setNewName] = useState(null);
+  const [newPronouns, setNewPronouns] = useState(null);
   const [nameEdit, setNameEdit] = useState(false);
   const [usernameEdit, setUsernameEdit] = useState(false);
   const [open, setOpen] = useState(false);
@@ -75,7 +75,7 @@ const EditProfile = () => {
   }, [])
 
   function handleSubmit() {
-    if (!newUsername.length || !newName.length) {
+    if (!newUsername.length || !newUsername  || !newName.length || !newName) {
       Alert.alert('Name and username must not be empty')
     } else {
       setLoading(true)
@@ -363,7 +363,7 @@ const EditProfile = () => {
               { textAlign: "right", fontSize: 13, color: COLORS.textColor50 },
             ]}
           >
-            {newBio.length} / 240
+            {newBio ? newBio.length : 0} / 240
           </Text>
         </View>
         {/* PRONOUNS SELECT DROPDOWN */}
@@ -375,7 +375,7 @@ const EditProfile = () => {
             save="value"
             search={false}
             searchicon={() => <View></View>}
-            placeholder={newPronouns.length ? newPronouns : "Select your pronouns"}
+            placeholder={newPronouns ? newPronouns : "Select your pronouns"}
             inputStyles={{
               fontFamily: "Satoshi-Regular",
               color: COLORS.textColorFull,

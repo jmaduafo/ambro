@@ -184,7 +184,7 @@ const UserPage = ({ navigate, user, type }) => {
               </View>
               :
               (
-                isPrivate && user.id !== auth?.currentUser?.uid ?
+                isPrivate && user.id !== auth?.currentUser?.uid && !isFollowed  ?
                 <View style={[styles.privateSection, { marginTop: 50 }]}>
                   <View style={[generalStyles.center, { backgroundColor: COLORS.textColorFull, width: 75, height: 75, borderRadius: 1000}]}>
                     <LockClosedIcon size={50} strokeWidth={1} color={COLORS.backgroundFull}/>

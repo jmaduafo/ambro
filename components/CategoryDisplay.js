@@ -1,13 +1,15 @@
-import { StyleSheet, Text, View, Image, Alert, Pressable } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, Alert, Pressable, TouchableOpacity } from 'react-native'
+import React, { useState, useMemo } from 'react'
 import Cover from './Cover'
 import { COLORS } from '../constant/default'
-import { HeartIcon, ClockIcon } from 'react-native-heroicons/outline'
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { PhotoIcon, UserIcon } from 'react-native-heroicons/solid'
+import { HeartIcon as OutlineHeart, ClockIcon } from 'react-native-heroicons/outline'
+import { UserIcon, HeartIcon as SolidHeart } from 'react-native-heroicons/solid'
+import { saveThisRecipe, getIsSaved } from '../firebase/firebaseOperations'
+import { auth } from '../firebase/config'
 
-const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, recipeID, fileNames, profileImage, userFile, userID, username, isApi}) => {
-  return (
+const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, recipeID, profileImage, userID, username, isApi}) => {
+        console.log(recipeID)
+    return (
     <Pressable style={[styles.background]} onPress={() => navigate('HomeRecipeDetail', { item: item, isApi: isApi })}>
         {/* BACKGROUND IMAGE */}
         <View style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, objectFit: 'cover', zIndex: -1}}>
@@ -20,15 +22,29 @@ const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, rec
         {/* USER CREDENTIALS WITH USERNAME AND PROFILE PIC */}
         <View style={styles.label}>
             <View style={{ flex: 4 }}>
-                {username && username.length && 
                 <View style={styles.user}>
-                    <View style={{ width: 20, height: 20, borderRadius: 20/2, objectFit: 'cover'}}>
                     {/* USER IMAGE */}
-                    
+                    {/* {!isApi && profileImage ?
+                    <View style={{ backgroundColor: COLORS.textColorFull, width: 30, height: 30, borderRadius: 20/2, objectFit: 'cover'}}>
+                        <Image
+                            source={{ uri: profileImage }}
+                            style={{ width: '100%', height: '100%', borderRadius: 100}}
+                            resizeMode='cover'
+                            />
                     </View>
-                    <Text style={styles.userText}>{username}</Text>
+                        :
+                        (
+                            !isApi && !profileImage?
+                                <View style={{ backgroundColor: COLORS.textColorFull, width: 20, height: 20, borderRadius: 20/2, objectFit: 'cover'}}>
+                                    <UserIcon color={COLORS.backgroundFull}/>
+                                </View>
+                                :
+                                null
+
+                        )
+                    } */}
+                    {/* {username?.length && username ? <Text style={styles.userText}>@{username}</Text> : null} */}
                 </View>
-                }
                 <Text style={styles.title}>{title && title.length > 23 ? title.substring(0, 23) + '...' : title}</Text>
                 {duration &&
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
@@ -38,13 +54,34 @@ const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, rec
                 }
             </View>
             {/* HEART ICON */}
-            <View style={{ flex: 1 }}>
-                <HeartIcon color={COLORS.backgroundFull} size={24}/>
-            </View>
-            
+            {
+                !isApi ?
+                    <SaveRecipe recipeID={recipeID}/>
+                    :
+                    null
+
+            }
         </View>
     </Pressable>
   )
+}
+
+function SaveRecipe(recipeID) {
+    const [ isSaved, setIsSaved ] = useState(false)
+
+    useMemo(function() {
+        getIsSaved(auth?.currentUser?.uid, recipeID?.recipeID, setIsSaved)
+    }, [])
+
+    function saveRecipe() {
+        saveThisRecipe(auth?.currentUser?.uid, recipeID?.recipeID, isSaved)
+    }
+    
+    return (
+        <TouchableOpacity onPress={saveRecipe}>
+            {isSaved ? <SolidHeart color={COLORS.backgroundFull} size={24}/> : <OutlineHeart strokeWidth={1.5} color={COLORS.backgroundFull} size={24}/>}
+        </TouchableOpacity>
+    )
 }
 
 export default CategoryDisplay

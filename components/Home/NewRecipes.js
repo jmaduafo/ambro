@@ -53,16 +53,19 @@ const NewRecipes = ({ navigate }) => {
           renderItem={({ item, index }) => (
             <View style={{ marginLeft: index === 0 ? 30 : 7, marginRight: index + 1 === allRecipes?.length ? 30 : 7}}>
               <CategoryDisplay 
-              title={item.recipeName} 
-              duration={item.duration}
-              item={item}
-              navigate={navigate}
-              isApi={false}
-              backgroundImage={item.images[0]}
+                title={item.recipeName} 
+                duration={item.duration}
+                username={item?.user?.username}
+                profileImage={item?.user?.profileImage}
+                item={item}
+                navigate={navigate}
+                isApi={false}
+                backgroundImage={item.images[0]}
+                recipeID={item.id}
               />
             </View>
           )}
-          keyExtractor={item => item.id ? item.id : item.recipeName}
+          keyExtractor={item => item.id }
           horizontal
         
         />

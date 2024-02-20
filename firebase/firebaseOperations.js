@@ -44,6 +44,29 @@ export async function getSaveByUser(userId, recipeId, setSavedCount, setIsSaved)
     }
 }
 
+export async function getIsSaved(userId, recipeId, setIsSaved) {
+    try {
+        // Find where the recipe id matches the passed in recipe id
+        const saveRef = query(collection(db, 'saves'), where('recipe_id', '==', recipeId))
+    
+        const unsub = onSnapshot(saveRef, (snap) => {
+            // Collect all of the saves of the recipe
+            let saved = []
+            snap.forEach(doc => {
+                saved.push(doc.data())
+            })
+
+            // Returns a boolean of true if the searched user is included in array
+            const isSaved = saved?.some(save => save.user_id === userId)
+
+            setIsSaved(isSaved)
+
+        })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
 // PRIVATE AND UNPRIVATE USER ACCOUNT 
 export async function setPrivate(userId, isPrivate) {
     try {

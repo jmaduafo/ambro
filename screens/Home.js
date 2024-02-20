@@ -96,7 +96,7 @@ const Home = ({ navigation }) => {
                       style={{ width: '100%', height: '100%', borderRadius: 10000}}
                       /> 
                       : 
-                      <UserIcon color={COLORS.textColorFull}/>
+                      <UserIcon size={36} color={COLORS.textColorFull}/>
                     }
                     
                   </TouchableOpacity>
