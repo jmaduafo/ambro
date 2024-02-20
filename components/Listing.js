@@ -16,6 +16,7 @@ const Listing = (props) => {
 
     useEffect(function() {
         getAllFollows(setAllFollows)
+        getFollowsByUser(auth?.currentUser?.uid, props.id, setFollowCount, setIsFollowing)
     }, [])
 
     useMemo(function() {
