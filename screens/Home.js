@@ -120,7 +120,7 @@ const Home = ({ navigation }) => {
           style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40 }}
         >
           <PopularCategories navigate={navigate} />
-          <TopDisplay />
+          {/* <TopDisplay /> */}
           <ForYou navigate={navigate}/>
           <NewRecipes navigate={navigate}/>
         </ScrollView>

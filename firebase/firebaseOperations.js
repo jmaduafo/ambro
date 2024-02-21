@@ -1,5 +1,5 @@
 import { auth, db } from "./config";
-import { doc, collection, query, where, deleteDoc, setDoc, updateDoc, onSnapshot, serverTimestamp, addDoc } from "firebase/firestore";
+import { doc, collection, query, where, deleteDoc, setDoc, updateDoc, onSnapshot, serverTimestamp, addDoc, getDoc, limit, orderBy } from "firebase/firestore";
 
 // SAVED AND UNSAVE RECIPES 
 export async function saveThisRecipe(userId, recipeId, isSaved) {
@@ -296,6 +296,32 @@ export async function getAllFollows(setFollowedCount) {
 
             setFollowedCount(follows.length)
         })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+// GETS FOR YOU 
+export async function getAllForYou(userId, setForYouRecipes) {
+    try {
+        // Get the user's data to access their selected tags/category names
+        const userRef = doc(db, 'users', userId)
+        const forYouSnap = await getDoc(userRef)
+        
+        // Query for recipes collection where the categories array contains any of 
+        // the category tags from the array in the user's data        
+        const recipeRef = query(collection(db, 'recipes'), 
+        where('categories', 'array-contains-any', forYouSnap.data().tags), limit(12))
+        
+        const unsub = onSnapshot(recipeRef, (snap) => {
+            let recipes = []
+            snap.forEach(doc => {
+                recipes.push(doc.data())
+            })
+
+            setForYouRecipes(recipes)
+        })
+
     } catch (err) {
         console.log(err.message)
     }

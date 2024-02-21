@@ -176,6 +176,7 @@ const Create = () => {
             dairyFree: selectedDairyFree === "Yes",
             lowSodium: selectedLowSodium === "Yes",
             vegan: selectedVegan === "Yes",
+            views: 0,
             createdAt: serverTimestamp(),
           });
 
@@ -1116,7 +1117,7 @@ function TagsInput({ setTag, tag, setTagsArray, tagsArray }) {
   );
 }
 
-// TAGS SECTION COMPONENT
+// CATEGORIES SECTION COMPONENT
 function CategoriesInput({
   setCategoryName,
   categoryName,
@@ -1132,7 +1133,7 @@ function CategoriesInput({
   function handleCategories() {
     if (categoryName.length ) {
       // ENSURES THAT CATEGORY ARRAY IS UNIQUE SO THAT THERE ARE NO REPLICATES
-      setCategoryArray([...new Set([...categoryArray, categoryName])]);
+      setCategoryArray([...new Set([...categoryArray, categoryName.toLowerCase()])]);
       setCategoryName("");
     } else {
       Alert.alert('Please select a category name')

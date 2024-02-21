@@ -7,8 +7,7 @@ import { UserIcon, HeartIcon as SolidHeart } from 'react-native-heroicons/solid'
 import { saveThisRecipe, getIsSaved } from '../firebase/firebaseOperations'
 import { auth } from '../firebase/config'
 
-const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, recipeID, profileImage, userID, username, isApi}) => {
-        console.log(recipeID)
+const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, recipeID, isApi}) => {
     return (
     <Pressable style={[styles.background]} onPress={() => navigate('HomeRecipeDetail', { item: item, isApi: isApi })}>
         {/* BACKGROUND IMAGE */}
@@ -19,32 +18,8 @@ const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, rec
                 style={{ width: '100%', height: '100%', borderRadius: 30 }}/>
         </View>
         <Cover radius={30}/>
-        {/* USER CREDENTIALS WITH USERNAME AND PROFILE PIC */}
         <View style={styles.label}>
             <View style={{ flex: 4 }}>
-                <View style={styles.user}>
-                    {/* USER IMAGE */}
-                    {/* {!isApi && profileImage ?
-                    <View style={{ backgroundColor: COLORS.textColorFull, width: 30, height: 30, borderRadius: 20/2, objectFit: 'cover'}}>
-                        <Image
-                            source={{ uri: profileImage }}
-                            style={{ width: '100%', height: '100%', borderRadius: 100}}
-                            resizeMode='cover'
-                            />
-                    </View>
-                        :
-                        (
-                            !isApi && !profileImage?
-                                <View style={{ backgroundColor: COLORS.textColorFull, width: 20, height: 20, borderRadius: 20/2, objectFit: 'cover'}}>
-                                    <UserIcon color={COLORS.backgroundFull}/>
-                                </View>
-                                :
-                                null
-
-                        )
-                    } */}
-                    {/* {username?.length && username ? <Text style={styles.userText}>@{username}</Text> : null} */}
-                </View>
                 <Text style={styles.title}>{title && title.length > 23 ? title.substring(0, 23) + '...' : title}</Text>
                 {duration &&
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
@@ -59,7 +34,6 @@ const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, rec
                     <SaveRecipe recipeID={recipeID}/>
                     :
                     null
-
             }
         </View>
     </Pressable>

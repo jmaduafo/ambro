@@ -15,6 +15,8 @@ const NewRecipes = ({ navigate }) => {
 
   async function getLatestRecipes() {
     setLoading(true)
+
+    // Order recipes in descending order by the timestamp to get the latest recipes 
     const recipeRef = query(collection(db, "recipes"), orderBy('createdAt', 'desc'), limit(12));
 
     const unsub = onSnapshot(recipeRef, (snap) => {
@@ -26,6 +28,7 @@ const NewRecipes = ({ navigate }) => {
 
       setAllRecipes(recipes)
     })
+
     setLoading(false)
   }
 
@@ -56,7 +59,6 @@ const NewRecipes = ({ navigate }) => {
                 title={item.recipeName} 
                 duration={item.duration}
                 username={item?.user?.username}
-                profileImage={item?.user?.profileImage}
                 item={item}
                 navigate={navigate}
                 isApi={false}
@@ -67,7 +69,8 @@ const NewRecipes = ({ navigate }) => {
           )}
           keyExtractor={item => item.id }
           horizontal
-        
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>

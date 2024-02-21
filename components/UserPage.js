@@ -150,8 +150,8 @@ const UserPage = ({ navigate, user, type }) => {
           </View>
           {/* FOLLOW AND RECIPES STATS */}
           <View style={styles.followStats}>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>{recipeCount}</Text> recipes</Text>
-            <Text style={styles.followStatsText}><Text style={styles.stat}>{followersCount}</Text> followers</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{recipeCount}</Text> recipe{recipeCount === 1 ? '' : 's'}</Text>
+            <Text style={styles.followStatsText}><Text style={styles.stat}>{followersCount}</Text> follower{followersCount === 1 ? '' : 's'}</Text>
             <Text style={styles.followStatsText}><Text style={styles.stat}>{followingCount}</Text> following</Text>
           </View>
           {/* USER BIO */}

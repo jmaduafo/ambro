@@ -25,7 +25,7 @@ import { timestampToDate, timeAgo } from "../utils/convertToDate";
 import { COLORS } from "../constant/default";
 import generalStyles from "../constant/generalStyles";
 import { db, auth } from "../firebase/config";
-import { onSnapshot, collection, query, orderBy } from "firebase/firestore";
+import { onSnapshot, collection, query, orderBy, getDoc, doc } from "firebase/firestore";
 
 import {
   likedReview,
@@ -35,7 +35,9 @@ import {
 } from "../firebase/firebaseOperations";
 
 const ReviewDisplay = ({ item }) => {
-  const [allReviews, setAllReviews] = useState(null);
+  const [ allReviews, setAllReviews ] = useState(null);
+  const [ recipeID, setRecipeID ] = useState(null)
+  const [ recipeCreator, setRecipeCreator ] = useState(null)
   const [loading, setLoading] = useState(false);
 
   async function getReviews() {
@@ -49,7 +51,8 @@ const ReviewDisplay = ({ item }) => {
         snap.forEach((doc) => {
           doc.data().recipe_id === item.id && reviews.push(doc.data());
         });
-
+        
+        setRecipeID(reviews[0]?.recipe_id)
         setAllReviews(reviews);
       });
 
@@ -60,10 +63,32 @@ const ReviewDisplay = ({ item }) => {
     }
   }
 
+  async function getRecipe() {
+    try {
+        setLoading(true);
+        const recipeRef = doc(db, "recipes", recipeID);
+        const recipeSnap = await getDoc(recipeRef)
+        
+        setRecipeCreator(recipeSnap.data()?.user_id)
+
+        setLoading(false);
+    } catch (err) {
+        Alert.alert(err.message);
+        setLoading(false);
+    }
+  }
+
   useEffect(function () {
     getReviews();
   }, []);
 
+  useEffect(function () {
+    if (recipeID) {
+        getRecipe();
+    }
+  }, [recipeID]);
+
+  console.log(recipeID)
   return (
     <ScrollView style={styles.format}>
       {loading ? (
@@ -75,6 +100,7 @@ const ReviewDisplay = ({ item }) => {
           return (
             <Fragment key={review?.id}>
               <UserReview
+                creator={recipeCreator}
                 userId={review?.user_id}
                 image={review?.user?.profileImage}
                 id={review?.id}
@@ -105,10 +131,9 @@ const ReviewDisplay = ({ item }) => {
 
 export default ReviewDisplay;
 
-function UserReview({ image, name, rating, text, id, userId, time }) {
+function UserReview({ creator, image, name, rating, text, id, userId, time }) {
   const [isShowMore, setIsShowMore] = useState();
   const [reviewText, setReviewText] = useState(text);
-
   return (
     <View style={styles.reviewContainer}>
       <View style={[generalStyles.center, styles.profilePic]}>
@@ -123,12 +148,12 @@ function UserReview({ image, name, rating, text, id, userId, time }) {
         )}
       </View>
       <View>
-        {userId === auth?.currentUser?.uid ? (
+        {creator === userId ? (
             <View style={[ generalStyles.rowCenter, { gap: 10 }]}>
                 <View style={[generalStyles.rowCenter, { gap: 5 }]}>
                     <Text style={styles.nameText}>{name}</Text>
-                    <Text style={[styles.nameText, { fontSize: 12, color: COLORS.textColor75 }]}>&#x2022;</Text>
-                    <Text style={[styles.nameText, { fontSize: 12, color: COLORS.textColor75, fontFamily: 'Satoshi-Italic' }]}>Chef</Text>
+                    <Text style={[styles.nameText, { fontSize: 11, color: COLORS.textColor60 }]}>&#x2022;</Text>
+                    <Text style={[styles.nameText, { fontSize: 11, color: COLORS.textColor60, fontFamily: 'Satoshi-Italic' }]}>Chef</Text>
                 </View>
                 <View>
                     {time ? 
@@ -139,10 +164,15 @@ function UserReview({ image, name, rating, text, id, userId, time }) {
                 </View>
             </View>
         ) : (
-            name ?
+            <View style={[generalStyles.rowCenter, { gap: 10 }]}>
                 <Text style={styles.nameText}>{name}</Text>
-                :
-                null            
+                {time ? 
+                    <Text style={[styles.nameText, { fontSize: 11, color: COLORS.textColor60}]}>{timeAgo(time?.seconds)}</Text>
+                    :
+                    null
+                }
+            </View>
+                            
         )}
         <StarRatingDisplay
           rating={rating}
