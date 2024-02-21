@@ -327,6 +327,35 @@ export async function getAllForYou(userId, setForYouRecipes) {
     }
 }
 
+// INCREASE VIEW COUNT OF RECIPE BY 1
+export async function increaseViewCount(recipeId, viewCount) {
+    try {
+        // Get the user's data to access their selected tags/category names
+        const recipeRef = doc(db, 'recipes', recipeId)
+        
+        await updateDoc(recipeRef, {
+            views: viewCount++
+        })
+
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+// GET VIEW COUNT OF RECIPE
+export async function getViewCount(recipeId, setViewCount) {
+    try {
+        // Get the user's data to access their selected tags/category names
+        const recipeRef = doc(db, 'recipes', recipeId)
+        const viewSnap = await getDoc(recipeRef)
+        
+        setViewCount(viewSnap.data().views)
+
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
 // RECIPE COUNT FOR A SPECIFIC USER
 export async function totalRecipesByUser(userId, setRecipeCount) {
     try {

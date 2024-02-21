@@ -49,6 +49,7 @@ const ReviewDisplay = ({ item }) => {
         let reviews = [];
 
         snap.forEach((doc) => {
+        // ONLY PUSH THE REVIEWS WHERE THE RECIPE ID MATCHES THE ITEM ID
           doc.data().recipe_id === item.id && reviews.push(doc.data());
         });
         
@@ -63,7 +64,7 @@ const ReviewDisplay = ({ item }) => {
     }
   }
 
-  async function getRecipe() {
+  async function getRecipeCreator() {
     try {
         setLoading(true);
         const recipeRef = doc(db, "recipes", recipeID);
@@ -84,11 +85,10 @@ const ReviewDisplay = ({ item }) => {
 
   useEffect(function () {
     if (recipeID) {
-        getRecipe();
+        getRecipeCreator();
     }
   }, [recipeID]);
 
-  console.log(recipeID)
   return (
     <ScrollView style={styles.format}>
       {loading ? (
@@ -96,34 +96,34 @@ const ReviewDisplay = ({ item }) => {
           <ActivityIndicator size="small" color={COLORS.textColorFull} />
         </View>
       ) : allReviews && allReviews?.length ? (
-        allReviews?.map((review) => {
-          return (
-            <Fragment key={review?.id}>
-              <UserReview
-                creator={recipeCreator}
-                userId={review?.user_id}
-                image={review?.user?.profileImage}
-                id={review?.id}
-                name={review?.user?.name}
-                text={review?.reviewText}
-                rating={review?.rating}
-                time={review?.createdAt}
-              />
-            </Fragment>
-          );
-        })
-      ) : (
-        <View style={{ marginTop: 10 }}>
-          <Text
-            style={[
-              generalStyles.defaultParagraph,
-              { textAlign: "center", color: COLORS.textColor75 },
-            ]}
-          >
-            Be the first to write a review
-          </Text>
-        </View>
-      )}
+            allReviews?.map((review) => {
+            return (
+                <Fragment key={review?.id}>
+                    <UserReview
+                        creator={recipeCreator}
+                        userId={review?.user_id}
+                        image={review?.user?.profileImage}
+                        id={review?.id}
+                        name={review?.user?.name}
+                        text={review?.reviewText}
+                        rating={review?.rating}
+                        time={review?.createdAt}
+                    />
+                </Fragment>
+            );
+            })
+            ) : (
+            <View style={{ marginTop: 10 }}>
+                <Text
+                    style={[
+                    generalStyles.defaultParagraph,
+                    { textAlign: "center", color: COLORS.textColor75 },
+                    ]}
+                >
+                    Be the first to write a review
+                </Text>
+            </View>
+        )}
       <View style={{ marginBottom: 20 }}></View>
     </ScrollView>
   );
@@ -144,10 +144,11 @@ function UserReview({ creator, image, name, rating, text, id, userId, time }) {
             resizeMode="cover"
           />
         ) : (
-          <UserIcon size={20} color={COLORS.textColorFull} />
+          <UserIcon size={20} color={COLORS.backgroundFull} />
         )}
       </View>
       <View>
+        {/* EVALUATE IF THE REVIEW SENT WAS WRITTEN BY THE RECIPE CREATOR */}
         {creator === userId ? (
             <View style={[ generalStyles.rowCenter, { gap: 10 }]}>
                 <View style={[generalStyles.rowCenter, { gap: 5 }]}>
@@ -331,7 +332,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 40 / 2,
-    backgroundColor: "gray",
+    backgroundColor: COLORS.textColorFull,
   },
   nameText: {
     fontFamily: "Satoshi-Medium",
