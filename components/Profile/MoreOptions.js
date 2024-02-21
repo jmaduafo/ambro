@@ -20,7 +20,7 @@ const MoreOptions = ({ navigation }) => {
         navigation.navigate('Login')
     }).catch((error) => {
         // An error happened.
-        Alert.alert(error.message)
+        console.log(error.message)
     });
   }
   

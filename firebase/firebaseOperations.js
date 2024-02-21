@@ -427,23 +427,20 @@ export async function getAllSavesByUser(userId, setSavedRecipes) {
             // Collect all of the saves of the recipe
             let saves = []
             snap.forEach(doc => {
-                saves.push(doc.data())
+                saves.push(doc.data().recipe_id)
             })
 
-            saves?.map(s => {
-                const recipeRef = query(collection(db, 'recipes'), where('id', '==', s.recipe_id))
+            const recipeRef = query(collection(db, 'recipes'), where('id', 'in', saves))
 
-                const unsub = onSnapshot(recipeRef, (snapshot) => {
-                    let array = []
+            const unsub = onSnapshot(recipeRef, (snapshot) => {
+                let array = []
 
-                    snapshot.forEach(doc => {
-                        array.push(doc.data())
-                    })
-
-                    setSavedRecipes(array)
+                snapshot.forEach(doc => {
+                    array.push(doc.data())
                 })
 
-            })
+                setSavedRecipes(array)
+            })            
         })
     } catch (err) {
         console.log(err.message)

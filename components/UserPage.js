@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, ImageBackground, TouchableOp
 import React, { useEffect, useState, useMemo } from 'react'
 import { COLORS } from '../constant/default'
 import pic from '../assets/test.png'
-import { UserIcon } from 'react-native-heroicons/solid'
+import { UserIcon, PlusCircleIcon } from 'react-native-heroicons/solid'
 import { HeartIcon, ViewColumnsIcon, EllipsisVerticalIcon, LockClosedIcon } from 'react-native-heroicons/outline'
 import { categories } from '../utils/popularCategories'
 import MasonryList from 'react-native-masonry-list'
@@ -18,65 +18,68 @@ const UserPage = ({ navigate, user, type }) => {
 
   const [ isFollowed, setIsFollowed ] = useState(false)
   const [ isPrivate, setIsPrivate ] = useState(false)
+  
+  const [ allFollows, setAllFollows ] = useState(null)
 
   const [ followersCount, setFollowersCount ] = useState(0)
   const [ followingCount, setFollowingCount ] = useState(0)
   const [ recipeCount, setRecipeCount ] = useState(0)
 
-  const [ allFollows, setAllFollows ] = useState(null)
   const [ allRecipes, setAllRecipes ] = useState(null)
+  const [ recipeArray, setRecipeArray ] = useState([])
+
   const [ allSaves, setAllSaves ] = useState(null)
+  const [ savesArray, setSavesArray] = useState([])
 
   const [ loading, setLoading ] = useState(false)
 
   useMemo(function() {
     getAllFollows(setAllFollows)
     totalRecipesByUser(user.id, setRecipeCount)
-
     getPrivateByUser(user.id, setIsPrivate)
-
+    getAllRecipesByUser(user.id, setAllRecipes)
+    getAllSavesByUser(user.id, setAllSaves)
   }, [])
 
   useMemo(function() {
     if (allFollows) {
       getFollowingsCount(user.id, setFollowingCount)
-    }
-
-    if (allFollows) {
       getFollowsByUser(auth?.currentUser?.uid, user.id, setFollowersCount, setIsFollowed)
     }
   }, [allFollows])
-
-  useMemo(function() {
-    if (select === 'Recipe') {
-      setLoading(true)
-      getAllRecipesByUser(user.id, setAllRecipes)
-      setLoading(false)
-    } else if (select === 'Saves') {
-      setLoading(true)
-      getAllSavesByUser(user.id, setAllSaves)
-      setLoading(false)
-    }
-
-  }, [select])
   
   function handleFollow() {
     follow(auth?.currentUser?.uid, user.id, isFollowed)
   }
 
   // MASONRY LIST DATA ARRAY
-  function categoriesArray() {
-    const array = []
-    categories?.forEach(cat => {
-      array.push({source: cat.strCategoryThumb, dimensions: { width: 1080, height: 1920 }})
-    })
+  function recipesArray() {
+    if (allRecipes) {
+      let array = []
+      allRecipes?.forEach(recipe => {
+        array.push({source: recipe?.images[0], dimensions: { width: 1080, height: 1920 }})
+      })
 
-    setCategoryArray(array)
+      setRecipeArray(array)
+    }
+  }
+
+  function saveArray() {
+    if (allSaves) {
+      let array = []
+      allSaves?.forEach(save => {
+        array.push({source: save?.images[0], dimensions: { width: 1080, height: 1920 }})
+      })
+
+      setSavesArray(array)
+    }
   }
 
   useEffect(function() {
-    categoriesArray()
-  }, [])
+    recipesArray()
+    saveArray()
+  }, [allSaves, allRecipes])
+
   return (
     <>
       {/* BACKGROUND IMAGE */}
@@ -193,11 +196,25 @@ const UserPage = ({ navigate, user, type }) => {
                 </View>
                 :
                 (
-                  select === 'Recipe' ?
-                  <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
-                  :
-                  <MasonryList images={categoryArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
-                )
+                  !recipeArray.length && select === 'Recipe' ?
+                    <View style={[generalStyles.center, { flexDirection: 'column', marginTop: 50}]}>
+                      <Text style={styles.createRecipeText}>No recipes created yet</Text>
+                      <TouchableOpacity style={[generalStyles.rowCenter, styles.createRecipeButton]}>
+                        <PlusCircleIcon size={28} color={COLORS.backgroundFull}/>
+                        <Text style={styles.createRecipeButtonText}>Create a Recipe</Text>
+                      </TouchableOpacity>
+                    </View>
+                    : 
+                    !savesArray.length && select === 'Saves' ?
+                      <View style={[generalStyles.center, { marginTop: 50 }]}>
+                        <Text style={styles.createRecipeText}>No recipes saved yet</Text>
+                      </View>
+                      :
+                      select === 'Recipe' ?
+                      <MasonryList images={recipeArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                        :
+                      <MasonryList images={savesArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                    )
                 )
             }
           </View>
@@ -328,5 +345,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
     width: '45%'
+  },
+  createRecipeText: {
+    fontFamily: 'Satoshi-Medium',
+    color: COLORS.textColorFull,
+    fontSize: 15,
+    marginBottom: 10
+  },
+  createRecipeButton: {
+    backgroundColor: COLORS.textColorFull,
+    borderRadius: 30,
+    padding: 5,
+    gap: 15,
+    width: '45%'
+  },
+  createRecipeButtonText: {
+    fontFamily: 'Satoshi-Regular',
+    color: COLORS.backgroundFull,
+    fontSize: 14
   },
 })
