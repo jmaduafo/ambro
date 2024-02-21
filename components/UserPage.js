@@ -34,12 +34,14 @@ const UserPage = ({ navigate, user, type }) => {
   const [ loading, setLoading ] = useState(false)
 
   useMemo(function() {
+    setLoading(true)
     getAllFollows(setAllFollows)
     totalRecipesByUser(user.id, setRecipeCount)
     getPrivateByUser(user.id, setIsPrivate)
     getAllRecipesByUser(user.id, setAllRecipes)
     getAllSavesByUser(user.id, setAllSaves)
-  }, [])
+    setLoading(false)
+  }, [loading])
 
   useMemo(function() {
     if (allFollows) {
@@ -57,18 +59,19 @@ const UserPage = ({ navigate, user, type }) => {
     if (allRecipes) {
       let array = []
       allRecipes?.forEach(recipe => {
-        array.push({source: recipe?.images[0], dimensions: { width: 1080, height: 1920 }})
+        array.push({source: {uri: recipe?.images[0]}})
       })
 
       setRecipeArray(array)
     }
   }
 
+  // , dimensions: { width: 1080, height: 1920 }
   function saveArray() {
     if (allSaves) {
       let array = []
       allSaves?.forEach(save => {
-        array.push({source: save?.images[0], dimensions: { width: 1080, height: 1920 }})
+        array.push({source: {uri: save?.images[0]}})
       })
 
       setSavesArray(array)
@@ -182,7 +185,7 @@ const UserPage = ({ navigate, user, type }) => {
           {/* MASONRY LIST DISPLAY USER POSTS OR SAVED POSTS */}
           <View style={{ flex: 1}}>
             { loading ?
-              <View>
+              <View style={{ marginTop: 50 }}>
                 <ActivityIndicator color={COLORS.textColorFull}/> 
               </View>
               :
@@ -211,7 +214,7 @@ const UserPage = ({ navigate, user, type }) => {
                       </View>
                       :
                       select === 'Recipe' ?
-                      <MasonryList images={recipeArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
+                      <MasonryList images={recipeArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ maxHeight: 250, borderRadius: 5}}/>
                         :
                       <MasonryList images={savesArray} columns={3} backgroundColor={COLORS.backgroundFull} imageContainerStyle={{ borderRadius: 5}}/>
                     )
