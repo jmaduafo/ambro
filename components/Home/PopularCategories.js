@@ -90,13 +90,13 @@ const PopularCategories = ({ navigate }) => {
                 <CategoryDisplay
                   navigate={navigate}
                   item={item}
-                  title={item.strMeal}
-                  backgroundImage={item.strMealThumb}
+                  title={item?.strMeal}
+                  backgroundImage={item?.strMealThumb}
                   isApi={true}
                 />
               </View>
         )}
-            keyExtractor={(item) => item.idMeal}
+            keyExtractor={(item) => item?.idMeal}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             horizontal

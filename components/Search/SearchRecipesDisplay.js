@@ -12,7 +12,7 @@ const SearchRecipesDisplay = ({navigation, route}) => {
 
   return (
     <View style={generalStyles.default}>
-      <RecipeDisplay navigation={navigation} isApi={false} item={item} navigationName={'SearchReviewDisplay'}/>
+      <RecipeDisplay navigation={navigation} isApi={false} item={item} navigationName={'SearchReviewDisplay'} userNavigationName={'SearchUserPage'}/>
     </View>
   )
 }

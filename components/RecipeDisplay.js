@@ -5,7 +5,7 @@ import generalStyles from '../constant/generalStyles'
 import { COLORS, SHADOW } from '../constant/default'
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { FireIcon as FireOutline, ChatBubbleOvalLeftEllipsisIcon as CommentIcon, HeartIcon as HeartOutline } from 'react-native-heroicons/outline'
-import { FireIcon as FireSolid, HeartIcon as HeartSolid } from 'react-native-heroicons/solid'
+import { FireIcon as FireSolid, HeartIcon as HeartSolid, UserIcon } from 'react-native-heroicons/solid'
 import HeaderTitle from './HeaderTitle'
 import Checkbox from 'expo-checkbox';
 import WebView from 'react-native-webview'
@@ -14,9 +14,9 @@ import Cover from './Cover'
 import { auth } from '../firebase/config'
 import { saveThisRecipe, getSaveByUser, getRatingCount, getReviewsCount, totalRecipesByUser } from '../firebase/firebaseOperations'
 
-const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
+const RecipeDisplay = ({ navigation, isApi, item, navigationName, userNavigationName }) => {
     // Receives data from third party API
-    const [ apiData, setApiData] = useState(null)
+    const [ apiData, setApiData ] = useState({})
     // Set loading state when getting data from third party API
     const [ loading, setLoading ] = useState(false)
 
@@ -28,60 +28,60 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
     const [ recipeCount, setRecipeCount ] = useState(0)
 
     // RETRIEVES DATA FROM THE THIRD PARTY API
-    async function getApiData() {
-      if (isApi) {
+    async function getApiData(id) {
         setLoading(true)
-        const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${item.idMeal}`
 
-        async function getData() {
-          try{
-            const response = await axios.get(url)
+        try{
+          const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+          const response = await axios.get(url)
+  
+          if (response) {
+            setApiData(response?.data?.meals[0])
+            console.log(apiData)
+
+            // if (apiData) {
+            //   try {
+            //     let measureArray = []
+            //     let ingredientArray = []
     
-            if (response) {
-              setApiData(response?.data?.meals[0])
-
-              if (apiData) {
-                try {
-                  let measureArray = []
-                  let ingredientArray = []
-      
-                  Object.keys(apiData)?.forEach(obj => {
-                    {obj.includes('strMeasure') && apiData[obj]?.length &&  measureArray.push(obj)}
-                    {obj.includes('strIngredient') && apiData[obj]?.length && ingredientArray.push(obj)}
-                  })
-      
-                  setIngredientsData(ingredientArray)
-                  setMeasurementData(measureArray)
-      
-                } catch(err) {
-                  Alert.alert(err.message)
-                }
-              }
-            }
-            setLoading(false)
-          } catch(err) {
-            Alert.alert(err.message)
-            setLoading(false)
+            //     Object.keys(apiData)?.forEach(obj => {
+            //       {obj.includes('strMeasure') && apiData[obj]?.length &&  measureArray.push(obj)}
+            //       {obj.includes('strIngredient') && apiData[obj]?.length && ingredientArray.push(obj)}
+            //     })
+    
+            //     setIngredientsData(ingredientArray)
+            //     setMeasurementData(measureArray)
+    
+            //   } catch(err) {
+            //     Alert.alert(err.message)
+            //   }
+            // }
           }
-
+          setLoading(false)
+        } catch(err) {
+          Alert.alert(err.message)
+          setLoading(false)
         }
-        getData()
-      } else {
-        totalRecipesByUser(item?.user_id, setRecipeCount)
-        getReviewsCount(item, setReviewCount, Alert)
-        getRatingCount(item, setRatingCount, Alert)
-      }
+        
     }
 
-    useEffect(function() {
-      getApiData()
-    }, [])
+    // useEffect(function() {
+    //   if (isApi && item?.idMeal) {
+        
+    //   } else {
+    //     totalRecipesByUser(item?.user_id, setRecipeCount)
+    //     getReviewsCount(item, setReviewCount, Alert)
+    //     getRatingCount(item, setRatingCount, Alert)
+    //   } 
+    // }, [])
 
     useMemo(function() {
       if (!isApi) {
         totalRecipesByUser(item?.user_id, setRecipeCount)
         getReviewsCount(item, setReviewCount, Alert)
         getRatingCount(item, setRatingCount, Alert)
+      } else {
+        getApiData(item?.idMeal)
       }
     }, [isApi, auth, item])
 
@@ -128,10 +128,10 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
           {/* IF FIREBASE, DISPLAY RECIPE ITEM FROM BACKEND, AND IF API, DISPLAY RECIPE FROM
           THIRD PARTY API */}
           <View style={styles.recipeCard}>
-            {isApi ? 
-            <APIRecipe name={apiData?.strMeal} description={'hi'}/>
+            {isApi && apiData ? 
+            <APIRecipe data={apiData} name={'hello'} description={'hi'}/>
             :
-            <UserRecipe recipeCount={recipeCount} rating={ratingCount} navigation={navigation} item={item}/>
+            <UserRecipe recipeCount={recipeCount} rating={ratingCount} navigation={navigation} item={item} userNavigationName={userNavigationName}/>
             } 
           </View>
           {/* RECIPE TAGS */}
@@ -143,7 +143,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
             </View>
             }
             {/* CUISINE */}
-            {isApi ?
+            {isApi && apiData ?
               <View style={generalStyles.tagSection}>      
                   <Text style={generalStyles.tag}>{apiData?.strArea}</Text>
               </View>
@@ -242,8 +242,8 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
           </View>
 
           {/* IF API AND YOUTUBE SOURCE ISN'T AN EMPTY STRING, THEN DISPLAY YOUTUBE VIDEO */}
-          <View>
-            {isApi && apiData && apiData?.strYoutube?.length && 
+          {/* <View>
+            {isApi && apiData && 
             <WebView
               scalesPageToFit={true}
               bounces={false}
@@ -256,7 +256,7 @@ const RecipeDisplay = ({ navigation, route, isApi, item, navigationName }) => {
               automaticallyAdjustContentInsets={false}
             />
             } 
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </>
@@ -291,7 +291,7 @@ function HeartClick({ item }) {
   )
 }
 // THE RECIPE DISPLAYED FROM THE FIREBASE BACKEND
-function UserRecipe({navigation, item, rating, recipeCount}) {
+function UserRecipe({navigation, item, rating, recipeCount, userNavigationName}) {
   
     const info = [
       {
@@ -348,8 +348,16 @@ function UserRecipe({navigation, item, rating, recipeCount}) {
         {/* USERNAME WITH PROFILE IMAGE AND NUMBER OF RECIPES BY USER */}
         <View style={[generalStyles.rowCenter, { gap: 10}]}>
           {/* USER PROFILE IMAGE */}
-          <Pressable style={styles.userImage} onPress={() => navigation.navigate('SearchUserPage')}>
-
+          <Pressable style={[generalStyles.center, styles.userImage]} onPress={() => navigation.navigate(userNavigationName, { user: item?.user})}>
+            {item?.user?.profileImage 
+            ? 
+            <Image
+              source={{ uri: item?.user?.profileImage}}
+              resizeMode='cover'
+              style={{ width: '100%', height: '100%', borderRadius: 100}}
+              />
+            :
+            <UserIcon color={COLORS.backgroundFull}/>}
           </Pressable>
           {/* USERNAME AND NUMBER OF RECIPES POSTED BY USER */}
           <View>

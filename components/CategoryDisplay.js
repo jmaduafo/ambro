@@ -6,14 +6,19 @@ import { HeartIcon as OutlineHeart, ClockIcon } from 'react-native-heroicons/out
 import { UserIcon, HeartIcon as SolidHeart } from 'react-native-heroicons/solid'
 import { saveThisRecipe, getIsSaved } from '../firebase/firebaseOperations'
 import { auth } from '../firebase/config'
+import ExpoFastImage from 'expo-fast-image'
 
 const CategoryDisplay = ({ item, navigate, title, duration, backgroundImage, recipeID, isApi}) => {
-    return (
+    return (        
     <Pressable style={[styles.background]} onPress={() => navigate('HomeRecipeDetail', { item: item, isApi: isApi })}>
         {/* BACKGROUND IMAGE */}
         <View style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, objectFit: 'cover', zIndex: -1}}>
+            {/* <ExpoFastImage  
+                uri={backgroundImage}
+                cacheKey={isApi ? title : recipeID}
+                style={{ width: '100%', height: '100%', borderRadius: 30 }}/> */}
             <Image  
-                source={{ uri: backgroundImage }}
+                source={{ uri: backgroundImage}}
                 resizeMode='cover'
                 style={{ width: '100%', height: '100%', borderRadius: 30 }}/>
         </View>

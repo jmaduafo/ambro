@@ -400,7 +400,7 @@ export async function getAllRecipes(setAllRecipes) {
 export async function getAllRecipesByUser(userId, setAllRecipes) {
     try {
         // Find where the recipe id matches the passed in recipe id
-        const recipeRef = query(collection(db, 'recipes'), where('user_id', '==', userId))
+        const recipeRef = query(collection(db, 'recipes'), where('user_id', '==', userId), orderBy('createdAt', 'desc'))
     
         const unsub = onSnapshot(recipeRef, (snap) => {
             // Collect all of the saves of the recipe
@@ -430,17 +430,21 @@ export async function getAllSavesByUser(userId, setSavedRecipes) {
                 saves.push(doc.data().recipe_id)
             })
 
-            const recipeRef = query(collection(db, 'recipes'), where('id', 'in', saves))
-
-            const unsub = onSnapshot(recipeRef, (snapshot) => {
-                let array = []
-
-                snapshot.forEach(doc => {
-                    array.push(doc.data())
-                })
-
-                setSavedRecipes(array)
-            })            
+            if (saves.length) {
+                const recipeRef = query(collection(db, 'recipes'), where('id', 'in', saves))
+    
+                const unsub = onSnapshot(recipeRef, (snapshot) => {
+                    let array = []
+    
+                    snapshot.forEach(doc => {
+                        array.push(doc.data())
+                    })
+    
+                    setSavedRecipes(array)
+                })            
+            } else {
+                setSavedRecipes(saves)
+            }
         })
     } catch (err) {
         console.log(err.message)
